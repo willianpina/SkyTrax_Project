@@ -13,6 +13,9 @@ from api.schemas import (
     SemanticSearchResultResponse,
 )
 from app.config import get_settings
+from aviation.enrichment.pipeline import ReviewEnrichmentPipeline
+from aviation.normalization.engine import NormalizationEngine
+from database.models.aviation import AirportMetadata
 from database.session import get_session
 
 router = APIRouter(tags=["search"])
@@ -58,3 +61,66 @@ def rag_context(
     session: Session = Depends(get_session),
 ) -> RAGContextResponse:
     return SemanticSearchService(session).context(q, limit=limit, airline_slug=airline, days=days)
+
+
+@router.get("/semantic-search/enriched")
+def semantic_search_enriched(
+    q: str = Query(min_length=2, max_length=240),
+    limit: int = Query(default=10, ge=1, le=50),
+    airline: str | None = None,
+    session: Session = Depends(get_session),
+):
+    """Semantic search with aviation metadata enrichment overlay."""
+    settings = get_settings()
+    results = SemanticSearchService(session).search(
+        q,
+        limit=limit,
+        airline_slug=airline,
+        threshold=settings.semantic_similarity_threshold,
+    )
+
+    enricher = ReviewEnrichmentPipeline(session)
+    normalizer = NormalizationEngine(session)
+    enriched = []
+
+    airport_context = None
+    tokens = q.split()
+    for token in tokens:
+        norm = normalizer.normalize_airport(token)
+        if norm.entity_id:
+            ap = session.query(AirportMetadata).get(norm.entity_id)
+            if ap:
+                airport_context = {
+                    "name": ap.airport_name,
+                    "iata": ap.iata,
+                    "country": ap.country,
+                    "region": ap.region,
+                    "hub_level": ap.hub_level,
+                    "airport_rating": ap.airport_rating,
+                }
+                break
+
+    for r in results:
+        data = r if isinstance(r, dict) else r.model_dump() if hasattr(r, "model_dump") else r.__dict__
+        airline_slug = data.get("airline_slug") or data.get("airline", "")
+        enrichment = enricher.enrich(
+            airline_slug,
+            route=data.get("route"),
+            text=data.get("text", data.get("snippet", "")),
+        )
+        data["aviation_context"] = {
+            "airline_canonical": enrichment.airline_canonical,
+            "alliance": enrichment.alliance,
+            "airline_type": enrichment.airline_type,
+            "star_rating": enrichment.star_rating,
+            "airports_detected": enrichment.airports_detected[:3],
+            "region": enrichment.region,
+            "enrichment_confidence": enrichment.enrichment_confidence,
+        }
+        enriched.append(data)
+
+    return {
+        "results": enriched,
+        "query_airport_context": airport_context,
+        "total": len(enriched),
+    }

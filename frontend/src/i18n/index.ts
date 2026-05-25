@@ -11,7 +11,7 @@ function normalizeLanguage(language?: string | null): AppLanguage {
   return language.startsWith("pt") ? "pt" : "en";
 }
 
-export const NAMESPACES = ["common", "dashboard", "charts", "alerts", "semantic", "benchmarking", "command", "nav"] as const;
+export const NAMESPACES = ["common", "dashboard", "charts", "alerts", "semantic", "benchmarking", "command", "nav", "aviation"] as const;
 
 const STORAGE_KEY = "skytrax-language";
 
@@ -24,7 +24,8 @@ const localeLoaders: Record<AppLanguage, Record<string, () => Promise<{ default:
     semantic: () => import("./en/semantic.json"),
     benchmarking: () => import("./en/benchmarking.json"),
     command: () => import("./en/command.json"),
-    nav: () => import("./en/nav.json")
+    nav: () => import("./en/nav.json"),
+    aviation: () => import("./en/aviation.json")
   },
   pt: {
     common: () => import("./pt/common.json"),
@@ -34,7 +35,8 @@ const localeLoaders: Record<AppLanguage, Record<string, () => Promise<{ default:
     semantic: () => import("./pt/semantic.json"),
     benchmarking: () => import("./pt/benchmarking.json"),
     command: () => import("./pt/command.json"),
-    nav: () => import("./pt/nav.json")
+    nav: () => import("./pt/nav.json"),
+    aviation: () => import("./pt/aviation.json")
   }
 };
 

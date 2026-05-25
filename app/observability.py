@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from database.models import Airline, AnomalyEvent, ExecutiveInsight, ForecastSnapshot, MetricSnapshot, NLPResult, Review, SpiderRun
+from database.models.aviation import AirlineMetadata, AirportMetadata, Alliance
 
 
 class MetricsRegistry:
@@ -106,6 +107,20 @@ def collect_runtime_metrics(session: Session) -> None:
     one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
     recent_reviews = session.query(func.count(Review.id)).filter(Review.created_at >= one_hour_ago).scalar() or 0
     metrics.set("skytrax_reviews_per_hour", float(recent_reviews))
+
+    metrics.set("skytrax_aviation_airlines_total", float(session.query(func.count(AirlineMetadata.id)).scalar() or 0))
+    metrics.set("skytrax_aviation_airports_total", float(session.query(func.count(AirportMetadata.id)).scalar() or 0))
+    metrics.set("skytrax_aviation_alliances_total", float(session.query(func.count(Alliance.id)).scalar() or 0))
+    metrics.set(
+        "skytrax_aviation_hubs_total",
+        float(session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.hub_level.isnot(None)).scalar() or 0),
+    )
+    metrics.set(
+        "skytrax_aviation_premium_airlines",
+        float(session.query(func.count(AirlineMetadata.id)).filter(AirlineMetadata.is_premium.is_(True)).scalar() or 0),
+    )
+    avg_conf = session.query(func.avg(AirlineMetadata.enrichment_confidence)).scalar()
+    metrics.set("skytrax_normalization_confidence", float(avg_conf or 0))
 
     latest_run = session.query(SpiderRun).order_by(SpiderRun.started_at.desc()).first()
     if latest_run:

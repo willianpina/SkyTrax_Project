@@ -8,6 +8,9 @@
     "semantic": "Semantic Ops",
     "forecasting": "Forecasting",
     "anomalies": "Anomaly Center",
+    "aviationIntel": "Aviation Intel",
+    "hubIntel": "Hub Intel",
+    "allianceIntel": "Alliance Intel",
     "geospatial": "Geospatial",
     "investigations": "Investigations"
   },

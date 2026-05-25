@@ -10,6 +10,9 @@ const ForecastingWorkspace = React.lazy(() => import("./workspaces/forecasting/F
 const AnomaliesWorkspace = React.lazy(() => import("./workspaces/anomalies/AnomaliesWorkspace"));
 const GeospatialWorkspace = React.lazy(() => import("./workspaces/geospatial/GeospatialWorkspace"));
 const InvestigationsWorkspace = React.lazy(() => import("./workspaces/investigations/InvestigationsWorkspace"));
+const AviationWorkspace = React.lazy(() => import("./workspaces/aviation/AviationWorkspace"));
+const HubsWorkspace = React.lazy(() => import("./workspaces/hubs/HubsWorkspace"));
+const AlliancesWorkspace = React.lazy(() => import("./workspaces/alliances/AlliancesWorkspace"));
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +28,9 @@ export const router = createBrowserRouter([
       { path: "anomalies", element: <AnomaliesWorkspace /> },
       { path: "geospatial", element: <GeospatialWorkspace /> },
       { path: "investigations", element: <InvestigationsWorkspace /> },
+      { path: "aviation", element: <AviationWorkspace /> },
+      { path: "hubs", element: <HubsWorkspace /> },
+      { path: "alliances", element: <AlliancesWorkspace /> },
       { path: "*", element: <Navigate to="/executive" replace /> }
     ]
   }

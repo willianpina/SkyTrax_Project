@@ -14,7 +14,10 @@ const WORKSPACE_LABELS = {
   "/forecasting": "nav.forecasting",
   "/anomalies": "nav.anomalies",
   "/geospatial": "nav.geospatial",
-  "/investigations": "nav.investigations"
+  "/investigations": "nav.investigations",
+  "/aviation": "nav.aviationIntel",
+  "/hubs": "nav.hubIntel",
+  "/alliances": "nav.allianceIntel"
 };
 
 function TopCommandBarInner() {
