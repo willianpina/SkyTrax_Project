@@ -137,6 +137,9 @@ def _enrich_pending(limit: int) -> dict:
         record_worker_metric("skytrax_worker_last_nlp_reviews_processed", float(len(rows)))
         record_worker_metric("skytrax_nlp_reviews_enriched_total", float(len(rows)))
         return {"enriched": len(rows), "topic_snapshots": snapshots}
+    except Exception:
+        session.rollback()
+        raise
     finally:
         session.close()
 
@@ -220,6 +223,9 @@ def _run_forecasting() -> dict:
         record_worker_metric("skytrax_forecasting_jobs_total", 1.0)
         record_worker_metric("skytrax_forecasts_persisted", float(result.get("forecasts_persisted", 0)))
         return result
+    except Exception:
+        session.rollback()
+        raise
     finally:
         session.close()
 
@@ -234,6 +240,9 @@ def _run_anomaly_detection() -> dict:
         result = AnomalyDetectionService(session).detect_and_persist()
         record_worker_metric("skytrax_anomalies_total", float(result.get("anomalies_created", 0)))
         return result
+    except Exception:
+        session.rollback()
+        raise
     finally:
         session.close()
 

@@ -41,9 +41,9 @@ class AviationIntelligenceService:
                 avg_rating = round(float(stats[1] or 0), 2)
 
             anomaly_count = 0
-            if member_slugs:
+            if airline_ids:
                 anomaly_count = self.session.query(func.count(AnomalyEvent.id)).filter(
-                    AnomalyEvent.airline.in_([a.name for a in airlines])
+                    AnomalyEvent.airline_id.in_(airline_ids)
                 ).scalar() or 0
 
             result.append({
