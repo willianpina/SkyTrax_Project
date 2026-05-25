@@ -27,7 +27,9 @@ from database.models.aviation import (
     AirportMetadata,
     AirlineAirport,
     AviationTaxonomy,
+    AviationCoverageReport,
 )
+from database.models.operations import OperationalRefreshRun
 
 __all__ = [
     "Base",
@@ -59,4 +61,7 @@ __all__ = [
     "AirportMetadata",
     "AirlineAirport",
     "AviationTaxonomy",
+    "AviationCoverageReport",
+    # operations
+    "OperationalRefreshRun",
 ]

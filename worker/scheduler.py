@@ -18,6 +18,8 @@ from worker.jobs import (
     persist_reputation_scores,
     refresh_semantic_clusters,
     run_anomaly_detection_job,
+    run_aviation_bootstrap,
+    run_aviation_coverage_audit,
     run_data_quality_scan,
     run_forecasting_job,
     schedule_priority_crawls,
@@ -137,6 +139,22 @@ def build_scheduler() -> BlockingScheduler:
         lambda: enqueue(run_anomaly_detection_job),
         IntervalTrigger(hours=settings.anomaly_interval_hours),
         id="anomaly_detection",
+        max_instances=1,
+        coalesce=True,
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        lambda: enqueue(run_aviation_bootstrap),
+        CronTrigger(day_of_week="mon", hour=4, minute=0),
+        id="aviation_bootstrap",
+        max_instances=1,
+        coalesce=True,
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        lambda: enqueue(run_aviation_coverage_audit),
+        IntervalTrigger(hours=12),
+        id="aviation_coverage_audit",
         max_instances=1,
         coalesce=True,
         replace_existing=True,

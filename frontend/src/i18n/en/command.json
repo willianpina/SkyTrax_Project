@@ -65,5 +65,27 @@
   "degraded": {
     "title": "Partial intelligence sync",
     "message": "Some modules are unavailable. Displaying cached and demo data where needed."
+  },
+  "ops": {
+    "title": "Operational Refresh",
+    "sync": "Sync",
+    "syncing": "Syncing...",
+    "synchronizing": "Synchronizing",
+    "syncTitle": "Operational intelligence sync",
+    "running": "Running",
+    "completed": "Completed",
+    "failed": "Failed",
+    "standby": "Standby",
+    "idle": "Idle",
+    "history": "Recent operations",
+    "events": "Operational events",
+    "crawl": "Crawling airlines",
+    "nlp": "NLP enrichment",
+    "semantic": "Semantic clusters",
+    "forecasting": "Forecasting models",
+    "anomalies": "Anomaly detection",
+    "insights": "Executive insights",
+    "aviation": "Aviation metadata",
+    "snapshots": "Metric snapshots"
   }
 }

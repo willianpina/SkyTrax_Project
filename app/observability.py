@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from database.models import Airline, AnomalyEvent, ExecutiveInsight, ForecastSnapshot, MetricSnapshot, NLPResult, Review, SpiderRun
 from database.models.aviation import AirlineMetadata, AirportMetadata, Alliance
+from database.models.operations import OperationalRefreshRun
 
 
 class MetricsRegistry:
@@ -108,19 +109,44 @@ def collect_runtime_metrics(session: Session) -> None:
     recent_reviews = session.query(func.count(Review.id)).filter(Review.created_at >= one_hour_ago).scalar() or 0
     metrics.set("skytrax_reviews_per_hour", float(recent_reviews))
 
-    metrics.set("skytrax_aviation_airlines_total", float(session.query(func.count(AirlineMetadata.id)).scalar() or 0))
-    metrics.set("skytrax_aviation_airports_total", float(session.query(func.count(AirportMetadata.id)).scalar() or 0))
-    metrics.set("skytrax_aviation_alliances_total", float(session.query(func.count(Alliance.id)).scalar() or 0))
-    metrics.set(
-        "skytrax_aviation_hubs_total",
-        float(session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.hub_level.isnot(None)).scalar() or 0),
-    )
+    airlines_total = float(session.query(func.count(AirlineMetadata.id)).scalar() or 0)
+    airports_total = float(session.query(func.count(AirportMetadata.id)).scalar() or 0)
+    alliances_total = float(session.query(func.count(Alliance.id)).scalar() or 0)
+    hubs_total = float(session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.hub_level.isnot(None)).scalar() or 0)
+
+    metrics.set("skytrax_aviation_airlines_total", airlines_total)
+    metrics.set("skytrax_aviation_airports_total", airports_total)
+    metrics.set("skytrax_aviation_alliances_total", alliances_total)
+    metrics.set("skytrax_aviation_hubs_total", hubs_total)
     metrics.set(
         "skytrax_aviation_premium_airlines",
         float(session.query(func.count(AirlineMetadata.id)).filter(AirlineMetadata.is_premium.is_(True)).scalar() or 0),
     )
-    avg_conf = session.query(func.avg(AirlineMetadata.enrichment_confidence)).scalar()
-    metrics.set("skytrax_normalization_confidence", float(avg_conf or 0))
+
+    missing_iata = float(session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.iata.is_(None)).scalar() or 0)
+    missing_icao = float(session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.icao.is_(None)).scalar() or 0)
+    metrics.set("skytrax_aviation_missing_iata", missing_iata)
+    metrics.set("skytrax_aviation_missing_icao", missing_icao)
+
+    avg_enrich = session.query(func.avg(AirlineMetadata.enrichment_confidence)).scalar()
+    metrics.set("skytrax_aviation_enrichment_confidence", float(avg_enrich or 0))
+
+    avg_norm = session.query(func.avg(AirlineMetadata.normalization_confidence)).scalar()
+    metrics.set("skytrax_normalization_confidence", float(avg_norm or 0))
+
+    total_entities = airlines_total + airports_total
+    issues = missing_iata + missing_icao
+    coverage = max(0.0, (1 - issues / max(total_entities * 2, 1)) * 100)
+    metrics.set("skytrax_aviation_coverage_score", round(coverage, 1))
+
+    ops_total = float(session.query(func.count(OperationalRefreshRun.id)).scalar() or 0)
+    ops_avg_ms = session.query(func.avg(OperationalRefreshRun.duration_ms)).scalar()
+    ops_reviews = session.query(func.sum(OperationalRefreshRun.reviews_processed)).scalar()
+    ops_errors = session.query(func.sum(OperationalRefreshRun.error_count)).scalar()
+    metrics.set("skytrax_operations_refresh_total", ops_total)
+    metrics.set("skytrax_operations_avg_duration_ms", float(ops_avg_ms or 0))
+    metrics.set("skytrax_operations_reviews_processed_total", float(ops_reviews or 0))
+    metrics.set("skytrax_operations_failures_total", float(ops_errors or 0))
 
     latest_run = session.query(SpiderRun).order_by(SpiderRun.started_at.desc()).first()
     if latest_run:

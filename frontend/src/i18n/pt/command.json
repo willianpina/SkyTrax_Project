@@ -65,5 +65,27 @@
   "degraded": {
     "title": "Sincronização parcial",
     "message": "Alguns módulos indisponíveis. Exibindo cache e dados de demonstração quando necessário."
+  },
+  "ops": {
+    "title": "Refresh Operacional",
+    "sync": "Sincronizar",
+    "syncing": "Sincronizando...",
+    "synchronizing": "Sincronizando",
+    "syncTitle": "Sincronização de inteligência operacional",
+    "running": "Executando",
+    "completed": "Concluído",
+    "failed": "Falhou",
+    "standby": "Em espera",
+    "idle": "Inativo",
+    "history": "Operações recentes",
+    "events": "Eventos operacionais",
+    "crawl": "Crawling de companhias",
+    "nlp": "Enriquecimento NLP",
+    "semantic": "Clusters semânticos",
+    "forecasting": "Modelos de previsão",
+    "anomalies": "Detecção de anomalias",
+    "insights": "Insights executivos",
+    "aviation": "Metadados aeronáuticos",
+    "snapshots": "Snapshots de métricas"
   }
 }

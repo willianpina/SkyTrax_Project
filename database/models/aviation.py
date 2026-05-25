@@ -38,9 +38,9 @@ class AirlineMetadata(TimestampMixin, Base):
     airline_id: Mapped[str | None] = mapped_column(ForeignKey("airlines.id"), index=True)
     airline_name: Mapped[str] = mapped_column(String(200), nullable=False)
     slug: Mapped[str] = mapped_column(String(200), unique=True, nullable=False, index=True)
-    country: Mapped[str | None] = mapped_column(String(120))
+    country: Mapped[str | None] = mapped_column(String(120), index=True)
     alliance_id: Mapped[str | None] = mapped_column(ForeignKey("alliances.id"), index=True)
-    airline_type: Mapped[str | None] = mapped_column(String(60))
+    airline_type: Mapped[str | None] = mapped_column(String(60), index=True)
     star_rating: Mapped[int | None] = mapped_column(Integer)
     is_low_cost: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sql_text("false"))
     is_premium: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sql_text("false"))
@@ -58,10 +58,26 @@ class AirlineMetadata(TimestampMixin, Base):
     enrichment_confidence: Mapped[float] = mapped_column(
         Float, default=0.0, server_default=sql_text("0"), nullable=False,
     )
+    normalization_confidence: Mapped[float] = mapped_column(
+        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+    )
+    metadata_quality_score: Mapped[float] = mapped_column(
+        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+    )
+    enrichment_status: Mapped[str] = mapped_column(
+        String(32), default="pending", server_default=sql_text("'pending'"), nullable=False,
+    )
+    coverage_status: Mapped[str] = mapped_column(
+        String(32), default="partial", server_default=sql_text("'partial'"), nullable=False,
+    )
+    source_confidence: Mapped[float] = mapped_column(
+        Float, default=0.5, server_default=sql_text("0.5"), nullable=False,
+    )
     raw_metadata: Mapped[dict[str, Any]] = mapped_column(
         JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
     )
     last_enriched_at: Mapped[datetime | None] = mapped_column(DateTime)
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime)
 
     alliance_rel: Mapped[Alliance | None] = relationship(back_populates="members")
 
@@ -90,10 +106,26 @@ class AirportMetadata(TimestampMixin, Base):
     enrichment_confidence: Mapped[float] = mapped_column(
         Float, default=0.0, server_default=sql_text("0"), nullable=False,
     )
+    normalization_confidence: Mapped[float] = mapped_column(
+        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+    )
+    metadata_quality_score: Mapped[float] = mapped_column(
+        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+    )
+    enrichment_status: Mapped[str] = mapped_column(
+        String(32), default="pending", server_default=sql_text("'pending'"), nullable=False,
+    )
+    coverage_status: Mapped[str] = mapped_column(
+        String(32), default="partial", server_default=sql_text("'partial'"), nullable=False,
+    )
+    source_confidence: Mapped[float] = mapped_column(
+        Float, default=0.5, server_default=sql_text("0.5"), nullable=False,
+    )
     raw_metadata: Mapped[dict[str, Any]] = mapped_column(
         JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
     )
     last_enriched_at: Mapped[datetime | None] = mapped_column(DateTime)
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime)
 
 
 class AirlineAirport(TimestampMixin, Base):
@@ -118,5 +150,30 @@ class AviationTaxonomy(TimestampMixin, Base):
     parent_label: Mapped[str | None] = mapped_column(String(160))
     description: Mapped[str | None] = mapped_column(Text)
     metadata: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
+    )
+
+
+class AviationCoverageReport(TimestampMixin, Base):
+    """Point-in-time coverage audit snapshot."""
+    __tablename__ = "aviation_coverage_reports"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    total_airlines: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    total_airports: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    total_alliances: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    missing_iata: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    missing_icao: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    missing_country: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    missing_coordinates: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    duplicate_entities: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    orphan_airports: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    orphan_airlines: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    normalization_failures: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"))
+    coverage_score: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"))
+    metadata_completeness: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"))
+    enrichment_score: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"))
+    graph_readiness: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"))
+    report_data: Mapped[dict[str, Any]] = mapped_column(
         JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
     )

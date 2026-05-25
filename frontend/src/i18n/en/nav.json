@@ -11,6 +11,7 @@
     "aviationIntel": "Aviation Intel",
     "hubIntel": "Hub Intel",
     "allianceIntel": "Alliance Intel",
+    "coverageIntel": "Coverage Intel",
     "geospatial": "Geospatial",
     "investigations": "Investigations"
   },

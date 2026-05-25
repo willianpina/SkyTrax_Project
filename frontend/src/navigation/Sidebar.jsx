@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Activity, AlertTriangle, BarChart3, Globe, Layers,
-  Plane, Radar, Search, TrendingUp, FileSearch, Building2, Users
+  Plane, Radar, Search, TrendingUp, FileSearch, Building2, Users, ShieldCheck
 } from "lucide-react";
 
 const WORKSPACE_NAV = [
@@ -16,6 +16,7 @@ const WORKSPACE_NAV = [
   { path: "/aviation", icon: Plane, labelKey: "nav.aviationIntel", group: "aviation" },
   { path: "/hubs", icon: Building2, labelKey: "nav.hubIntel", group: "aviation" },
   { path: "/alliances", icon: Users, labelKey: "nav.allianceIntel", group: "aviation" },
+  { path: "/coverage", icon: ShieldCheck, labelKey: "nav.coverageIntel", group: "aviation" },
   { path: "/geospatial", icon: Globe, labelKey: "nav.geospatial", group: "platform" },
   { path: "/investigations", icon: FileSearch, labelKey: "nav.investigations", group: "platform" }
 ];

@@ -97,3 +97,9 @@ clean: ## Remove caches, bytecode, and build artifacts
 
 smoke: ## Run smoke tests against a live environment
 	python scripts/smoke_test.py
+
+refresh: ## Trigger operational intelligence refresh via API
+	@curl -s -X POST http://localhost:8000/api/operations/refresh | python -m json.tool 2>/dev/null || echo '{"info": "API not reachable"}'
+
+refresh-status: ## Check current operational refresh status
+	@curl -s http://localhost:8000/api/operations/status | python -m json.tool 2>/dev/null || echo '{"info": "API not reachable"}'

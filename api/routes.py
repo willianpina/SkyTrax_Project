@@ -10,6 +10,7 @@ from api.routers.admin import router as admin_router
 from api.routers.analytics_router import router as analytics_router
 from api.routers.aviation import router as aviation_router
 from api.routers.intelligence import router as intelligence_router
+from api.routers.operations import router as operations_router
 from api.routers.reviews import router as reviews_router
 from api.routers.search import router as search_router
 
@@ -21,3 +22,4 @@ router.include_router(intelligence_router)
 router.include_router(search_router)
 router.include_router(admin_router)
 router.include_router(aviation_router)
+router.include_router(operations_router)

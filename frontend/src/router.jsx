@@ -13,6 +13,7 @@ const InvestigationsWorkspace = React.lazy(() => import("./workspaces/investigat
 const AviationWorkspace = React.lazy(() => import("./workspaces/aviation/AviationWorkspace"));
 const HubsWorkspace = React.lazy(() => import("./workspaces/hubs/HubsWorkspace"));
 const AlliancesWorkspace = React.lazy(() => import("./workspaces/alliances/AlliancesWorkspace"));
+const CoverageWorkspace = React.lazy(() => import("./workspaces/coverage/CoverageWorkspace"));
 
 export const router = createBrowserRouter([
   {
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
       { path: "aviation", element: <AviationWorkspace /> },
       { path: "hubs", element: <HubsWorkspace /> },
       { path: "alliances", element: <AlliancesWorkspace /> },
+      { path: "coverage", element: <CoverageWorkspace /> },
       { path: "*", element: <Navigate to="/executive" replace /> }
     ]
   }

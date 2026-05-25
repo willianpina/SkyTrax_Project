@@ -238,6 +238,78 @@ def _run_anomaly_detection() -> dict:
         session.close()
 
 
+def run_operational_refresh(
+    operation_id: str | None = None,
+    airline_slug: str | None = None,
+    triggered_by: str = "scheduler",
+) -> dict:
+    """RQ job: run full operational intelligence refresh.
+
+    This function MUST live in worker.jobs so that RQ can serialize/find it
+    by import path (worker.jobs.run_operational_refresh).
+    """
+    from worker.orchestration.refresh_pipeline import OperationalRefreshPipeline
+    logger.info("[OPS] run_operational_refresh started op=%s trigger=%s", operation_id, triggered_by)
+    return OperationalRefreshPipeline(
+        operation_id=operation_id,
+        airline_slug=airline_slug,
+        triggered_by=triggered_by,
+    ).execute()
+
+
+def run_aviation_bootstrap() -> dict:
+    """RQ job: run aviation metadata bootstrap pipeline."""
+    return _with_lock("aviation:bootstrap", _aviation_bootstrap)
+
+
+def _aviation_bootstrap() -> dict:
+    from scripts.bootstrap_aviation import run_spiders, run_enrichment_pass, run_coverage_validation, persist_coverage_report
+    spiders = run_spiders()
+    enrichment = run_enrichment_pass()
+    report = run_coverage_validation()
+    persist_coverage_report(report)
+    record_worker_metric("skytrax_aviation_bootstrap_runs_total", 1.0)
+    record_worker_metric("skytrax_aviation_coverage_score", float(report.get("coverage_score", 0)))
+    return {"spiders": spiders, "enrichment": enrichment, "coverage": report}
+
+
+def run_aviation_coverage_audit() -> dict:
+    """RQ job: generate and persist aviation coverage report."""
+    return _with_lock("aviation:coverage", _coverage_audit)
+
+
+def _coverage_audit() -> dict:
+    from aviation.coverage.engine import CoverageAuditEngine
+    from database.models.aviation import AviationCoverageReport
+    session = SessionLocal()
+    try:
+        report = CoverageAuditEngine(session).generate_report()
+        rec = AviationCoverageReport(
+            total_airlines=report.get("total_airlines", 0),
+            total_airports=report.get("total_airports", 0),
+            total_alliances=report.get("total_alliances", 0),
+            missing_iata=report.get("missing_iata", 0),
+            missing_icao=report.get("missing_icao", 0),
+            missing_country=report.get("missing_country", 0),
+            missing_coordinates=report.get("missing_coordinates", 0),
+            duplicate_entities=report.get("duplicate_entities", 0),
+            orphan_airports=report.get("orphan_airports", 0),
+            orphan_airlines=report.get("orphan_airlines", 0),
+            normalization_failures=report.get("normalization_failures", 0),
+            coverage_score=report.get("coverage_score", 0.0),
+            metadata_completeness=report.get("metadata_completeness", 0.0),
+            enrichment_score=report.get("enrichment_score", 0.0),
+            graph_readiness=report.get("graph_readiness", 0.0),
+            report_data=report,
+        )
+        session.add(rec)
+        session.commit()
+        record_worker_metric("skytrax_aviation_coverage_score", float(report.get("coverage_score", 0)))
+        return report
+    finally:
+        session.close()
+
+
 def operational_cleanup(retention_days: int = 90) -> dict:
     return _with_lock("ops:cleanup", _cleanup, retention_days)
 

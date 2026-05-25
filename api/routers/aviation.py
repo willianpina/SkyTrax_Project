@@ -1,15 +1,21 @@
 """Aviation Metadata Intelligence API endpoints."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query
+import threading
+
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.orm import Session
 
 from database.session import get_session
+from aviation.coverage.engine import CoverageAuditEngine
 from aviation.intelligence.service import AviationIntelligenceService
 from aviation.graph.context import AviationGraphContext
-from database.models.aviation import AirlineMetadata, AirportMetadata
+from aviation.validation.engine import AviationValidator
+from database.models.aviation import AirlineMetadata, AirportMetadata, AviationCoverageReport
 
 router = APIRouter(prefix="/aviation", tags=["aviation"])
+
+_bootstrap_status = {"running": False, "last_result": None}
 
 
 def _intel(session: Session = Depends(get_session)) -> AviationIntelligenceService:
@@ -18,6 +24,14 @@ def _intel(session: Session = Depends(get_session)) -> AviationIntelligenceServi
 
 def _graph(session: Session = Depends(get_session)) -> AviationGraphContext:
     return AviationGraphContext(session)
+
+
+def _coverage(session: Session = Depends(get_session)) -> CoverageAuditEngine:
+    return CoverageAuditEngine(session)
+
+
+def _validator(session: Session = Depends(get_session)) -> AviationValidator:
+    return AviationValidator(session)
 
 
 @router.get("/airlines")
@@ -121,3 +135,99 @@ def graph_context(
     if airport:
         return graph.airport_context(airport)
     return {"error": "provide airline slug or airport IATA code"}
+
+
+@router.get("/coverage")
+def coverage_summary(cov: CoverageAuditEngine = Depends(_coverage)):
+    return cov.generate_report()
+
+
+@router.get("/coverage/report")
+def coverage_report_history(
+    limit: int = Query(10, ge=1, le=50),
+    session: Session = Depends(get_session),
+):
+    rows = session.query(AviationCoverageReport).order_by(
+        AviationCoverageReport.created_at.desc()
+    ).limit(limit).all()
+    return [
+        {
+            "id": r.id,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "total_airlines": r.total_airlines,
+            "total_airports": r.total_airports,
+            "coverage_score": r.coverage_score,
+            "metadata_completeness": r.metadata_completeness,
+            "enrichment_score": r.enrichment_score,
+            "graph_readiness": r.graph_readiness,
+            "duplicate_entities": r.duplicate_entities,
+            "orphan_airports": r.orphan_airports,
+            "orphan_airlines": r.orphan_airlines,
+        }
+        for r in rows
+    ]
+
+
+@router.get("/coverage/missing")
+def coverage_missing(cov: CoverageAuditEngine = Depends(_coverage)):
+    return cov.missing_fields()
+
+
+@router.get("/coverage/duplicates")
+def coverage_duplicates(cov: CoverageAuditEngine = Depends(_coverage)):
+    return cov.detect_duplicates()
+
+
+@router.get("/coverage/orphans")
+def coverage_orphans(cov: CoverageAuditEngine = Depends(_coverage)):
+    return cov.detect_orphans()
+
+
+@router.get("/coverage/quality")
+def coverage_quality(cov: CoverageAuditEngine = Depends(_coverage)):
+    report = cov.generate_report()
+    return {
+        "coverage_score": report["coverage_score"],
+        "metadata_completeness": report["metadata_completeness"],
+        "enrichment_score": report["enrichment_score"],
+        "graph_readiness": report["graph_readiness"],
+    }
+
+
+@router.get("/bootstrap/status")
+def bootstrap_status():
+    return _bootstrap_status
+
+
+@router.post("/bootstrap/run")
+def bootstrap_run(background_tasks: BackgroundTasks):
+    if _bootstrap_status["running"]:
+        return {"status": "already_running"}
+
+    def _run():
+        _bootstrap_status["running"] = True
+        try:
+            from scripts.bootstrap_aviation import run_spiders, run_enrichment_pass, run_coverage_validation
+            spiders = run_spiders()
+            enrichment = run_enrichment_pass()
+            coverage = run_coverage_validation()
+            _bootstrap_status["last_result"] = {
+                "spiders": spiders, "enrichment": enrichment, "coverage": coverage,
+            }
+        except Exception as e:
+            _bootstrap_status["last_result"] = {"error": str(e)}
+        finally:
+            _bootstrap_status["running"] = False
+
+    background_tasks.add_task(_run)
+    return {"status": "started"}
+
+
+@router.get("/validation")
+def validation_report(validator: AviationValidator = Depends(_validator)):
+    return validator.validate_all()
+
+
+@router.get("/normalization")
+def normalization_report(validator: AviationValidator = Depends(_validator)):
+    return validator.normalization_report()

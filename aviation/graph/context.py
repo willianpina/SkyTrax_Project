@@ -5,6 +5,7 @@ Designed to be portable to a graph DB in the future.
 """
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -107,4 +108,40 @@ class AviationGraphContext:
             "hub_level": ap.hub_level,
             "airport_rating": ap.airport_rating,
             "edges": edges,
+        }
+
+    def hub_adjacency(self) -> dict[str, Any]:
+        """Airport-airline adjacency map for hub topology."""
+        links = self.session.query(AirlineAirport).all()
+        adj: dict[str, list[str]] = defaultdict(list)
+        for link in links:
+            ap = self.session.query(AirportMetadata).get(link.airport_metadata_id)
+            am = self.session.query(AirlineMetadata).get(link.airline_metadata_id)
+            if ap and am:
+                key = ap.iata or ap.airport_name
+                adj[key].append(am.slug)
+        return {"adjacency_type": "hub_airline", "nodes": len(adj), "map": dict(adj)}
+
+    def alliance_topology(self) -> dict[str, Any]:
+        """Alliance membership graph."""
+        alliances = self.session.query(Alliance).all()
+        topology = {}
+        for alliance in alliances:
+            members = self.session.query(AirlineMetadata).filter_by(alliance_id=alliance.id).all()
+            topology[alliance.name] = {
+                "id": alliance.id,
+                "members": [{"slug": m.slug, "name": m.airline_name, "country": m.country} for m in members],
+                "countries": list({m.country for m in members if m.country}),
+            }
+        return {"topology_type": "alliance_membership", "alliances": len(topology), "map": topology}
+
+    def regional_clusters(self) -> dict[str, Any]:
+        """Country-based airline clustering."""
+        clusters: dict[str, list[str]] = defaultdict(list)
+        for am in self.session.query(AirlineMetadata).filter(AirlineMetadata.country.isnot(None)).all():
+            clusters[am.country].append(am.slug)
+        return {
+            "topology_type": "regional_cluster",
+            "regions": len(clusters),
+            "map": {k: v for k, v in sorted(clusters.items(), key=lambda x: -len(x[1]))},
         }

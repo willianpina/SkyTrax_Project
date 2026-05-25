@@ -165,6 +165,17 @@ services:
       redis:
         condition: service_healthy
 
+  rq-dashboard:
+    image: jaredv/rq-dashboard:latest
+    restart: unless-stopped
+    environment:
+      RQ_DASHBOARD_REDIS_URL: redis://redis:6379/0
+    ports:
+      - "9181:9181"
+    depends_on:
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   prometheus_data:

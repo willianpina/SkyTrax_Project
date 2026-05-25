@@ -47,6 +47,8 @@ class AviationMetadataPipeline:
         record = self.session.query(AirlineMetadata).filter_by(slug=slug).first()
         alliance_id = self._resolve_alliance(item.get("alliance"))
 
+        now = datetime.now(timezone.utc)
+        quality = self._compute_airline_quality(item)
         fields = dict(
             airline_name=item["airline_name"],
             country=item.get("country"),
@@ -61,7 +63,13 @@ class AviationMetadataPipeline:
             skytrax_url=item.get("skytrax_url"),
             raw_metadata=item.get("raw_metadata", {}),
             enrichment_confidence=0.7,
-            last_enriched_at=datetime.now(timezone.utc),
+            normalization_confidence=0.8 if item.get("country") else 0.4,
+            metadata_quality_score=quality,
+            enrichment_status="enriched" if quality > 0.5 else "partial",
+            coverage_status="complete" if quality > 0.7 else "partial",
+            source_confidence=0.9,
+            last_enriched_at=now,
+            last_seen_at=now,
         )
 
         if record:
@@ -83,6 +91,8 @@ class AviationMetadataPipeline:
         if not record:
             record = self.session.query(AirportMetadata).filter_by(airport_name=name).first()
 
+        now = datetime.now(timezone.utc)
+        quality = self._compute_airport_quality(item)
         fields = dict(
             airport_name=name,
             iata=iata,
@@ -99,7 +109,13 @@ class AviationMetadataPipeline:
             skytrax_url=item.get("skytrax_url"),
             raw_metadata=item.get("raw_metadata", {}),
             enrichment_confidence=0.7,
-            last_enriched_at=datetime.now(timezone.utc),
+            normalization_confidence=0.9 if iata else 0.3,
+            metadata_quality_score=quality,
+            enrichment_status="enriched" if quality > 0.5 else "partial",
+            coverage_status="complete" if quality > 0.7 else "partial",
+            source_confidence=0.9,
+            last_enriched_at=now,
+            last_seen_at=now,
         )
 
         if record:
@@ -111,6 +127,18 @@ class AviationMetadataPipeline:
             self.session.add(record)
 
         self._flush(spider)
+
+    @staticmethod
+    def _compute_airline_quality(item) -> float:
+        checks = ["airline_name", "country", "airline_type", "star_rating"]
+        filled = sum(1 for f in checks if item.get(f))
+        return round(filled / len(checks), 2)
+
+    @staticmethod
+    def _compute_airport_quality(item) -> float:
+        checks = ["airport_name", "iata", "country", "city", "region"]
+        filled = sum(1 for f in checks if item.get(f))
+        return round(filled / len(checks), 2)
 
     def _flush(self, spider) -> None:
         try:
