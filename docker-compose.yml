@@ -166,7 +166,7 @@ services:
         condition: service_healthy
 
   rq-dashboard:
-    image: jaredv/rq-dashboard:latest
+    image: eoranged/rq-dashboard:latest
     restart: unless-stopped
     environment:
       RQ_DASHBOARD_REDIS_URL: redis://redis:6379/0

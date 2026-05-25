@@ -149,8 +149,8 @@ class AviationTaxonomy(TimestampMixin, Base):
     label: Mapped[str] = mapped_column(String(160), nullable=False)
     parent_label: Mapped[str | None] = mapped_column(String(160))
     description: Mapped[str | None] = mapped_column(Text)
-    metadata: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
+    taxonomy_data: Mapped[dict[str, Any]] = mapped_column(
+        "metadata", JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
     )
 
 
