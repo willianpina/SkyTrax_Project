@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   Activity, AlertTriangle, BarChart3, Globe, Layers,
   Plane, Radar, Search, TrendingUp, FileSearch, Building2,
-  Users, ShieldCheck, PanelLeftClose, PanelLeft
+  Users, ShieldCheck, ChevronsLeft, ChevronsRight
 } from "lucide-react";
 
 const STORAGE_KEY = "skytrax-sidebar";
@@ -92,9 +92,10 @@ function SidebarInner() {
             type="button"
             className="sidebar-toggle"
             onClick={toggle}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? t("nav.expandSidebar", { defaultValue: "Expand navigation" }) : t("nav.collapseSidebar", { defaultValue: "Collapse navigation" })}
+            aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
           >
-            {collapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+            {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
           </button>
         </div>
 
