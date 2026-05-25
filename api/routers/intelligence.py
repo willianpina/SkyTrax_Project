@@ -9,6 +9,7 @@ from analytics.intelligence import (
     ExecutiveInsightService,
     ReputationService,
 )
+from analytics.operational_intelligence import OperationalIntelligenceService
 from analytics.snapshots import SnapshotService
 from api.schemas import (
     BenchmarkingResponse,
@@ -58,3 +59,74 @@ def snapshots(
 @router.post("/insights/refresh", response_model=dict)
 def refresh_insights(session: Session = Depends(get_session)) -> dict:
     return ExecutiveInsightEngine(session).generate_and_persist()
+
+
+# ── Operational Intelligence endpoints ──────────────────────────────────
+
+@router.get("/operational/dashboard")
+def operational_dashboard(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session).operational_dashboard()
+
+
+@router.get("/operational/risk")
+def operational_risk(session: Session = Depends(get_session)):
+    svc = OperationalIntelligenceService(session)
+    airlines = svc._airlines_with_reviews()
+    slugs = [a["slug"] for a in airlines]
+    return svc._operational_risk_ranking(slugs)
+
+
+@router.get("/operational/complaints")
+def complaint_heatmap(session: Session = Depends(get_session)):
+    svc = OperationalIntelligenceService(session)
+    airlines = svc._airlines_with_reviews()
+    slugs = [a["slug"] for a in airlines[:20]]
+    return svc._complaint_heatmap(slugs)
+
+
+@router.get("/operational/routes")
+def route_intelligence(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session)._route_intelligence()
+
+
+@router.get("/operational/deterioration")
+def deterioration_alerts(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session)._deterioration_alerts()
+
+
+@router.get("/operational/premium")
+def premium_dissatisfaction(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session)._premium_dissatisfaction()
+
+
+@router.get("/operational/cabins")
+def cabin_analysis(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session)._cabin_class_analysis()
+
+
+@router.get("/operational/alliance-risk")
+def alliance_risk(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session).alliance_risk()
+
+
+@router.get("/operational/airport-friction")
+def airport_friction(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session).airport_friction()
+
+
+@router.get("/operational/transfer-bottlenecks")
+def transfer_bottlenecks(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session).transfer_bottlenecks()
+
+
+@router.get("/operational/signals")
+def executive_signals(session: Session = Depends(get_session)):
+    return OperationalIntelligenceService(session)._executive_signals()
+
+
+@router.get("/operational/rankings")
+def airline_rankings(
+    limit: int = Query(default=30, le=100),
+    session: Session = Depends(get_session),
+):
+    return OperationalIntelligenceService(session)._airline_rankings(limit=limit)

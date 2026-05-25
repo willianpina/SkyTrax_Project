@@ -49,8 +49,7 @@ export function SeverityBadge({ severity, label }) {
   const s = (severity || "neutral").toLowerCase();
   const display = label || t(`severity.${s}`, { defaultValue: s });
   return (
-    <span className={`op-badge severity-${s}`} title={display}>
-      <span className="pulse-dot" aria-hidden />
+    <span className={`ob ob--${s === "critical" || s === "high" ? "danger" : s === "medium" ? "warning" : s === "low" || s === "positive" ? "success" : "neutral"}`} title={display}>
       {display}
     </span>
   );
@@ -59,12 +58,12 @@ export function SeverityBadge({ severity, label }) {
 export function ConfidenceBadge({ score, insufficient, label }) {
   const { t } = useTranslation("common");
   if (insufficient) {
-    return <span className="op-badge confidence-low">{label || t("severity.low", { defaultValue: "Low" })}</span>;
+    return <span className="ob ob--warning">{label || t("severity.low", { defaultValue: "Low" })}</span>;
   }
-  const tier = score >= 75 ? "high" : score >= 45 ? "mid" : "low";
+  const variant = score >= 75 ? "ob--success" : score >= 45 ? "ob--info" : "ob--warning";
   return (
-    <span className={`op-badge confidence-${tier}`}>
-      {label || `${score}%`}
+    <span className={`ob ${variant}`}>
+      <span className="ob-score">{label || `${score}%`}</span>
     </span>
   );
 }

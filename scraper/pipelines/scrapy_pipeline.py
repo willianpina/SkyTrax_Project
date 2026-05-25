@@ -95,7 +95,6 @@ class PostgresPersistencePipeline:
             airline.country = item.get("country")
             airline.review_url = item.get("review_url")
             airline.source = item.get("source", airline.source)
-        airline.last_scraped_at = datetime.now(timezone.utc)
         self.session.flush()
         self._mark_write(spider)
         return airline
@@ -126,6 +125,7 @@ class PostgresPersistencePipeline:
         try:
             self.session.flush()
             self.inserted_reviews += 1
+            airline.last_scraped_at = datetime.now(timezone.utc)
             self._mark_write(spider)
         except IntegrityError:
             self.session.rollback()

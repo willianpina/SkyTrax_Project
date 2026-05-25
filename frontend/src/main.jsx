@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router-dom";
 import { I18nextProvider } from "react-i18next";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AnalyticsProvider } from "./hooks/AnalyticsProvider";
+import { ThemeProvider } from "./hooks/ThemeProvider";
 import { router } from "./router";
 import i18n, { initI18n } from "./i18n";
 import "./styles.css";
@@ -26,13 +27,15 @@ function AppBootstrap() {
   }
 
   return (
-    <I18nextProvider i18n={i18n}>
-      <ErrorBoundary>
-        <AnalyticsProvider>
-          <RouterProvider router={router} />
-        </AnalyticsProvider>
-      </ErrorBoundary>
-    </I18nextProvider>
+    <ThemeProvider>
+      <I18nextProvider i18n={i18n}>
+        <ErrorBoundary>
+          <AnalyticsProvider>
+            <RouterProvider router={router} />
+          </AnalyticsProvider>
+        </ErrorBoundary>
+      </I18nextProvider>
+    </ThemeProvider>
   );
 }
 

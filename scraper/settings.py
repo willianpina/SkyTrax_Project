@@ -14,9 +14,9 @@ DOWNLOAD_DELAY = float(os.getenv("SCRAPY_DOWNLOAD_DELAY", "1.5"))
 RANDOMIZE_DOWNLOAD_DELAY = True
 DOWNLOAD_TIMEOUT = int(os.getenv("SCRAPE_TIMEOUT_SECONDS", "20"))
 COOKIES_ENABLED = False
-CLOSESPIDER_PAGECOUNT = int(os.getenv("SCRAPY_CLOSESPIDER_PAGECOUNT", "500"))
-CLOSESPIDER_ERRORCOUNT = int(os.getenv("SCRAPY_CLOSESPIDER_ERRORCOUNT", "25"))
-DEPTH_LIMIT = int(os.getenv("SCRAPY_DEPTH_LIMIT", "20"))
+CLOSESPIDER_PAGECOUNT = int(os.getenv("SCRAPY_CLOSESPIDER_PAGECOUNT", "50000"))
+CLOSESPIDER_ERRORCOUNT = int(os.getenv("SCRAPY_CLOSESPIDER_ERRORCOUNT", "50"))
+DEPTH_LIMIT = int(os.getenv("SCRAPY_DEPTH_LIMIT", "500"))
 
 AUTOTHROTTLE_ENABLED = True
 AUTOTHROTTLE_START_DELAY = 1.0
@@ -51,13 +51,7 @@ EXTENSIONS = {
     "scraper.middlewares.SpiderStatsExtension": 500,
 }
 
-DOWNLOAD_HANDLERS = {
-    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-}
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
-PLAYWRIGHT_BROWSER_TYPE = os.getenv("PLAYWRIGHT_BROWSER_TYPE", "chromium")
-PLAYWRIGHT_LAUNCH_OPTIONS = {"headless": True}
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 FEEDS = {

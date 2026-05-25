@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { Download, RefreshCw, Radio } from "lucide-react";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { ThemeToggle } from "../components/ui/ThemeToggle";
 import { OperationalSyncModal } from "../components/OperationalSyncModal";
 import { useSharedAnalytics } from "../hooks/AnalyticsProvider";
 import { useOperations } from "../hooks/useOperations";
@@ -53,6 +54,7 @@ function TopCommandBarInner() {
           <h1 className="topbar-workspace-title">{t(workspaceKey)}</h1>
         </div>
         <div className="topbar-actions">
+          <ThemeToggle />
           <LanguageSwitcher />
           <button
             type="button"

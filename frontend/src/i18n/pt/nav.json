@@ -2,6 +2,9 @@
   "sidebarLabel": "Navegação de workspaces",
   "brand": "Inteligência de Avaliação Aérea",
   "nav": {
+    "groupIntelligence": "Inteligência",
+    "groupAviation": "Aviação",
+    "groupSpatial": "Espacial",
     "executive": "Executivo",
     "benchmarking": "Benchmarking",
     "reputation": "Reputação",

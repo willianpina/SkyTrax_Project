@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin
 
 import scrapy
@@ -10,6 +11,7 @@ from bs4 import BeautifulSoup, Tag
 
 from scraper.items import AirlineItem, ReviewItem
 
+MAX_PAGES_ABSOLUTE = 500
 
 SEED_AIRLINES = [
     {
@@ -51,41 +53,53 @@ SEED_AIRLINES = [
 
 
 class AirlineQualitySpider(scrapy.Spider):
-    """Scrapy spider for AirlineQuality/Skytrax airline review pages."""
+    """Full historical review ingestion spider for airlinequality.com.
+
+    Supports unlimited pagination (max_pages=0) and incremental crawling
+    (skip airlines scraped within --skip_recent_hours).
+    """
 
     name = "airlinequality_reviews"
     allowed_domains = ["airlinequality.com", "www.airlinequality.com"]
-    custom_settings = {"PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT": 30_000}
 
-    def __init__(self, airline: str | None = None, max_pages: str = "3",
-                 use_playwright: str = "false", mode: str = "seed", **kwargs):
+    def __init__(self, airline: str | None = None, max_pages: str = "0",
+                 mode: str = "seed", skip_recent_hours: str = "0", **kwargs):
         super().__init__(**kwargs)
         self.airline_filter = airline
         self.max_pages = int(max_pages)
-        self.use_playwright = use_playwright.lower() == "true"
         self.mode = mode
+        self.skip_recent_hours = int(skip_recent_hours)
+
         self._airlines_queued = 0
+        self._airlines_skipped = 0
+        self._pages_crawled = 0
         self._reviews_parsed = 0
+        self._reviews_dropped = 0
 
     def _build_airline_list(self) -> list[dict]:
         if self.airline_filter:
             return [self._make_entry(self.airline_filter)]
-
         if self.mode == "all":
             return self._airlines_from_db()
-
         return sorted(SEED_AIRLINES, key=lambda row: row.get("priority", 99))
 
     def _airlines_from_db(self) -> list[dict]:
-        """Load all active airlines from the database."""
         try:
             from database.session import SessionLocal
             from database.models.core import Airline
             session = SessionLocal()
             try:
                 rows = session.query(Airline).filter(Airline.is_active.is_(True)).all()
+                cutoff = None
+                if self.skip_recent_hours > 0:
+                    cutoff = datetime.now(timezone.utc) - timedelta(hours=self.skip_recent_hours)
+
                 result = []
+                skipped = 0
                 for row in rows:
+                    if cutoff and row.last_scraped_at and row.last_scraped_at >= cutoff:
+                        skipped += 1
+                        continue
                     url = row.review_url or f"https://www.airlinequality.com/airline-reviews/{row.slug}/"
                     result.append({
                         "name": row.name,
@@ -94,12 +108,16 @@ class AirlineQualitySpider(scrapy.Spider):
                         "review_url": url,
                         "priority": 5,
                     })
-                self.logger.info("[SCRAPER] Loaded %d airlines from DB (mode=all)", len(result))
+                self._airlines_skipped = skipped
+                self.logger.info(
+                    "[CRAWLER] Loaded %d airlines from DB, skipped %d (recently scraped), mode=all",
+                    len(result), skipped,
+                )
                 return result
             finally:
                 session.close()
         except Exception as exc:
-            self.logger.warning("[SCRAPER] DB load failed, falling back to seeds: %s", exc)
+            self.logger.warning("[CRAWLER] DB load failed, falling back to seeds: %s", exc)
             return SEED_AIRLINES
 
     @staticmethod
@@ -115,43 +133,61 @@ class AirlineQualitySpider(scrapy.Spider):
     def start_requests(self):
         airlines = self._build_airline_list()
         self._airlines_queued = len(airlines)
-        self.logger.info("[SCRAPER] Starting review crawl: %d airlines, max_pages=%d, mode=%s",
-                         len(airlines), self.max_pages, self.mode)
+        effective_limit = self.max_pages if self.max_pages > 0 else "unlimited"
+        self.logger.info(
+            "[CRAWLER] Starting: airlines=%d max_pages=%s mode=%s skip_recent=%dh",
+            len(airlines), effective_limit, self.mode, self.skip_recent_hours,
+        )
         for airline in airlines:
             yield scrapy.Request(
                 airline["review_url"],
                 callback=self.parse_listing,
                 cb_kwargs={"airline": airline, "page": 1},
-                meta={"playwright": self.use_playwright, "airline_slug": airline["slug"]},
+                meta={"airline_slug": airline["slug"]},
             )
 
     def parse_listing(self, response, airline: dict, page: int):
-        yield AirlineItem(source="airlinequality", **airline)
+        self._pages_crawled += 1
+
+        if page == 1:
+            yield AirlineItem(
+                name=airline["name"],
+                slug=airline["slug"],
+                country=airline.get("country"),
+                review_url=airline.get("review_url"),
+                source="airlinequality",
+            )
 
         cards = response.css(
             "article[itemprop='review'], article.review, article[class*='review'], "
             ".comp_media-review-rated"
         )
-        if not cards:
-            extracted = trafilatura.extract(response.text) or ""
-            if extracted.strip():
-                self.logger.warning(
-                    "review_cards_not_found",
-                    extra={"spider": self.name, "airline": airline["slug"], "url": response.url},
-                )
+
+        page_reviews = 0
         for card in cards:
             html = card.get()
             item = self._parse_card(html, airline, response.url)
             if item:
+                page_reviews += 1
                 yield item
 
-        if page < self.max_pages:
+        self.logger.info("[CRAWLER] %s page=%d cards=%d reviews=%d",
+                         airline["slug"], page, len(cards), page_reviews)
+
+        if not cards:
+            return
+
+        should_continue = (
+            (self.max_pages == 0 or page < self.max_pages)
+            and page < MAX_PAGES_ABSOLUTE
+        )
+        if should_continue:
             next_url = self._next_page_url(response.url, page + 1)
             yield scrapy.Request(
                 next_url,
                 callback=self.parse_listing,
                 cb_kwargs={"airline": airline, "page": page + 1},
-                meta={"playwright": self.use_playwright, "airline_slug": airline["slug"]},
+                meta={"airline_slug": airline["slug"]},
             )
 
     @staticmethod
@@ -170,17 +206,7 @@ class AirlineQualitySpider(scrapy.Spider):
         review_date = self._review_date(soup)
 
         if not title or len(text) < 40 or rating is None or review_date is None:
-            self.logger.debug(
-                "review_card_dropped",
-                extra={
-                    "spider": self.name,
-                    "airline": airline["slug"],
-                    "has_title": bool(title),
-                    "text_length": len(text),
-                    "has_rating": rating is not None,
-                    "has_review_date": review_date is not None,
-                },
-            )
+            self._reviews_dropped += 1
             return None
         self._reviews_parsed += 1
         return ReviewItem(
@@ -275,7 +301,9 @@ class AirlineQualitySpider(scrapy.Spider):
 
     def closed(self, reason):
         self.logger.info(
-            "[SCRAPER] airlinequality_reviews closed: airlines_queued=%d reviews_parsed=%d "
-            "mode=%s max_pages=%d reason=%s",
-            self._airlines_queued, self._reviews_parsed, self.mode, self.max_pages, reason,
+            "[CRAWLER] closed: airlines=%d pages=%d reviews=%d dropped=%d skipped=%d "
+            "max_pages=%d mode=%s reason=%s",
+            self._airlines_queued, self._pages_crawled, self._reviews_parsed,
+            self._reviews_dropped, self._airlines_skipped,
+            self.max_pages, self.mode, reason,
         )

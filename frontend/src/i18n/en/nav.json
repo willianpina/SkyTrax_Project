@@ -2,6 +2,9 @@
   "sidebarLabel": "Workspace navigation",
   "brand": "Airline Review Intelligence",
   "nav": {
+    "groupIntelligence": "Intelligence",
+    "groupAviation": "Aviation",
+    "groupSpatial": "Spatial",
     "executive": "Executive",
     "benchmarking": "Benchmarking",
     "reputation": "Reputation",

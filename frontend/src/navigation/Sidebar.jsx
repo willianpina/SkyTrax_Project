@@ -1,57 +1,143 @@
-import React, { memo } from "react";
+import React, { memo, useState, useCallback, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Activity, AlertTriangle, BarChart3, Globe, Layers,
-  Plane, Radar, Search, TrendingUp, FileSearch, Building2, Users, ShieldCheck
+  Plane, Radar, Search, TrendingUp, FileSearch, Building2,
+  Users, ShieldCheck, PanelLeftClose, PanelLeft
 } from "lucide-react";
 
-const WORKSPACE_NAV = [
-  { path: "/executive", icon: Radar, labelKey: "nav.executive", group: "ops" },
-  { path: "/benchmarking", icon: BarChart3, labelKey: "nav.benchmarking", group: "ops" },
-  { path: "/reputation", icon: Activity, labelKey: "nav.reputation", group: "ops" },
-  { path: "/semantic", icon: Search, labelKey: "nav.semantic", group: "ops" },
-  { path: "/forecasting", icon: TrendingUp, labelKey: "nav.forecasting", group: "ops" },
-  { path: "/anomalies", icon: AlertTriangle, labelKey: "nav.anomalies", group: "ops" },
-  { path: "/aviation", icon: Plane, labelKey: "nav.aviationIntel", group: "aviation" },
-  { path: "/hubs", icon: Building2, labelKey: "nav.hubIntel", group: "aviation" },
-  { path: "/alliances", icon: Users, labelKey: "nav.allianceIntel", group: "aviation" },
-  { path: "/coverage", icon: ShieldCheck, labelKey: "nav.coverageIntel", group: "aviation" },
-  { path: "/geospatial", icon: Globe, labelKey: "nav.geospatial", group: "platform" },
-  { path: "/investigations", icon: FileSearch, labelKey: "nav.investigations", group: "platform" }
+const STORAGE_KEY = "skytrax-sidebar";
+
+const GROUPS = [
+  {
+    id: "intelligence",
+    labelKey: "nav.groupIntelligence",
+    items: [
+      { path: "/executive", icon: Radar, labelKey: "nav.executive" },
+      { path: "/benchmarking", icon: BarChart3, labelKey: "nav.benchmarking" },
+      { path: "/reputation", icon: Activity, labelKey: "nav.reputation" },
+      { path: "/semantic", icon: Search, labelKey: "nav.semantic" },
+      { path: "/forecasting", icon: TrendingUp, labelKey: "nav.forecasting" },
+      { path: "/anomalies", icon: AlertTriangle, labelKey: "nav.anomalies" },
+    ],
+  },
+  {
+    id: "aviation",
+    labelKey: "nav.groupAviation",
+    items: [
+      { path: "/aviation", icon: Plane, labelKey: "nav.aviationIntel" },
+      { path: "/hubs", icon: Building2, labelKey: "nav.hubIntel" },
+      { path: "/alliances", icon: Users, labelKey: "nav.allianceIntel" },
+      { path: "/coverage", icon: ShieldCheck, labelKey: "nav.coverageIntel" },
+    ],
+  },
+  {
+    id: "spatial",
+    labelKey: "nav.groupSpatial",
+    items: [
+      { path: "/geospatial", icon: Globe, labelKey: "nav.geospatial" },
+      { path: "/investigations", icon: FileSearch, labelKey: "nav.investigations" },
+    ],
+  },
 ];
+
+function getInitialCollapsed() {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY);
+    if (v === "collapsed") return true;
+    if (v === "expanded") return false;
+  } catch {}
+  return window.innerWidth < 1024;
+}
 
 function SidebarInner() {
   const { t } = useTranslation("nav");
+  const [collapsed, setCollapsed] = useState(getInitialCollapsed);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const toggle = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try { localStorage.setItem(STORAGE_KEY, next ? "collapsed" : "expanded"); } catch {}
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 900px)");
+    const handler = () => { if (mq.matches) setMobileOpen(false); };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+
+  const sidebarCls = [
+    "sidebar",
+    collapsed ? "sidebar--collapsed" : "sidebar--expanded",
+    mobileOpen ? "sidebar--mobile-open" : "",
+  ].join(" ");
 
   return (
-    <aside className="command-rail" aria-label={t("sidebarLabel")}>
-      <div className="rail-brand" title={t("brand")}>
-        <Radar size={20} strokeWidth={1.75} />
-      </div>
-      <nav className="rail-nav">
-        {WORKSPACE_NAV.map(({ path, icon: Icon, labelKey, group }, idx) => {
-          const prev = WORKSPACE_NAV[idx - 1];
-          const showSep = prev && prev.group !== group;
-          return (
-            <React.Fragment key={path}>
-              {showSep && <div className="rail-separator" />}
-              <NavLink
-                to={path}
-                className={({ isActive }) => `rail-btn ${isActive ? "active" : ""}`}
-                title={t(labelKey)}
-              >
-                <Icon size={16} strokeWidth={1.75} />
-                <span className="rail-label">{t(labelKey)}</span>
-              </NavLink>
-            </React.Fragment>
-          );
-        })}
-      </nav>
-      <div className="rail-footer">
-        <Layers size={14} className="muted-icon" />
-      </div>
-    </aside>
+    <>
+      {mobileOpen && <div className="sidebar-overlay" onClick={closeMobile} />}
+      <aside className={sidebarCls} aria-label={t("sidebarLabel", { defaultValue: "Navigation" })}>
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
+            <Radar size={22} strokeWidth={1.75} />
+            {!collapsed && <span className="sidebar-brand-text">SkyTrax Intel</span>}
+          </div>
+          <button
+            type="button"
+            className="sidebar-toggle"
+            onClick={toggle}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <PanelLeft size={16} /> : <PanelLeftClose size={16} />}
+          </button>
+        </div>
+
+        <nav className="sidebar-nav">
+          {GROUPS.map((group) => (
+            <div className="sidebar-group" key={group.id}>
+              {!collapsed && (
+                <span className="sidebar-group-label">
+                  {t(group.labelKey, { defaultValue: group.id })}
+                </span>
+              )}
+              {collapsed && <div className="sidebar-group-dot" />}
+              {group.items.map(({ path, icon: Icon, labelKey }) => (
+                <NavLink
+                  key={path}
+                  to={path}
+                  className={({ isActive }) =>
+                    `sidebar-item ${isActive ? "sidebar-item--active" : ""}`
+                  }
+                  onClick={closeMobile}
+                  {...(collapsed ? { "data-tooltip": t(labelKey) } : {})}
+                >
+                  <Icon size={18} strokeWidth={1.75} className="sidebar-item-icon" />
+                  {!collapsed && (
+                    <span className="sidebar-item-label">{t(labelKey)}</span>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          {!collapsed && (
+            <span className="sidebar-footer-text">
+              <Layers size={13} />
+              Command Center
+            </span>
+          )}
+          {collapsed && <Layers size={14} className="sidebar-footer-icon" />}
+        </div>
+      </aside>
+    </>
   );
 }
 

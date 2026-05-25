@@ -6,6 +6,28 @@ PRIORITY_AIRLINES = [row["slug"] for row in sorted(SEED_AIRLINES, key=lambda r: 
 
 BENCHMARK_AIRLINES = [row["slug"] for row in SEED_AIRLINES]
 
+
+def get_all_reviewed_slugs() -> list[str]:
+    """Return slugs of all airlines that have reviews in the database."""
+    try:
+        from database.session import SessionLocal
+        from database.models.core import Airline, Review
+        from sqlalchemy import func
+        session = SessionLocal()
+        try:
+            rows = (
+                session.query(Airline.slug)
+                .join(Review)
+                .group_by(Airline.slug)
+                .having(func.count(Review.id) >= 5)
+                .all()
+            )
+            return [r[0] for r in rows]
+        finally:
+            session.close()
+    except Exception:
+        return BENCHMARK_AIRLINES
+
 PREMIUM_AIRLINES = [r["slug"] for r in SEED_AIRLINES if r.get("tier") == "premium"]
 LOW_COST_AIRLINES = [r["slug"] for r in SEED_AIRLINES if r.get("tier") == "low_cost"]
 REGIONAL_AIRLINES = [r["slug"] for r in SEED_AIRLINES if r.get("tier") == "regional"]

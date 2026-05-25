@@ -49,6 +49,8 @@ class Settings:
     scheduler_timezone: str = getenv("SCHEDULER_TIMEZONE", "UTC")
     crawl_interval_hours: int = int(getenv("CRAWL_INTERVAL_HOURS", "6"))
     crawl_max_pages: int = int(getenv("CRAWL_MAX_PAGES", "5"))
+    crawl_deep_max_pages: int = int(getenv("CRAWL_DEEP_MAX_PAGES", "0"))
+    crawl_skip_recent_hours: int = int(getenv("CRAWL_SKIP_RECENT_HOURS", "0"))
     nlp_interval_minutes: int = int(getenv("NLP_INTERVAL_MINUTES", "30"))
     snapshot_hourly_minutes: int = int(getenv("SNAPSHOT_HOURLY_MINUTES", "60"))
     snapshot_daily_hour: int = int(getenv("SNAPSHOT_DAILY_HOUR", "2"))
