@@ -87,6 +87,9 @@
     "anomalies": "Anomaly detection",
     "insights": "Executive insights",
     "aviation": "Aviation metadata",
-    "snapshots": "Metric snapshots"
+    "snapshots": "Metric snapshots",
+    "airportDiscovery": "Discovering airports",
+    "aviationMetadata": "Syncing aviation metadata",
+    "hubIntelligence": "Computing hub intelligence"
   }
 }

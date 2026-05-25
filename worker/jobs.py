@@ -266,6 +266,22 @@ def run_operational_refresh(
     ).execute()
 
 
+def run_aviation_sync(
+    operation_id: str | None = None,
+    triggered_by: str = "aviation_sync",
+) -> dict:
+    """RQ job: run aviation-only sync (airports, metadata, hub intelligence).
+
+    Reuses the same operational ecosystem as run_operational_refresh.
+    """
+    from worker.orchestration.refresh_pipeline import AviationSyncPipeline
+    logger.info("[OPS] run_aviation_sync started op=%s trigger=%s", operation_id, triggered_by)
+    return AviationSyncPipeline(
+        operation_id=operation_id,
+        triggered_by=triggered_by,
+    ).execute()
+
+
 def run_aviation_bootstrap() -> dict:
     """RQ job: run aviation metadata bootstrap pipeline."""
     return _with_lock("aviation:bootstrap", _aviation_bootstrap)

@@ -11,6 +11,7 @@ from aviation.coverage.engine import CoverageAuditEngine
 from aviation.intelligence.service import AviationIntelligenceService
 from aviation.graph.context import AviationGraphContext
 from aviation.validation.engine import AviationValidator
+from analytics.hub_intelligence import HubIntelligenceService
 from database.models.aviation import AirlineMetadata, AirportMetadata, AviationCoverageReport
 
 router = APIRouter(prefix="/aviation", tags=["aviation"])
@@ -20,6 +21,10 @@ _bootstrap_status = {"running": False, "last_result": None}
 
 def _intel(session: Session = Depends(get_session)) -> AviationIntelligenceService:
     return AviationIntelligenceService(session)
+
+
+def _hub_intel(session: Session = Depends(get_session)) -> HubIntelligenceService:
+    return HubIntelligenceService(session)
 
 
 def _graph(session: Session = Depends(get_session)) -> AviationGraphContext:
@@ -231,3 +236,35 @@ def validation_report(validator: AviationValidator = Depends(_validator)):
 @router.get("/normalization")
 def normalization_report(validator: AviationValidator = Depends(_validator)):
     return validator.normalization_report()
+
+
+# ═══ Hub Intelligence ═══
+
+@router.get("/hub-intelligence/dashboard")
+def hub_intel_dashboard(svc: HubIntelligenceService = Depends(_hub_intel)):
+    return svc.hub_dashboard()
+
+
+@router.get("/hub-intelligence/rankings")
+def hub_intel_rankings(svc: HubIntelligenceService = Depends(_hub_intel)):
+    return svc.hub_rankings()
+
+
+@router.get("/hub-intelligence/risk")
+def hub_intel_risk(svc: HubIntelligenceService = Depends(_hub_intel)):
+    return svc.hub_risk_matrix()
+
+
+@router.get("/hub-intelligence/alliances")
+def hub_intel_alliances(svc: HubIntelligenceService = Depends(_hub_intel)):
+    return svc.alliance_hub_network()
+
+
+@router.get("/hub-intelligence/incidents")
+def hub_intel_incidents(svc: HubIntelligenceService = Depends(_hub_intel)):
+    return svc.airport_incidents()
+
+
+@router.get("/hub-intelligence/concentration")
+def hub_intel_concentration(svc: HubIntelligenceService = Depends(_hub_intel)):
+    return svc.hub_concentration()
