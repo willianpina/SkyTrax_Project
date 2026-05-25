@@ -57,17 +57,67 @@ class AirlineQualitySpider(scrapy.Spider):
     allowed_domains = ["airlinequality.com", "www.airlinequality.com"]
     custom_settings = {"PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT": 30_000}
 
-    def __init__(self, airline: str | None = None, max_pages: str = "3", use_playwright: str = "false", **kwargs):
+    def __init__(self, airline: str | None = None, max_pages: str = "3",
+                 use_playwright: str = "false", mode: str = "seed", **kwargs):
         super().__init__(**kwargs)
         self.airline_filter = airline
         self.max_pages = int(max_pages)
         self.use_playwright = use_playwright.lower() == "true"
+        self.mode = mode
+        self._airlines_queued = 0
+        self._reviews_parsed = 0
+
+    def _build_airline_list(self) -> list[dict]:
+        if self.airline_filter:
+            return [self._make_entry(self.airline_filter)]
+
+        if self.mode == "all":
+            return self._airlines_from_db()
+
+        return sorted(SEED_AIRLINES, key=lambda row: row.get("priority", 99))
+
+    def _airlines_from_db(self) -> list[dict]:
+        """Load all active airlines from the database."""
+        try:
+            from database.session import SessionLocal
+            from database.models.core import Airline
+            session = SessionLocal()
+            try:
+                rows = session.query(Airline).filter(Airline.is_active.is_(True)).all()
+                result = []
+                for row in rows:
+                    url = row.review_url or f"https://www.airlinequality.com/airline-reviews/{row.slug}/"
+                    result.append({
+                        "name": row.name,
+                        "slug": row.slug,
+                        "country": row.country,
+                        "review_url": url,
+                        "priority": 5,
+                    })
+                self.logger.info("[SCRAPER] Loaded %d airlines from DB (mode=all)", len(result))
+                return result
+            finally:
+                session.close()
+        except Exception as exc:
+            self.logger.warning("[SCRAPER] DB load failed, falling back to seeds: %s", exc)
+            return SEED_AIRLINES
+
+    @staticmethod
+    def _make_entry(slug: str) -> dict:
+        return {
+            "name": slug.replace("-", " ").title(),
+            "slug": slug,
+            "country": None,
+            "review_url": f"https://www.airlinequality.com/airline-reviews/{slug}/",
+            "priority": 1,
+        }
 
     def start_requests(self):
-        airlines = sorted(SEED_AIRLINES, key=lambda row: row.get("priority", 99))
+        airlines = self._build_airline_list()
+        self._airlines_queued = len(airlines)
+        self.logger.info("[SCRAPER] Starting review crawl: %d airlines, max_pages=%d, mode=%s",
+                         len(airlines), self.max_pages, self.mode)
         for airline in airlines:
-            if self.airline_filter and airline["slug"] != self.airline_filter:
-                continue
             yield scrapy.Request(
                 airline["review_url"],
                 callback=self.parse_listing,
@@ -132,6 +182,7 @@ class AirlineQualitySpider(scrapy.Spider):
                 },
             )
             return None
+        self._reviews_parsed += 1
         return ReviewItem(
             airline_slug=airline["slug"],
             airline_name=airline["name"],
@@ -221,3 +272,10 @@ class AirlineQualitySpider(scrapy.Spider):
             text,
             flags=re.IGNORECASE,
         ).strip()
+
+    def closed(self, reason):
+        self.logger.info(
+            "[SCRAPER] airlinequality_reviews closed: airlines_queued=%d reviews_parsed=%d "
+            "mode=%s max_pages=%d reason=%s",
+            self._airlines_queued, self._reviews_parsed, self.mode, self.max_pages, reason,
+        )
