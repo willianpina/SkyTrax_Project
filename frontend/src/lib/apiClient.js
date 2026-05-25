@@ -1,0 +1,48 @@
+export const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+
+export const FALLBACK_ANALYTICS = {
+  average_rating: 7.8,
+  review_count: 1240,
+  recommendation_rate: 0.72,
+  sentiment_distribution: { positive: 684, neutral: 221, negative: 335 },
+  timeline: [
+    { month: "2026-01-01", average_rating: 7.2, count: 140 },
+    { month: "2026-02-01", average_rating: 7.6, count: 182 },
+    { month: "2026-03-01", average_rating: 8.0, count: 211 },
+    { month: "2026-04-01", average_rating: 7.4, count: 190 },
+    { month: "2026-05-01", average_rating: 8.2, count: 256 }
+  ],
+  top_positive_topics: [
+    { label: "cabin crew", weight: 42 },
+    { label: "seat comfort", weight: 36 },
+    { label: "smooth boarding", weight: 25 }
+  ],
+  top_negative_topics: [
+    { label: "delayed baggage", weight: 39 },
+    { label: "refund handling", weight: 31 },
+    { label: "legroom", weight: 24 }
+  ]
+};
+
+export const EMPTY_BENCHMARKING = {
+  leaders: [],
+  airlines: [],
+  topic_heatmap: {},
+  radar_analytics: [],
+  operational_risk: {},
+  complaint_density: {}
+};
+
+export async function fetchJson(path, fallback) {
+  try {
+    const response = await fetch(`${API_BASE}${path}`);
+    if (!response.ok) {
+      console.warn("api_request_failed", path, response.status);
+      return fallback;
+    }
+    return await response.json();
+  } catch (error) {
+    console.warn("api_request_error", path, error);
+    return fallback;
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "sidebarLabel": "Workspace navigation",
+  "brand": "Airline Review Intelligence",
+  "nav": {
+    "executive": "Executive",
+    "benchmarking": "Benchmarking",
+    "reputation": "Reputation",
+    "semantic": "Semantic Ops",
+    "forecasting": "Forecasting",
+    "anomalies": "Anomaly Center",
+    "geospatial": "Geospatial",
+    "investigations": "Investigations"
+  },
+  "geo": {
+    "hubsTitle": "Hub intelligence",
+    "hubsDesc": "Connect PostGIS for live hub and route intelligence overlays.",
+    "layersTitle": "Map layers",
+    "layersDesc": "Prepared for Deck.gl / Mapbox integration. Currently in lightweight mode."
+  },
+  "investigations": {
+    "subtitle": "Full investigative workflow",
+    "insights": "Related insights"
+  }
+}

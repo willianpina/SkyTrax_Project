@@ -1,0 +1,69 @@
+{
+  "title": "Centro de Comando de Inteligência Aérea",
+  "subtitle": "Operações executivas de reputação · inteligência em tempo real",
+  "nav": { "operations": "Operações" },
+  "rail": { "label": "Navegação de comando", "signals": "Sinais" },
+  "metrics": {
+    "stripLabel": "Métricas de inteligência operacional",
+    "operationalRisk": "Risco operacional",
+    "frustration": "Frustração do passageiro",
+    "premiumDissatisfaction": "Insatisfação premium",
+    "complaintDensity": "Densidade de reclamações",
+    "reputationDeterioration": "Deterioração reputacional",
+    "activeSignals": "Sinais ativos"
+  },
+  "timeline": {
+    "title": "Linha do tempo de inteligência",
+    "subtitle": "{{count}} eventos operacionais",
+    "empty": "Nenhum evento operacional na janela atual.",
+    "types": {
+      "anomaly": "Anomalia detectada",
+      "insight": "Insight executivo",
+      "forecast": "Previsão de reputação",
+      "partialSync": "Sincronização parcial da API",
+      "demoMode": "Modo de demonstração"
+    },
+    "partialMeta": "{{count}} módulos degradados",
+    "demoMeta": "Usando dados de análise de reserva"
+  },
+  "feed": {
+    "anomalyTitle": "Feed de anomalias",
+    "live": "{{count}} ativos",
+    "groupBy": "por companhia"
+  },
+  "semantic": {
+    "title": "Investigação semântica",
+    "threshold": "Limiar de relevância",
+    "allAirlines": "Todas as companhias",
+    "noResults": "Sem resultados — ajuste a busca ou o limiar.",
+    "relevance": "Relevância",
+    "drivers": "Drivers semânticos",
+    "driversHint": "Clusters ponderados por volume de avaliações.",
+    "clickToSearch": "Clique para investigar"
+  },
+  "matrix": {
+    "title": "Matriz comparativa de companhias",
+    "subtitle": "Postura operacional entre pares",
+    "airline": "Companhia",
+    "reputation": "ARS",
+    "complaints": "Reclamações",
+    "risk": "Risco",
+    "sentiment": "Sentimento"
+  },
+  "forecast": { "confidence": "{{score}}% confiança" },
+  "map": {
+    "title": "Mapa operacional",
+    "subtitle": "Camada geoespacial · modo leve",
+    "placeholder": "Overlay de rotas e hubs — conecte PostGIS para mapa ao vivo.",
+    "layers": {
+      "routes": "Rotas de hub",
+      "risk": "Zonas de risco",
+      "coverage": "Cobertura",
+      "alerts": "Alertas ativos"
+    }
+  },
+  "degraded": {
+    "title": "Sincronização parcial",
+    "message": "Alguns módulos indisponíveis. Exibindo cache e dados de demonstração quando necessário."
+  }
+}

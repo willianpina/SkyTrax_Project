@@ -1,0 +1,42 @@
+{
+  "nav": {
+    "executiveView": "Visão Executiva",
+    "benchmarking": "Benchmarking",
+    "reputation": "Reputação",
+    "semanticOps": "Operações Semânticas"
+  },
+  "header": {
+    "eyebrow": "Centro de Comando da Experiência do Cliente",
+    "title": "Inteligência de reputação aérea"
+  },
+  "kpi": {
+    "ars": "Índice de Reputação da Companhia",
+    "arsDetailLeading": "{{airline}} liderando o conjunto de pares",
+    "arsDetailDefault": "Índice composto ARS",
+    "recommendation": "Recomendação",
+    "recommendationDetail": "Participação de intenção positiva",
+    "reviewsIndexed": "Avaliações indexadas",
+    "reviewsDetail": "Corpus multi-companhia",
+    "operationalAlerts": "Alertas operacionais",
+    "operationalAlertsDetail": "Sinais orientados por anomalias"
+  },
+  "sections": {
+    "executiveInsights": "Insights Executivos",
+    "signals": "{{count}} sinais",
+    "noInsights": "Nenhum alerta executivo para a amostra atual.",
+    "portfolio": "Portfólio",
+    "operationalRisk": "Risco Operacional",
+    "peerComparison": "comparação entre pares"
+  },
+  "topics": {
+    "positiveDrivers": "Fatores Positivos",
+    "negativeFriction": "Fricção Negativa",
+    "weight": "peso do tópico",
+    "samples": "{{count}} amostras",
+    "prioritySignal": "sinal prioritário"
+  },
+  "reputation": {
+    "arsTable": "Scores de reputação",
+    "byAirline": "Por companhia"
+  }
+}

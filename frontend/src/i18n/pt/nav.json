@@ -1,0 +1,24 @@
+{
+  "sidebarLabel": "Navegação de workspaces",
+  "brand": "Inteligência de Avaliação Aérea",
+  "nav": {
+    "executive": "Executivo",
+    "benchmarking": "Benchmarking",
+    "reputation": "Reputação",
+    "semantic": "Ops Semântico",
+    "forecasting": "Previsões",
+    "anomalies": "Centro de Anomalias",
+    "geospatial": "Geoespacial",
+    "investigations": "Investigações"
+  },
+  "geo": {
+    "hubsTitle": "Inteligência de hubs",
+    "hubsDesc": "Conecte PostGIS para overlays de inteligência de hubs e rotas em tempo real.",
+    "layersTitle": "Camadas do mapa",
+    "layersDesc": "Preparado para integração Deck.gl / Mapbox. Atualmente em modo leve."
+  },
+  "investigations": {
+    "subtitle": "Fluxo investigativo completo",
+    "insights": "Insights relacionados"
+  }
+}

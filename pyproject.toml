@@ -1,0 +1,15 @@
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["api", "app", "analytics", "database", "nlp", "pipelines", "scraper", "worker"]
+omit = ["*/migrations/*", "tests/*"]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true

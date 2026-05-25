@@ -1,0 +1,49 @@
+{
+  "ratingEvolution": {
+    "title": "Evolução da Avaliação",
+    "subtitle": "Tendência temporal"
+  },
+  "sentimentMix": {
+    "title": "Mix de Sentimento",
+    "subtitle": "Distribuição NLP"
+  },
+  "complaintDensity": {
+    "title": "Densidade de Reclamações",
+    "subtitle": "Entrada de risco operacional"
+  },
+  "topicHeatmap": {
+    "title": "Mapa de Calor de Tópicos",
+    "subtitle": "Fricção por companhia"
+  },
+  "reputationForecast": {
+    "title": "Previsão de Reputação",
+    "subtitle": "EWMA + média móvel",
+    "empty": "Execute o job de previsão para popular as predições.",
+    "actual": "Real",
+    "forecast": "Previsão"
+  },
+  "competitiveRadar": {
+    "title": "Radar Competitivo",
+    "subtitle": "Dimensões ARS",
+    "rating": "Avaliação",
+    "sentiment": "Sentimento",
+    "recommend": "Recomendação",
+    "lowSeverity": "Baixa Severidade",
+    "recency": "Recência"
+  },
+  "anomalyTimeline": {
+    "title": "Linha do Tempo de Anomalias",
+    "events": "{{count}} eventos",
+    "empty": "Nenhuma anomalia detectada na janela atual.",
+    "vs": "{{observed}} vs {{expected}}"
+  },
+  "metrics": {
+    "sentiment": "Sentimento",
+    "complaint_density": "Densidade de reclamações",
+    "reputation_score": "Índice de reputação"
+  },
+  "forecastMetrics": {
+    "title": "Visão geral de previsões",
+    "subtitle": "Todas as métricas rastreadas"
+  }
+}

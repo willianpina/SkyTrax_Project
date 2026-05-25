@@ -1,0 +1,42 @@
+{
+  "brand": "Inteligência de Avaliações Aéreas",
+  "language": {
+    "label": "Idioma",
+    "en": "EN",
+    "pt": "PT"
+  },
+  "status": {
+    "apiLive": "API ativa",
+    "demoData": "dados de demonstração",
+    "partial": "{{count}} parcial",
+    "loading": "Carregando painel executivo…"
+  },
+  "actions": {
+    "exportCsv": "Exportar CSV",
+    "reload": "Recarregar dados",
+    "retry": "Tentar novamente",
+    "search": "Buscar avaliações"
+  },
+  "error": {
+    "title": "Falha ao renderizar o painel",
+    "apiUnavailable": "Alguns módulos da API indisponíveis"
+  },
+  "sentiment": {
+    "positive": "Positivo",
+    "neutral": "Neutro",
+    "negative": "Negativo"
+  },
+  "trend": {
+    "improving": "Em melhora",
+    "declining": "Em queda",
+    "stable": "Estável"
+  },
+  "severity": {
+    "critical": "Crítica",
+    "high": "Alta",
+    "medium": "Média",
+    "low": "Baixa",
+    "neutral": "Neutra",
+    "positive": "Positiva"
+  }
+}

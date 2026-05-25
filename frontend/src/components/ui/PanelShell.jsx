@@ -1,0 +1,95 @@
+import React, { memo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ChevronDown } from "lucide-react";
+
+function PanelShellInner({
+  title,
+  subtitle,
+  badges,
+  children,
+  className = "",
+  expandable = false,
+  defaultExpanded = true,
+  footer,
+  accent = "signal"
+}) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+
+  return (
+    <article className={`intel-panel glass-panel accent-${accent} ${className} ${expanded ? "" : "collapsed"}`}>
+      <header className="intel-panel-header">
+        <div className="intel-panel-titles">
+          <h2>{title}</h2>
+          {subtitle ? <span className="intel-panel-sub">{subtitle}</span> : null}
+        </div>
+        <div className="intel-panel-meta">
+          {badges}
+          {expandable ? (
+            <button
+              type="button"
+              className="panel-expand-btn"
+              onClick={() => setExpanded((e) => !e)}
+              aria-expanded={expanded}
+            >
+              <ChevronDown size={14} className={expanded ? "rotated" : ""} />
+            </button>
+          ) : null}
+        </div>
+      </header>
+      {(!expandable || expanded) && <div className="intel-panel-body fade-in">{children}</div>}
+      {footer && expanded ? <footer className="intel-panel-footer">{footer}</footer> : null}
+    </article>
+  );
+}
+
+export const PanelShell = memo(PanelShellInner);
+
+export function SeverityBadge({ severity, label }) {
+  const { t } = useTranslation("common");
+  const s = (severity || "neutral").toLowerCase();
+  const display = label || t(`severity.${s}`, { defaultValue: s });
+  return (
+    <span className={`op-badge severity-${s}`} title={display}>
+      <span className="pulse-dot" aria-hidden />
+      {display}
+    </span>
+  );
+}
+
+export function ConfidenceBadge({ score, insufficient, label }) {
+  const { t } = useTranslation("common");
+  if (insufficient) {
+    return <span className="op-badge confidence-low">{label || t("severity.low", { defaultValue: "Low" })}</span>;
+  }
+  const tier = score >= 75 ? "high" : score >= 45 ? "mid" : "low";
+  return (
+    <span className={`op-badge confidence-${tier}`}>
+      {label || `${score}%`}
+    </span>
+  );
+}
+
+export function TrendArrow({ direction }) {
+  const d = (direction || "stable").toLowerCase();
+  const symbol = d === "up" || d === "improving" ? "↑" : d === "down" || d === "declining" ? "↓" : "→";
+  return <span className={`trend-arrow trend-${d}`}>{symbol}</span>;
+}
+
+export function OperationalTag({ children }) {
+  return <span className="op-tag">{children}</span>;
+}
+
+export function FallbackPanel({ title, message, onRetry }) {
+  const { t } = useTranslation("common");
+  return (
+    <div className="fallback-panel">
+      <strong>{title}</strong>
+      <p>{message}</p>
+      {onRetry ? (
+        <button type="button" className="tactical-btn" onClick={onRetry}>
+          {t("actions.retry")}
+        </button>
+      ) : null}
+    </div>
+  );
+}

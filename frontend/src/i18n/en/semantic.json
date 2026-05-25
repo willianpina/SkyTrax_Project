@@ -1,0 +1,12 @@
+{
+  "clusters": {
+    "title": "Semantic Clusters",
+    "groups": "{{count}} groups",
+    "reviews": "{{count}} reviews"
+  },
+  "lookup": {
+    "title": "Semantic Lookup",
+    "subtitle": "RAG-ready retrieval",
+    "placeholder": "Search reviews (e.g. delayed baggage refund)"
+  }
+}

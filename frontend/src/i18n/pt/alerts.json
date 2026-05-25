@@ -1,0 +1,29 @@
+{
+  "operationalAlerts": {
+    "title": "Alertas Operacionais",
+    "active": "{{count}} ativos",
+    "empty": "Nenhum alerta operacional na janela de detecção atual."
+  },
+  "types": {
+    "complaint_spike": "Pico de volume de reclamações",
+    "sentiment_drop": "Deterioração de sentimento",
+    "reputation_deterioration": "Alerta de risco reputacional",
+    "topic_explosion": "Explosão de tópico negativo",
+    "route_spike": "Pico de reclamações na rota"
+  },
+  "detail": {
+    "observedVsExpected": "{{airline}} — Observado {{observed}} vs esperado {{expected}} em {{metric}}.",
+    "generic": "{{airline}} — {{detail}}"
+  },
+  "labels": {
+    "reputationalRisk": "Risco reputacional",
+    "operationalInstability": "Instabilidade operacional",
+    "complaintDensity": "Densidade de reclamações",
+    "sentiment": "Sentimento",
+    "operationalRisk": "Risco operacional"
+  },
+  "incidents": {
+    "title": "Incidentes ativos",
+    "subtitle": "Todas as anomalias detectadas"
+  }
+}

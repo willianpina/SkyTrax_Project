@@ -1,0 +1,12 @@
+{
+  "clusters": {
+    "title": "Clusters Semânticos",
+    "groups": "{{count}} grupos",
+    "reviews": "{{count}} avaliações"
+  },
+  "lookup": {
+    "title": "Busca Semântica",
+    "subtitle": "Recuperação pronta para RAG",
+    "placeholder": "Buscar avaliações (ex.: reembolso bagagem atrasada)"
+  }
+}

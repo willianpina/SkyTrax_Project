@@ -1,0 +1,42 @@
+{
+  "nav": {
+    "executiveView": "Executive View",
+    "benchmarking": "Benchmarking",
+    "reputation": "Reputation",
+    "semanticOps": "Semantic Ops"
+  },
+  "header": {
+    "eyebrow": "Customer Experience Command Center",
+    "title": "Airline reputation intelligence"
+  },
+  "kpi": {
+    "ars": "Airline Reputation Score",
+    "arsDetailLeading": "{{airline}} leading peer set",
+    "arsDetailDefault": "ARS composite index",
+    "recommendation": "Recommendation",
+    "recommendationDetail": "Share of positive intent",
+    "reviewsIndexed": "Reviews indexed",
+    "reviewsDetail": "Multi-airline corpus",
+    "operationalAlerts": "Operational alerts",
+    "operationalAlertsDetail": "Anomaly-driven signals"
+  },
+  "sections": {
+    "executiveInsights": "Executive Insights",
+    "signals": "{{count}} signals",
+    "noInsights": "No executive alerts for the current sample.",
+    "portfolio": "Portfolio",
+    "operationalRisk": "Operational Risk",
+    "peerComparison": "peer comparison"
+  },
+  "topics": {
+    "positiveDrivers": "Positive Drivers",
+    "negativeFriction": "Negative Friction",
+    "weight": "topic weight",
+    "samples": "{{count}} samples",
+    "prioritySignal": "priority signal"
+  },
+  "reputation": {
+    "arsTable": "Reputation scores",
+    "byAirline": "By airline"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "ratingEvolution": {
+    "title": "Rating Evolution",
+    "subtitle": "Temporal trend"
+  },
+  "sentimentMix": {
+    "title": "Sentiment Mix",
+    "subtitle": "NLP distribution"
+  },
+  "complaintDensity": {
+    "title": "Complaint Density",
+    "subtitle": "Operational risk input"
+  },
+  "topicHeatmap": {
+    "title": "Topic Heatmap",
+    "subtitle": "Airline friction"
+  },
+  "reputationForecast": {
+    "title": "Reputation Forecast",
+    "subtitle": "EWMA + rolling avg",
+    "empty": "Run forecasting job to populate predictions.",
+    "actual": "Actual",
+    "forecast": "Forecast"
+  },
+  "competitiveRadar": {
+    "title": "Competitive Radar",
+    "subtitle": "ARS dimensions",
+    "rating": "Rating",
+    "sentiment": "Sentiment",
+    "recommend": "Recommend",
+    "lowSeverity": "Low Severity",
+    "recency": "Recency"
+  },
+  "anomalyTimeline": {
+    "title": "Anomaly Timeline",
+    "events": "{{count}} events",
+    "empty": "No anomalies detected in the current window.",
+    "vs": "{{observed}} vs {{expected}}"
+  },
+  "metrics": {
+    "sentiment": "Sentiment",
+    "complaint_density": "Complaint density",
+    "reputation_score": "Reputation score"
+  },
+  "forecastMetrics": {
+    "title": "Forecast overview",
+    "subtitle": "All tracked metrics"
+  }
+}

@@ -1,0 +1,79 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: skytrax-operational
+    folder: SkyTrax
+    interval: 1m
+    rules:
+      - uid: skytrax-crawl-failure
+        title: Scrapy crawl failure
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: skytrax_worker_last_scrapy_success == 0
+              intervalMs: 60000
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: classic_conditions
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Scrapy worker reported a failed crawl
+          description: Check spider_runs and worker logs.
+
+      - uid: skytrax-queue-backlog
+        title: RQ queue backlog
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: skytrax_rq_default_queue_size > 50
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Redis RQ default queue backlog is high
+
+      - uid: skytrax-anomalies-high
+        title: Anomaly events elevated
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: skytrax_anomalies_total > 10
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Elevated anomaly events detected in SkyTrax
+
+      - uid: skytrax-ingestion-drop
+        title: Review ingestion drop
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: skytrax_reviews_per_hour < 1
+        for: 2h
+        labels:
+          severity: warning
+        annotations:
+          summary: No reviews ingested in the last hour

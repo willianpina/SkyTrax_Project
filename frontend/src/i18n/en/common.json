@@ -1,0 +1,42 @@
+{
+  "brand": "Airline Review Intelligence",
+  "language": {
+    "label": "Language",
+    "en": "EN",
+    "pt": "PT"
+  },
+  "status": {
+    "apiLive": "API live",
+    "demoData": "demo data",
+    "partial": "{{count}} partial",
+    "loading": "Loading executive dashboard…"
+  },
+  "actions": {
+    "exportCsv": "Export CSV",
+    "reload": "Reload data",
+    "retry": "Retry",
+    "search": "Search reviews"
+  },
+  "error": {
+    "title": "Dashboard failed to render",
+    "apiUnavailable": "Some API modules unavailable"
+  },
+  "sentiment": {
+    "positive": "Positive",
+    "neutral": "Neutral",
+    "negative": "Negative"
+  },
+  "trend": {
+    "improving": "Improving",
+    "declining": "Declining",
+    "stable": "Stable"
+  },
+  "severity": {
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "neutral": "Neutral",
+    "positive": "Positive"
+  }
+}

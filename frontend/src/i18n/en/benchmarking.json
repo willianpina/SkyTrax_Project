@@ -1,0 +1,15 @@
+{
+  "subtitle": "Competitive intelligence and peer comparison",
+  "heatmap": {
+    "airlineAxis": "Airlines",
+    "topicAxis": "Topics"
+  },
+  "risk": {
+    "high": "High risk",
+    "low": "Low risk"
+  },
+  "ranking": {
+    "title": "Airline ranking",
+    "subtitle": "Sorted by ARS"
+  }
+}

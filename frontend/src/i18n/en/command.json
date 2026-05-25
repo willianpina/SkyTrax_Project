@@ -1,0 +1,69 @@
+{
+  "title": "Aviation Intelligence Command Center",
+  "subtitle": "Executive reputation operations · real-time intelligence",
+  "nav": { "operations": "Operations" },
+  "rail": { "label": "Command navigation", "signals": "Signals" },
+  "metrics": {
+    "stripLabel": "Operational intelligence metrics",
+    "operationalRisk": "Operational risk",
+    "frustration": "Passenger frustration",
+    "premiumDissatisfaction": "Premium dissatisfaction",
+    "complaintDensity": "Complaint density",
+    "reputationDeterioration": "Reputation deterioration",
+    "activeSignals": "Active signals"
+  },
+  "timeline": {
+    "title": "Intelligence timeline",
+    "subtitle": "{{count}} operational events",
+    "empty": "No operational events in the current window.",
+    "types": {
+      "anomaly": "Anomaly detected",
+      "insight": "Executive insight",
+      "forecast": "Reputation forecast",
+      "partialSync": "Partial API sync",
+      "demoMode": "Demo intelligence mode"
+    },
+    "partialMeta": "{{count}} modules degraded",
+    "demoMeta": "Using fallback analytics data"
+  },
+  "feed": {
+    "anomalyTitle": "Anomaly feed",
+    "live": "{{count}} live",
+    "groupBy": "by airline"
+  },
+  "semantic": {
+    "title": "Semantic investigation",
+    "threshold": "Relevance threshold",
+    "allAirlines": "All airlines",
+    "noResults": "No matches — adjust query or threshold.",
+    "relevance": "Relevance",
+    "drivers": "Semantic drivers",
+    "driversHint": "Topic clusters weighted by review volume.",
+    "clickToSearch": "Click to investigate"
+  },
+  "matrix": {
+    "title": "Airline comparison matrix",
+    "subtitle": "Cross-carrier operational posture",
+    "airline": "Airline",
+    "reputation": "ARS",
+    "complaints": "Complaints",
+    "risk": "Risk",
+    "sentiment": "Sentiment"
+  },
+  "forecast": { "confidence": "{{score}}% confidence" },
+  "map": {
+    "title": "Operational map",
+    "subtitle": "Geospatial layer · lightweight mode",
+    "placeholder": "Route and hub intelligence overlay — connect PostGIS for live map.",
+    "layers": {
+      "routes": "Hub routes",
+      "risk": "Risk zones",
+      "coverage": "Coverage",
+      "alerts": "Active alerts"
+    }
+  },
+  "degraded": {
+    "title": "Partial intelligence sync",
+    "message": "Some modules are unavailable. Displaying cached and demo data where needed."
+  }
+}

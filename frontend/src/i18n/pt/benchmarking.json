@@ -1,0 +1,15 @@
+{
+  "subtitle": "Inteligência competitiva e comparação entre pares",
+  "heatmap": {
+    "airlineAxis": "Companhias",
+    "topicAxis": "Tópicos"
+  },
+  "risk": {
+    "high": "Alto risco",
+    "low": "Baixo risco"
+  },
+  "ranking": {
+    "title": "Ranking de companhias",
+    "subtitle": "Ordenado por ARS"
+  }
+}
