@@ -1,3 +1,4 @@
+from api.main import app  # noqa: F401 — re-export for uvicorn/gunicorn
 
 
 if __name__ == "__main__":
