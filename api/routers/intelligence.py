@@ -180,3 +180,25 @@ def disruption_summary(session: Session = Depends(get_session)):
         "total_analyzed": total,
         "severity_distribution": severities,
     }
+
+
+# ── Operational Semantic Friction Matrix ────────────────────────────────
+
+@router.get("/friction-matrix")
+def friction_matrix(
+    top: int = Query(default=15, ge=5, le=30),
+    session: Session = Depends(get_session),
+):
+    from analytics.friction_matrix import FrictionMatrixService
+    return FrictionMatrixService(session).compute(top_airlines=top)
+
+
+@router.get("/friction-matrix/drilldown")
+def friction_drilldown(
+    airline: str = Query(..., description="Airline slug"),
+    cluster: str = Query(..., description="Cluster id"),
+    limit: int = Query(default=30, ge=1, le=100),
+    session: Session = Depends(get_session),
+):
+    from analytics.friction_matrix import FrictionMatrixService
+    return FrictionMatrixService(session).cluster_drilldown(airline, cluster, limit=limit)

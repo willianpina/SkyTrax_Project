@@ -7,7 +7,6 @@ import { buildIntelligenceFeed } from "../lib/intelligenceFeed";
 import {
   buildRatingOption,
   buildSentimentOption,
-  buildHeatmapOption,
   buildComplaintDensityOption,
   exportReputationCsv
 } from "../lib/chartConfigs";
@@ -26,6 +25,7 @@ import { ExecutiveInsightsPanel } from "./command/ExecutiveInsightsPanel";
 import { SemanticInvestigationPanel } from "./command/SemanticInvestigationPanel";
 import { AirlineComparisonMatrix } from "./command/AirlineComparisonMatrix";
 import { FallbackPanel } from "./ui/PanelShell";
+import { FrictionMatrix } from "./FrictionMatrix";
 
 function translateSentimentLabel(t, label) {
   const key = String(label || "").toLowerCase();
@@ -83,14 +83,6 @@ export default function ExecutiveDashboard() {
     [sentiment, t, i18n.language]
   );
 
-  const heatmapAirlines = Object.keys(benchmarking?.topic_heatmap || {}).slice(0, 5);
-  const heatmapTopics = Array.from(
-    new Set(heatmapAirlines.flatMap((slug) => (benchmarking.topic_heatmap[slug] || []).map((r) => r.label)))
-  ).slice(0, 8);
-  const heatmapOption = useMemo(
-    () => buildHeatmapOption(heatmapAirlines, heatmapTopics, benchmarking?.topic_heatmap || {}),
-    [heatmapAirlines, heatmapTopics, benchmarking?.topic_heatmap]
-  );
   const complaintOption = useMemo(
     () => buildComplaintDensityOption(reputation, benchmarking.complaint_density),
     [reputation, benchmarking.complaint_density]
@@ -166,9 +158,9 @@ export default function ExecutiveDashboard() {
             <section className="tactical-grid">
               <TopicPanel title={t("dashboard:topics.positiveDrivers")} rows={data.top_positive_topics || []} tone="positive" />
               <TopicPanel title={t("dashboard:topics.negativeFriction")} rows={data.top_negative_topics || []} tone="negative" />
-              <ChartPanel title={t("charts:topicHeatmap.title")} subtitle={t("charts:topicHeatmap.subtitle")} option={heatmapOption} height={260} accent="warning" />
               <ChartPanel title={t("charts:complaintDensity.title")} subtitle={t("charts:complaintDensity.subtitle")} option={complaintOption} accent="risk" />
             </section>
+            <FrictionMatrix />
             <SemanticInvestigationPanel clusters={clusters} apiBase={apiBase} reputation={reputation} />
             <article className="intel-panel glass-panel map-placeholder span-full">
               <header className="intel-panel-header">
