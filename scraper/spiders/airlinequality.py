@@ -63,18 +63,21 @@ class AirlineQualitySpider(scrapy.Spider):
     allowed_domains = ["airlinequality.com", "www.airlinequality.com"]
 
     def __init__(self, airline: str | None = None, max_pages: str = "0",
-                 mode: str = "seed", skip_recent_hours: str = "0", **kwargs):
+                 mode: str = "seed", skip_recent_hours: str = "0",
+                 operation_id: str = "", **kwargs):
         super().__init__(**kwargs)
         self.airline_filter = airline
         self.max_pages = int(max_pages)
         self.mode = mode
         self.skip_recent_hours = int(skip_recent_hours)
+        self.operation_id = operation_id
 
         self._airlines_queued = 0
         self._airlines_skipped = 0
         self._pages_crawled = 0
         self._reviews_parsed = 0
         self._reviews_dropped = 0
+        self._current_airline = ""
 
     def _build_airline_list(self) -> list[dict]:
         if self.airline_filter:
@@ -148,6 +151,7 @@ class AirlineQualitySpider(scrapy.Spider):
 
     def parse_listing(self, response, airline: dict, page: int):
         self._pages_crawled += 1
+        self._current_airline = airline.get("name", airline.get("slug", ""))
 
         if page == 1:
             yield AirlineItem(
@@ -171,8 +175,10 @@ class AirlineQualitySpider(scrapy.Spider):
                 page_reviews += 1
                 yield item
 
-        self.logger.info("[CRAWLER] %s page=%d cards=%d reviews=%d",
-                         airline["slug"], page, len(cards), page_reviews)
+        self.logger.info(
+            "[OPS][CRAWL] airline=%s page=%d cards=%d reviews=%d total_pages=%d",
+            airline["slug"], page, len(cards), page_reviews, self._pages_crawled,
+        )
 
         if not cards:
             return
@@ -183,6 +189,10 @@ class AirlineQualitySpider(scrapy.Spider):
         )
         if should_continue:
             next_url = self._next_page_url(response.url, page + 1)
+            self.logger.info(
+                "[OPS][PAGINATION] airline=%s next_page=%d",
+                airline["slug"], page + 1,
+            )
             yield scrapy.Request(
                 next_url,
                 callback=self.parse_listing,
@@ -299,10 +309,16 @@ class AirlineQualitySpider(scrapy.Spider):
             flags=re.IGNORECASE,
         ).strip()
 
+        if should_continue:
+            self.logger.info(
+                "[OPS][PAGINATION] airline=%s page=%d url=%s",
+                airline["slug"], page + 1, next_url,
+            )
+
     def closed(self, reason):
         self.logger.info(
-            "[CRAWLER] closed: airlines=%d pages=%d reviews=%d dropped=%d skipped=%d "
-            "max_pages=%d mode=%s reason=%s",
+            "[OPS][CRAWL] spider_closed airlines=%d pages=%d reviews=%d "
+            "dropped=%d skipped=%d max_pages=%d mode=%s reason=%s",
             self._airlines_queued, self._pages_crawled, self._reviews_parsed,
             self._reviews_dropped, self._airlines_skipped,
             self.max_pages, self.mode, reason,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from datetime import date, datetime, timezone
 
@@ -11,6 +12,8 @@ from database.models import Airline, Review
 from database.session import SessionLocal
 from scraper.pipelines.fingerprinting import review_fingerprint
 from scraper.items import AirlineItem, ReviewItem
+
+logger = logging.getLogger(__name__)
 
 
 class FingerprintPipeline:
@@ -60,14 +63,11 @@ class PostgresPersistencePipeline:
 
     def close_spider(self, spider):
         self._commit(spider)
+        self._sync_stats(spider)
         self.session.close()
-        spider.logger.info(
-            "postgres_pipeline_closed",
-            extra={
-                "spider": spider.name,
-                "inserted_reviews": self.inserted_reviews,
-                "skipped_reviews": self.skipped_reviews,
-            },
+        logger.info(
+            "[OPS][PERSIST] pipeline_closed spider=%s inserted=%d skipped=%d",
+            spider.name, self.inserted_reviews, self.skipped_reviews,
         )
 
     def process_item(self, item, spider):
@@ -102,6 +102,11 @@ class PostgresPersistencePipeline:
     def _insert_review(self, item: ItemAdapter, spider) -> None:
         if self.session.query(Review.id).filter_by(fingerprint=item["fingerprint"]).first():
             self.skipped_reviews += 1
+            self._sync_stats(spider)
+            logger.debug(
+                "[OPS][DEDUPE] airline=%s fingerprint=%s",
+                item.get("airline_slug"), item["fingerprint"][:12],
+            )
             return
         airline = self._get_or_create_airline(item)
         review = Review(
@@ -127,9 +132,15 @@ class PostgresPersistencePipeline:
             self.inserted_reviews += 1
             airline.last_scraped_at = datetime.now(timezone.utc)
             self._mark_write(spider)
+            self._sync_stats(spider)
+            logger.debug(
+                "[OPS][PERSIST] airline=%s review_date=%s inserted=%d",
+                item.get("airline_slug"), item.get("review_date"), self.inserted_reviews,
+            )
         except IntegrityError:
             self.session.rollback()
             self.skipped_reviews += 1
+            self._sync_stats(spider)
 
     def _get_or_create_airline(self, item: ItemAdapter) -> Airline:
         airline = self.session.query(Airline).filter_by(slug=item["airline_slug"]).first()
@@ -144,6 +155,14 @@ class PostgresPersistencePipeline:
         self.session.add(airline)
         self.session.flush()
         return airline
+
+    def _sync_stats(self, spider) -> None:
+        """Expose insert/skip counters via Scrapy stats for the telemetry extension."""
+        try:
+            spider.crawler.stats.set_value("pipeline/reviews_inserted", self.inserted_reviews)
+            spider.crawler.stats.set_value("pipeline/reviews_skipped", self.skipped_reviews)
+        except Exception:
+            pass
 
     def _mark_write(self, spider) -> None:
         self.pending_writes += 1

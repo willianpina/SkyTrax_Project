@@ -62,24 +62,28 @@ export const AnomalyTimeline = memo(function AnomalyTimeline({ anomalies }) {
       ) : (
         <LazyEChart option={timelineOption} height={200} />
       )}
-      <div className="anomaly-list tactical">
+      <div className="atp-recent">
         {sorted
           .slice(-6)
           .reverse()
-          .map((row) => (
-            <div className={`anomaly-row hover-intel severity-${row.severity}`} key={row.id}>
-              <div>
-                <strong>{row.airline}</strong>
-                <SeverityBadge severity={row.severity} label={translateAnomalyType(t, row.anomaly_type)} />
+          .map((row) => {
+            const sev = row.severity || "low";
+            const typeName = translateAnomalyType(t, row.anomaly_type);
+            return (
+              <div className={`atp-row atp-row--${sev}`} key={row.id}>
+                <span className={`anm-sev-dot anm-sev-dot--${sev}`} />
+                <div className="atp-row-body">
+                  <strong className="atp-row-airline">{row.airline}</strong>
+                  <span className="atp-row-type">{typeName}</span>
+                </div>
+                <div className="atp-row-score">
+                  <span className="atp-row-obs">{row.observed_value}</span>
+                  <span className="atp-row-sep">→</span>
+                  <span className="atp-row-exp">{row.expected_value}</span>
+                </div>
               </div>
-              <small>
-                {t("charts:anomalyTimeline.vs", {
-                  observed: row.observed_value,
-                  expected: row.expected_value
-                })}
-              </small>
-            </div>
-          ))}
+            );
+          })}
       </div>
     </PanelShell>
   );

@@ -96,20 +96,57 @@ const AirlineGroup = memo(function AirlineGroup({ group }) {
   );
 });
 
+function categorizeAnomaly(type) {
+  const t = (type || "").toLowerCase();
+  if (t.includes("reputation") || t.includes("score")) return "Reputation";
+  if (t.includes("sentiment") || t.includes("rating")) return "Sentiment";
+  if (t.includes("complaint") || t.includes("density")) return "Complaints";
+  if (t.includes("service") || t.includes("crew") || t.includes("cabin")) return "Service";
+  if (t.includes("delay") || t.includes("cancel")) return "Operations";
+  return "Signal";
+}
+
+function formatGap(observed, expected) {
+  const obs = parseFloat(observed);
+  const exp = parseFloat(expected);
+  if (isNaN(obs) || isNaN(exp)) return null;
+  const gap = obs - exp;
+  const sign = gap >= 0 ? "+" : "";
+  return `${sign}${gap.toFixed(1)}`;
+}
+
 const IncidentRow = memo(function IncidentRow({ anomaly: a }) {
   const sev = a.severity || "low";
   const typeName = (a.anomaly_type || "").replace(/_/g, " ");
+  const category = categorizeAnomaly(a.anomaly_type);
+  const gap = formatGap(a.observed_value, a.expected_value);
+  const sevLabel = sev === "critical" ? "CRITICAL" : sev === "high" ? "HIGH" : sev === "medium" ? "ELEVATED" : "MONITORING";
 
   return (
     <div className={`anm-incident anm-incident--${sev}`}>
-      <div className="anm-incident-sev">
-        <OperationalBadge variant={SEV_CONFIG[sev]?.variant || "neutral"} compact>{sev}</OperationalBadge>
+      <div className="anm-incident-lead">
+        <span className={`anm-sev-dot anm-sev-dot--${sev}`} />
+        <span className={`anm-sev-chip anm-sev-chip--${sev}`}>{sevLabel}</span>
       </div>
-      <div className="anm-incident-body">
+      <div className="anm-incident-primary">
         <span className="anm-incident-type">{typeName}</span>
-        <span className="anm-incident-metric">
-          {a.metric}: <strong>{a.observed_value}</strong> vs expected <strong>{a.expected_value}</strong>
-        </span>
+        <span className="anm-incident-cat">{category}</span>
+      </div>
+      <div className="anm-incident-scores">
+        <div className="anm-score-cell">
+          <span className="anm-score-label">Observed</span>
+          <span className="anm-score-val">{a.observed_value ?? "—"}</span>
+        </div>
+        <div className="anm-score-cell">
+          <span className="anm-score-label">Threshold</span>
+          <span className="anm-score-val anm-score-val--dim">{a.expected_value ?? "—"}</span>
+        </div>
+        {gap && (
+          <div className="anm-score-cell">
+            <span className="anm-score-label">Gap</span>
+            <span className={`anm-score-val anm-score-gap ${parseFloat(gap) < 0 ? "anm-score-gap--neg" : "anm-score-gap--pos"}`}>{gap}</span>
+          </div>
+        )}
       </div>
       <time className="anm-incident-time">{a.detected_at?.slice(0, 10)}</time>
     </div>

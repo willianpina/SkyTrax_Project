@@ -49,6 +49,7 @@ ITEM_PIPELINES = {
 
 EXTENSIONS = {
     "scraper.middlewares.SpiderStatsExtension": 500,
+    "scraper.extensions.telemetry.LiveTelemetryExtension": 600,
 }
 
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
