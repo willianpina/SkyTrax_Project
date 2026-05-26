@@ -30,6 +30,12 @@ from database.models.aviation import (
     AviationCoverageReport,
 )
 from database.models.operations import OperationalRefreshRun
+from database.models.graph import (
+    GraphNode,
+    GraphEdge,
+    FusionSignal,
+    ReviewIntelligence,
+)
 
 __all__ = [
     "Base",
@@ -64,4 +70,9 @@ __all__ = [
     "AviationCoverageReport",
     # operations
     "OperationalRefreshRun",
+    # knowledge graph
+    "GraphNode",
+    "GraphEdge",
+    "FusionSignal",
+    "ReviewIntelligence",
 ]

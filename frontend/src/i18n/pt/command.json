@@ -67,11 +67,11 @@
     "message": "Alguns módulos indisponíveis. Exibindo cache e dados de demonstração quando necessário."
   },
   "ops": {
-    "title": "Refresh Operacional",
+    "title": "Sincronização de Inteligência",
     "sync": "Sincronizar",
     "syncing": "Sincronizando...",
     "synchronizing": "Sincronizando",
-    "syncTitle": "Sincronização de inteligência operacional",
+    "syncTitle": "Pipeline de inteligência por fusão",
     "running": "Executando",
     "completed": "Concluído",
     "failed": "Falhou",
@@ -80,16 +80,17 @@
     "history": "Operações recentes",
     "events": "Eventos operacionais",
     "discovery": "Descoberta de companhias",
-    "crawl": "Coleta profunda de reviews",
-    "nlp": "Enriquecimento NLP",
-    "semantic": "Clusters semânticos",
-    "forecasting": "Modelos de previsão",
+    "crawl": "Coleta incremental",
+    "metadata": "Extração de metadados",
+    "semantic": "Inteligência semântica",
+    "knowledgeGraph": "Grafo de conhecimento",
+    "forecasting": "Previsão",
     "anomalies": "Detecção de anomalias",
-    "insights": "Insights executivos",
-    "aviation": "Metadados aeronáuticos",
-    "snapshots": "Snapshots de métricas",
+    "insights": "Insights estratégicos",
+    "fusion": "Fusão de inteligência",
+    "snapshots": "Snapshots",
     "airportDiscovery": "Descobrindo aeroportos",
-    "aviationMetadata": "Sincronizando metadados aeronáuticos",
-    "hubIntelligence": "Computando inteligência de hubs"
+    "aviationMetadata": "Metadados aeronáuticos",
+    "hubIntelligence": "Inteligência de hubs"
   }
 }

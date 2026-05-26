@@ -78,6 +78,7 @@ class AirlineQualitySpider(scrapy.Spider):
         self._reviews_parsed = 0
         self._reviews_dropped = 0
         self._current_airline = ""
+        self._saturated = False
 
     def _build_airline_list(self) -> list[dict]:
         if self.airline_filter:
@@ -150,6 +151,13 @@ class AirlineQualitySpider(scrapy.Spider):
             )
 
     def parse_listing(self, response, airline: dict, page: int):
+        if self._saturated:
+            self.logger.info(
+                "[OPS][SATURATION] Corpus saturated — skipping %s page %d",
+                airline.get("slug"), page,
+            )
+            return
+
         self._pages_crawled += 1
         self._current_airline = airline.get("name", airline.get("slug", ""))
 

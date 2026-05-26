@@ -130,3 +130,53 @@ def airline_rankings(
     session: Session = Depends(get_session),
 ):
     return OperationalIntelligenceService(session)._airline_rankings(limit=limit)
+
+
+@router.get("/graph/stats")
+def graph_stats(session: Session = Depends(get_session)):
+    from analytics.knowledge_graph import AviationKnowledgeGraph
+    return AviationKnowledgeGraph(session).get_stats()
+
+
+@router.get("/fusion/signals")
+def fusion_signals(
+    limit: int = Query(default=50, le=200),
+    session: Session = Depends(get_session),
+):
+    from database.models.graph import FusionSignal
+    rows = (
+        session.query(FusionSignal)
+        .filter(FusionSignal.is_active.is_(True))
+        .order_by(FusionSignal.confidence.desc())
+        .limit(limit)
+        .all()
+    )
+    return [
+        {
+            "id": s.id,
+            "category": s.category,
+            "severity": s.severity,
+            "title": s.title,
+            "description": s.description,
+            "entities": s.entities,
+            "evidence": s.evidence,
+            "confidence": s.confidence,
+            "detected_at": s.detected_at.isoformat() if s.detected_at else None,
+        }
+        for s in rows
+    ]
+
+
+@router.get("/fusion/disruptions")
+def disruption_summary(session: Session = Depends(get_session)):
+    from sqlalchemy import func
+    from database.models.graph import ReviewIntelligence
+    total = session.query(func.count(ReviewIntelligence.id)).scalar() or 0
+    severities = dict(
+        session.query(ReviewIntelligence.operational_severity, func.count(ReviewIntelligence.id))
+        .group_by(ReviewIntelligence.operational_severity).all()
+    )
+    return {
+        "total_analyzed": total,
+        "severity_distribution": severities,
+    }

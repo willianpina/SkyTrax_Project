@@ -67,11 +67,11 @@
     "message": "Some modules are unavailable. Displaying cached and demo data where needed."
   },
   "ops": {
-    "title": "Operational Refresh",
+    "title": "Aviation Intelligence Sync",
     "sync": "Sync",
     "syncing": "Syncing...",
     "synchronizing": "Synchronizing",
-    "syncTitle": "Operational intelligence sync",
+    "syncTitle": "Fusion intelligence pipeline",
     "running": "Running",
     "completed": "Completed",
     "failed": "Failed",
@@ -80,16 +80,17 @@
     "history": "Recent operations",
     "events": "Operational events",
     "discovery": "Discovering airlines",
-    "crawl": "Deep review scraping",
-    "nlp": "NLP enrichment",
-    "semantic": "Semantic clusters",
-    "forecasting": "Forecasting models",
+    "crawl": "Incremental crawl",
+    "metadata": "Metadata extraction",
+    "semantic": "Semantic intelligence",
+    "knowledgeGraph": "Knowledge graph",
+    "forecasting": "Forecasting",
     "anomalies": "Anomaly detection",
-    "insights": "Executive insights",
-    "aviation": "Aviation metadata",
-    "snapshots": "Metric snapshots",
+    "insights": "Strategic insights",
+    "fusion": "Intelligence fusion",
+    "snapshots": "Snapshots",
     "airportDiscovery": "Discovering airports",
-    "aviationMetadata": "Syncing aviation metadata",
-    "hubIntelligence": "Computing hub intelligence"
+    "aviationMetadata": "Aviation metadata",
+    "hubIntelligence": "Hub intelligence"
   }
 }

@@ -2464,6 +2464,7 @@ h1, h2, h3, p { margin: 0; }
 .osm-status--standby { background: rgba(100, 116, 139, 0.1); color: #94a3b8; }
 .osm-status--error { background: rgba(239, 68, 68, 0.1); color: var(--ops-red); }
 .osm-status--stalled { background: rgba(245, 158, 11, 0.1); color: var(--ops-amber); animation: osm-badge-pulse 1.2s ease-in-out infinite; }
+.osm-status--saturated { background: rgba(34, 211, 238, 0.1); color: var(--ops-cyan); }
 @keyframes osm-badge-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
@@ -2568,6 +2569,7 @@ h1, h2, h3, p { margin: 0; }
   border-radius: 6px;
 }
 .osm-crawl--stalled { border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.02); }
+.osm-crawl--saturated { border-color: rgba(245, 158, 11, 0.2); background: rgba(245, 158, 11, 0.02); }
 .osm-crawl-stall {
   display: flex; align-items: center; gap: 6px;
   padding: 4px 8px; margin-bottom: 8px;
@@ -2575,6 +2577,14 @@ h1, h2, h3, p { margin: 0; }
   border: 1px solid rgba(239, 68, 68, 0.15);
   border-radius: 4px;
   color: var(--ops-red); font-size: 11px; font-weight: 600;
+}
+.osm-crawl-saturated {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px; margin-bottom: 8px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: 4px;
+  color: var(--ops-amber); font-size: 11px; font-weight: 600;
 }
 .osm-crawl-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 12px;
@@ -3358,6 +3368,12 @@ h1, h2, h3, p { margin: 0; }
   background: rgba(220, 38, 38, 0.02);
   border-color: rgba(220, 38, 38, 0.15);
 }
+[data-theme="light"] .osm-crawl--saturated {
+  background: rgba(180, 83, 9, 0.02);
+  border-color: rgba(180, 83, 9, 0.1);
+}
+[data-theme="light"] .osm-crawl-saturated { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+[data-theme="light"] .osm-status--saturated { background: #ecfeff; color: #0e7490; }
 [data-theme="light"] .osm-crawl-val { color: #0f172a; }
 [data-theme="light"] .osm-crawl-airline { color: #0e7490; }
 [data-theme="light"] .osm-crawl-total { color: #0e7490; }
