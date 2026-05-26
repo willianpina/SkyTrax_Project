@@ -1,91 +1,115 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
-import { computeExecutiveMetrics } from "../../lib/executiveMetrics";
-import { buildRatingOption, buildSentimentOption } from "../../lib/chartConfigs";
-import { formatScore } from "../../utils/formatMetric";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
-import { ChartPanel } from "../../components/charts/ChartPanel";
-import { ExecutiveInsightsPanel } from "../../components/command/ExecutiveInsightsPanel";
-import { TopicPanel } from "../../components/TopicPanel";
-import { PanelShell, SeverityBadge, TrendArrow } from "../../components/ui/PanelShell";
+import { PanelShell, TrendArrow } from "../../components/ui/PanelShell";
+import { OperationalBadge } from "../../components/ui/OperationalBadge";
+import { formatScore, formatDeltaNumeric } from "../../utils/formatMetric";
+import {
+  buildReputationRegistry,
+  computeReputationKPIs,
+  extractPrioritySignals,
+} from "../../lib/reputationIntelligence";
+import { ReputationKpiStrip } from "./ReputationKpiStrip";
+import { ReputationTable } from "./ReputationTable";
+import { AirlineDrilldownModal } from "./AirlineDrilldownModal";
+import {
+  TrendingDown, TrendingUp, AlertTriangle, Zap, BarChart3,
+} from "lucide-react";
 
-function translateSentimentLabel(t, label) {
-  return t(`common:sentiment.${String(label || "").toLowerCase()}`, { defaultValue: label });
-}
+const SIGNAL_ICONS = {
+  worstDeterioration: TrendingDown,
+  bestRecovery: TrendingUp,
+  criticalRisk: AlertTriangle,
+  highComplaints: BarChart3,
+  incidentCluster: Zap,
+};
 
-export default function ReputationWorkspace() {
-  const { t, i18n } = useTranslation(["dashboard", "charts", "common", "nav"]);
-  const { data, reputation, benchmarking, alerts, anomalies, snapshots } = useSharedAnalytics();
+const SIGNAL_ACCENTS = {
+  worstDeterioration: "risk",
+  bestRecovery: "positive",
+  criticalRisk: "risk",
+  highComplaints: "warning",
+  incidentCluster: "risk",
+};
 
-  const execMetrics = useMemo(
-    () => computeExecutiveMetrics({ data, reputation, benchmarking, alerts, anomalies }),
-    [data, reputation, benchmarking, alerts, anomalies]
-  );
-  const frustration = execMetrics.find((m) => m.id === "frustration");
-  const deterioration = execMetrics.find((m) => m.id === "reputation_deterioration");
-  const premium = execMetrics.find((m) => m.id === "premium_dissatisfaction");
-
-  const sentiment = useMemo(
-    () => Object.entries(data.sentiment_distribution || {}).map(([label, value]) => ({ label, value })),
-    [data]
-  );
-  const sentimentOption = useMemo(
-    () => buildSentimentOption(sentiment, (label) => translateSentimentLabel(t, label)),
-    [sentiment, t, i18n.language]
-  );
-
-  const safeSnapshots = Array.isArray(snapshots) ? snapshots : [];
-  const timelineFromSnapshots = safeSnapshots
-    .filter((s) => s?.period_end && !s.airline_id).slice(0, 12)
-    .map((s) => ({ month: String(s.period_end).slice(0, 10), score: s.metrics?.reputation_score || 0 }));
-  const ratingTimeline = timelineFromSnapshots.length ? timelineFromSnapshots : data.timeline || [];
-  const ratingOption = useMemo(() => buildRatingOption(ratingTimeline), [ratingTimeline]);
-
-  const defaultInsight = { severity: "neutral", summary: t("dashboard:sections.noInsights"), airline: t("dashboard:sections.portfolio"), drivers: [] };
+function PrioritySignals({ signals }) {
+  const { t } = useTranslation(["dashboard"]);
+  const keys = Object.keys(signals).filter((k) => signals[k].length > 0);
+  if (keys.length === 0) return null;
 
   return (
-    <WorkspaceShell id="reputation" title={t("nav:nav.reputation")} subtitle={t("dashboard:header.eyebrow")} accent="positive">
-      <section className="workspace-kpi-strip">
-        {[frustration, deterioration, premium].filter(Boolean).map((m) => {
-          const displayValue = typeof m.value === "number" ? formatScore(m.value, { allowZero: true }) : m.value;
+    <section className="rep-signals">
+      <h3 className="rep-signals-title">{t("dashboard:reputation.signals.title")}</h3>
+      <div className="rep-signals-grid">
+        {keys.map((key) => {
+          const Icon = SIGNAL_ICONS[key] || AlertTriangle;
+          const items = signals[key];
           return (
-            <div className={`strip-metric severity-${m.severity}`} key={m.id}>
-              <span className="strip-label">{t(`command:metrics.${m.id}`, { defaultValue: m.id })}</span>
-              <div className="strip-value-row">
-                <span className="strip-value metric-num">{displayValue}{m.unit ? <small>{m.unit}</small> : null}</span>
-                <TrendArrow direction={m.trend} />
+            <div className={`rep-signal-card rep-signal-card--${SIGNAL_ACCENTS[key] || "neutral"}`} key={key}>
+              <div className="rep-signal-head">
+                <Icon size={13} />
+                <span>{t(`dashboard:reputation.signals.${key}`)}</span>
+              </div>
+              <div className="rep-signal-items">
+                {items.map((r) => (
+                  <div className="rep-signal-item" key={r.slug}>
+                    <span className="rep-signal-name">{r.airline}</span>
+                    <span className="rep-signal-val metric-num">
+                      {key === "bestRecovery" || key === "worstDeterioration"
+                        ? formatDeltaNumeric(r.forecastDelta)
+                        : key === "highComplaints"
+                          ? formatScore(r.complaints, { allowZero: true })
+                          : key === "incidentCluster"
+                            ? r.incidents
+                            : formatScore(r.score, { allowZero: true })
+                      }
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           );
         })}
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      <section className="tactical-grid">
-        <ChartPanel title={t("charts:ratingEvolution.title")} subtitle={t("charts:ratingEvolution.subtitle")} option={ratingOption} accent="positive" />
-        <ChartPanel title={t("charts:sentimentMix.title")} subtitle={t("charts:sentimentMix.subtitle")} option={sentimentOption} accent="signal" />
-      </section>
+export default function ReputationWorkspace() {
+  const { t } = useTranslation(["dashboard", "nav", "charts", "common"]);
+  const { reputation, benchmarking, anomalies, alerts, forecasts } = useSharedAnalytics();
+  const [selectedAirline, setSelectedAirline] = useState(null);
 
-      <section className="tactical-grid">
-        <TopicPanel title={t("dashboard:topics.positiveDrivers")} rows={data.top_positive_topics || []} tone="positive" />
-        <TopicPanel title={t("dashboard:topics.negativeFriction")} rows={data.top_negative_topics || []} tone="negative" />
-      </section>
+  const registry = useMemo(
+    () => buildReputationRegistry(reputation, benchmarking, anomalies, alerts, forecasts),
+    [reputation, benchmarking, anomalies, alerts, forecasts]
+  );
 
-      <PanelShell title={t("dashboard:reputation.arsTable", { defaultValue: "Reputation scores" })} subtitle={t("dashboard:reputation.byAirline", { defaultValue: "By airline" })} accent="positive">
-        <div className="reputation-table tactical">
-          {reputation.map((r) => (
-            <div className="reputation-row hover-intel" key={r.slug}>
-              <strong>{r.airline}</strong>
-              <span className="reputation-score metric-num">{formatScore(r.score, { allowZero: true })}</span>
-              <SeverityBadge severity={r.score > 60 ? "positive" : r.score > 40 ? "medium" : "high"} />
-              <span className="reputation-reviews">{r.review_count} reviews</span>
-              <TrendArrow direction={r.score > 60 ? "up" : "down"} />
-            </div>
-          ))}
-        </div>
-      </PanelShell>
+  const kpis = useMemo(
+    () => computeReputationKPIs(registry, reputation, benchmarking, anomalies, alerts),
+    [registry, reputation, benchmarking, anomalies, alerts]
+  );
 
-      <ExecutiveInsightsPanel insights={[]} defaultInsight={defaultInsight} />
+  const signals = useMemo(() => extractPrioritySignals(registry), [registry]);
+
+  const handleAirlineClick = useCallback((row) => setSelectedAirline(row), []);
+  const handleCloseModal = useCallback(() => setSelectedAirline(null), []);
+
+  return (
+    <WorkspaceShell
+      id="reputation"
+      title={t("dashboard:reputation.title")}
+      subtitle={t("dashboard:reputation.subtitle")}
+      accent="positive"
+    >
+      <ReputationKpiStrip kpis={kpis} />
+
+      <PrioritySignals signals={signals} />
+
+      <ReputationTable registry={registry} onAirlineClick={handleAirlineClick} />
+
+      <AirlineDrilldownModal airline={selectedAirline} onClose={handleCloseModal} />
     </WorkspaceShell>
   );
 }
