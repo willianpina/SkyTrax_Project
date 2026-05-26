@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 from datetime import date
 
@@ -7,6 +8,9 @@ from sqlalchemy import Integer, func
 from sqlalchemy.orm import Session
 
 from database.models import Airline, NLPResult, ReputationScoreHistory, Review, TopicSnapshot
+from database.models.aviation import AirlineMetadata
+
+logger = logging.getLogger(__name__)
 
 
 SEVERITY_TERMS = {
@@ -26,9 +30,39 @@ class ReputationService:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def airline_scores(self) -> list[dict]:
-        airlines = self.session.query(Airline).order_by(Airline.name.asc()).all()
-        return [self.score_airline(airline.slug) for airline in airlines]
+    def airline_scores(self, min_reviews: int = 1) -> list[dict]:
+        """Return scores only for airlines with at least min_reviews reviews."""
+        total_airlines = self.session.query(Airline).count()
+        slugs_with_reviews = (
+            self.session.query(Airline.slug)
+            .join(Review, Review.airline_id == Airline.id)
+            .group_by(Airline.slug)
+            .having(func.count(Review.id) >= min_reviews)
+            .all()
+        )
+        logger.info(
+            "[OPS][REPUTATION] airline_scores total_airlines=%d with_reviews=%d min_reviews=%d",
+            total_airlines, len(slugs_with_reviews), min_reviews,
+        )
+        scored = [self.score_airline(slug) for (slug,) in slugs_with_reviews]
+        return sorted(scored, key=lambda r: r["score"], reverse=True)
+
+    def _get_metadata(self, airline_slug: str) -> dict:
+        """Fetch enrichment metadata (country, alliance, star_rating) from AirlineMetadata."""
+        meta = self.session.query(AirlineMetadata).filter(AirlineMetadata.slug == airline_slug).first()
+        if not meta:
+            airline = self.session.query(Airline).filter(Airline.slug == airline_slug).first()
+            country = airline.country if airline else None
+            return {"country": country, "alliance": None, "star_rating": None, "airline_type": None}
+        alliance_name = None
+        if meta.alliance_rel:
+            alliance_name = meta.alliance_rel.name
+        return {
+            "country": meta.country,
+            "alliance": alliance_name,
+            "star_rating": meta.star_rating,
+            "airline_type": meta.airline_type,
+        }
 
     def score_airline(self, airline_slug: str) -> dict:
         rows = (
@@ -39,6 +73,7 @@ class ReputationService:
             .all()
         )
         airline = self.session.query(Airline).filter(Airline.slug == airline_slug).first()
+        metadata = self._get_metadata(airline_slug)
         if not rows:
             return {
                 "airline": airline.name if airline else airline_slug,
@@ -55,6 +90,7 @@ class ReputationService:
                 "timeline": [],
                 "categories": {},
                 "history": [],
+                **metadata,
             }
 
         ratings = [review.rating for review, _ in rows if review.rating is not None]
@@ -75,6 +111,18 @@ class ReputationService:
             + 0.07 * recency_component
             + 0.05 * (1 - complaint_density)
         )
+
+        negative_reviews = sum(1 for _, nlp in rows if nlp and nlp.sentiment_label == "negative")
+        complaint_count = sum(1 for review, _ in rows if review.recommended is False)
+        nlp_coverage = sum(1 for _, nlp in rows if nlp)
+
+        logger.debug(
+            "[OPS][SCORE_ENGINE] airline=%s reviews=%d complaints=%d negative=%d "
+            "nlp_coverage=%d ars=%.1f country=%s",
+            airline_slug, len(rows), complaint_count, negative_reviews,
+            nlp_coverage, round(score * 100, 2), metadata.get("country"),
+        )
+
         return {
             "airline": airline.name if airline else airline_slug,
             "slug": airline_slug,
@@ -87,9 +135,12 @@ class ReputationService:
             "recency_component": round(recency_component * 100, 2),
             "complaint_density": round(complaint_density * 100, 2),
             "review_count": len(rows),
+            "complaint_count": complaint_count,
+            "negative_count": negative_reviews,
             "timeline": self.temporal_score(airline_slug),
             "categories": self.category_scores(airline_slug),
             "history": self.score_history(airline_slug, limit=24),
+            **metadata,
         }
 
     def persist_scores(self) -> int:

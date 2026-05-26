@@ -46,7 +46,9 @@
       "emergingComplaints": "Emerging Complaints",
       "stability": "Stability Index",
       "regionalRisk": "Regional Risk",
-      "monitored": "Monitored"
+      "monitored": "Airlines Evaluated",
+      "totalReviews": "Total Reviews",
+      "totalComplaints": "Total Complaints"
     },
     "groups": {
       "global": "Global",

@@ -46,7 +46,9 @@
       "emergingComplaints": "Reclamações Emergentes",
       "stability": "Índice de Estabilidade",
       "regionalRisk": "Risco Regional",
-      "monitored": "Monitoradas"
+      "monitored": "Companhias Avaliadas",
+      "totalReviews": "Total de Reviews",
+      "totalComplaints": "Total de Reclamações"
     },
     "groups": {
       "global": "Global",

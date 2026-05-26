@@ -109,6 +109,12 @@ class ReputationScoreResponse(BaseModel):
     recency_component: float = 0.0
     complaint_density: float = 0.0
     review_count: int
+    complaint_count: int = 0
+    negative_count: int = 0
+    country: str | None = None
+    alliance: str | None = None
+    star_rating: int | None = None
+    airline_type: str | None = None
     timeline: list[dict]
     categories: dict[str, float]
     history: list[dict] = []

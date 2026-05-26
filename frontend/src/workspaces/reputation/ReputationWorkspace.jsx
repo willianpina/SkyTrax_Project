@@ -87,8 +87,8 @@ export default function ReputationWorkspace() {
   );
 
   const kpis = useMemo(
-    () => computeReputationKPIs(registry, reputation, benchmarking, anomalies, alerts),
-    [registry, reputation, benchmarking, anomalies, alerts]
+    () => computeReputationKPIs(registry),
+    [registry]
   );
 
   const signals = useMemo(() => extractPrioritySignals(registry), [registry]);
