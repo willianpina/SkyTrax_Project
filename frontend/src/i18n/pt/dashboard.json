@@ -36,7 +36,89 @@
     "prioritySignal": "sinal prioritário"
   },
   "reputation": {
-    "arsTable": "Scores de reputação",
-    "byAirline": "Por companhia"
+    "title": "Inteligência de Reputação",
+    "subtitle": "Monitoramento operacional de reputação e inteligência de risco",
+    "kpi": {
+      "avgScore": "Score Médio Global",
+      "critical": "Risco Crítico",
+      "deteriorating": "Em Deterioração",
+      "recovering": "Em Recuperação",
+      "emergingComplaints": "Reclamações Emergentes",
+      "stability": "Índice de Estabilidade",
+      "regionalRisk": "Risco Regional",
+      "monitored": "Monitoradas"
+    },
+    "groups": {
+      "global": "Global",
+      "region": "Regiões",
+      "alliance": "Alianças",
+      "risk": "Risco",
+      "trend": "Tendência"
+    },
+    "regions": {
+      "europe": "Europa",
+      "northAmerica": "América do Norte",
+      "latam": "América Latina",
+      "middleEast": "Oriente Médio",
+      "asia": "Ásia",
+      "africa": "África",
+      "oceania": "Oceania",
+      "other": "Outros"
+    },
+    "table": {
+      "rank": "#",
+      "airline": "Companhia",
+      "country": "País",
+      "alliance": "Aliança",
+      "score": "ARS",
+      "trend": "Tendência",
+      "complaints": "Reclamações",
+      "risk": "Risco Op.",
+      "stability": "Estabilidade",
+      "incidents": "Incidentes",
+      "reviews": "Avaliações",
+      "search": "Buscar companhias...",
+      "noResults": "Nenhuma companhia corresponde aos filtros atuais",
+      "showMore": "Exibir mais {{count}}"
+    },
+    "risk": {
+      "critical": "Crítico",
+      "high": "Alto Risco",
+      "attention": "Atenção",
+      "stable": "Estável",
+      "excellent": "Excelente"
+    },
+    "trend": {
+      "declining": "Em Declínio",
+      "stable": "Estável",
+      "improving": "Melhorando"
+    },
+    "signals": {
+      "title": "Sinais Prioritários",
+      "worstDeterioration": "Pior Deterioração",
+      "bestRecovery": "Melhor Recuperação",
+      "criticalRisk": "Risco Crítico",
+      "highComplaints": "Alto Volume de Reclamações",
+      "incidentCluster": "Cluster de Incidentes"
+    },
+    "drilldown": {
+      "title": "Perfil Operacional",
+      "scoreBreakdown": "Composição do Score",
+      "sentiment": "Sentimento",
+      "complaints": "Reclamações",
+      "negativeFreq": "Freq. Negativa",
+      "trend": "Tendência Temporal",
+      "incidents": "Incidentes",
+      "opRisk": "Risco Op.",
+      "tooltipComposition": "Score de Reputação Operacional derivado de sinais de inteligência aeronáutica multifatoriais.",
+      "reviews": "{{count}} avaliações",
+      "alliance": "Aliança",
+      "region": "Região",
+      "stars": "Classificação por Estrelas",
+      "forecastDelta": "Delta de Previsão",
+      "operationalRisk": "Risco Operacional",
+      "close": "Fechar"
+    },
+    "independent": "Independente"
   }
 }

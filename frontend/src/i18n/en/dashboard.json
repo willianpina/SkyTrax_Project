@@ -36,7 +36,89 @@
     "prioritySignal": "priority signal"
   },
   "reputation": {
-    "arsTable": "Reputation scores",
-    "byAirline": "By airline"
+    "title": "Reputation Intelligence",
+    "subtitle": "Operational reputation monitoring & risk intelligence",
+    "kpi": {
+      "avgScore": "Global Avg. Score",
+      "critical": "Critical Risk",
+      "deteriorating": "Deteriorating",
+      "recovering": "Recovering",
+      "emergingComplaints": "Emerging Complaints",
+      "stability": "Stability Index",
+      "regionalRisk": "Regional Risk",
+      "monitored": "Monitored"
+    },
+    "groups": {
+      "global": "Global",
+      "region": "Regions",
+      "alliance": "Alliances",
+      "risk": "Risk",
+      "trend": "Trend"
+    },
+    "regions": {
+      "europe": "Europe",
+      "northAmerica": "North America",
+      "latam": "Latin America",
+      "middleEast": "Middle East",
+      "asia": "Asia",
+      "africa": "Africa",
+      "oceania": "Oceania",
+      "other": "Other"
+    },
+    "table": {
+      "rank": "#",
+      "airline": "Airline",
+      "country": "Country",
+      "alliance": "Alliance",
+      "score": "ARS",
+      "trend": "Trend",
+      "complaints": "Complaints",
+      "risk": "Op. Risk",
+      "stability": "Stability",
+      "incidents": "Incidents",
+      "reviews": "Reviews",
+      "search": "Search airlines...",
+      "noResults": "No airlines match the current filters",
+      "showMore": "Show {{count}} more"
+    },
+    "risk": {
+      "critical": "Critical",
+      "high": "High Risk",
+      "attention": "Attention",
+      "stable": "Stable",
+      "excellent": "Excellent"
+    },
+    "trend": {
+      "declining": "Declining",
+      "stable": "Stable",
+      "improving": "Improving"
+    },
+    "signals": {
+      "title": "Priority Signals",
+      "worstDeterioration": "Worst Deterioration",
+      "bestRecovery": "Best Recovery",
+      "criticalRisk": "Critical Risk",
+      "highComplaints": "High Complaints",
+      "incidentCluster": "Incident Cluster"
+    },
+    "drilldown": {
+      "title": "Operational Profile",
+      "scoreBreakdown": "Score Breakdown",
+      "sentiment": "Sentiment",
+      "complaints": "Complaints",
+      "negativeFreq": "Neg. Frequency",
+      "trend": "Temporal Trend",
+      "incidents": "Incidents",
+      "opRisk": "Op. Risk",
+      "tooltipComposition": "Operational Reputation Score derived from multi-factor aviation intelligence signals.",
+      "reviews": "{{count}} reviews",
+      "alliance": "Alliance",
+      "region": "Region",
+      "stars": "Star Rating",
+      "forecastDelta": "Forecast Delta",
+      "operationalRisk": "Operational Risk",
+      "close": "Close"
+    },
+    "independent": "Independent"
   }
 }
