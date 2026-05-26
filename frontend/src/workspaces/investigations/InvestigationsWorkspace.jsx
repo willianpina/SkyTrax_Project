@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FileSearch } from "lucide-react";
 import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
 import { forecastConfidence } from "../../lib/executiveMetrics";
+import { formatScore } from "../../utils/formatMetric";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
 import { SemanticInvestigationPanel } from "../../components/command/SemanticInvestigationPanel";
 import { PanelShell, SeverityBadge, ConfidenceBadge, TrendArrow } from "../../components/ui/PanelShell";
@@ -44,15 +45,15 @@ export default function InvestigationsWorkspace() {
         <section className="workspace-kpi-strip">
           <div className="strip-metric severity-low">
             <span className="strip-label">ARS</span>
-            <span className="strip-value">{airlineRep.score}</span>
+            <span className="strip-value metric-num">{formatScore(airlineRep.score, { allowZero: true })}</span>
           </div>
           <div className="strip-metric severity-medium">
             <span className="strip-label">{t("command:metrics.complaintDensity")}</span>
-            <span className="strip-value">{Math.round(benchmarking?.complaint_density?.[selectedAirline] ?? 0)}</span>
+            <span className="strip-value metric-num">{formatScore(benchmarking?.complaint_density?.[selectedAirline])}</span>
           </div>
           <div className="strip-metric severity-low">
             <span className="strip-label">{t("command:metrics.operationalRisk")}</span>
-            <span className="strip-value">{Math.round(benchmarking?.operational_risk?.[selectedAirline] ?? 0)}</span>
+            <span className="strip-value metric-num">{formatScore(benchmarking?.operational_risk?.[selectedAirline])}</span>
           </div>
         </section>
       )}
@@ -76,7 +77,7 @@ export default function InvestigationsWorkspace() {
           <PanelShell title={t("charts:reputationForecast.title")} subtitle={t("charts:reputationForecast.subtitle")} accent="warning" badges={<ConfidenceBadge score={conf.score} insufficient={conf.insufficient} />}>
             {repForecast ? (
               <div className="forecast-detail-card">
-                <span>{repForecast.current_value ?? "—"} → {repForecast.forecast_value ?? "—"}</span>
+                <span className="metric-num">{formatScore(repForecast.current_value)} → {formatScore(repForecast.forecast_value)}</span>
                 <TrendArrow direction={repForecast.trend_direction} />
               </div>
             ) : (

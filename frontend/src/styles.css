@@ -4642,6 +4642,26 @@ h1, h2, h3, p { margin: 0; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   METRIC NUMERIC TYPOGRAPHY — Intelligence-grade number display
+   ═══════════════════════════════════════════════════════════════ */
+
+.metric-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+}
+
+.delta-neg {
+  color: var(--risk);
+  font-weight: 600;
+}
+
+.delta-pos {
+  color: var(--positive);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    FORECAST INTELLIGENCE — Palantir Operational UX
    ═══════════════════════════════════════════════════════════════ */
 
@@ -4988,9 +5008,6 @@ h1, h2, h3, p { margin: 0; }
   font-weight: 700;
   text-align: right;
 }
-
-.delta-neg { color: var(--risk); }
-.delta-pos { color: var(--positive); }
 
 .pt-cell small {
   font-size: 9px;

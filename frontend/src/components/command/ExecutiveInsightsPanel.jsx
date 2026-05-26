@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
+import { formatScore } from "../../utils/formatMetric";
 import { PanelShell, ConfidenceBadge, SeverityBadge } from "../ui/PanelShell";
 
 function ExecutiveInsightsPanelInner({ insights, defaultInsight }) {
@@ -22,7 +23,7 @@ function ExecutiveInsightsPanelInner({ insights, defaultInsight }) {
               <strong style={{ fontSize: "12px" }}>{insight.airline}</strong>
               <SeverityBadge severity={insight.severity} />
               {insight.confidence != null && (
-                <ConfidenceBadge score={Math.round(insight.confidence * 100)} />
+                <ConfidenceBadge score={Math.round(Number(insight.confidence) * 100)} />
               )}
             </div>
             <p>{insight.summary || insight.insight_text}</p>
