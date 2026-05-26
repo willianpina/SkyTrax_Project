@@ -6,6 +6,7 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Sao_Paulo
       ENABLE_POSTGIS: ${ENABLE_POSTGIS:-false}
     ports:
       - "8000:8000"
@@ -30,6 +31,7 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Sao_Paulo
       ENABLE_POSTGIS: ${ENABLE_POSTGIS:-false}
     depends_on:
       postgres:
@@ -52,6 +54,7 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Sao_Paulo
       ENABLE_POSTGIS: ${ENABLE_POSTGIS:-false}
     depends_on:
       postgres:

@@ -6,6 +6,7 @@ import { forecastConfidence } from "../../lib/executiveMetrics";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
 import { SemanticInvestigationPanel } from "../../components/command/SemanticInvestigationPanel";
 import { PanelShell, SeverityBadge, ConfidenceBadge, TrendArrow } from "../../components/ui/PanelShell";
+import { formatShortDate } from "../../utils/datetime";
 
 export default function InvestigationsWorkspace() {
   const { t } = useTranslation(["command", "alerts", "charts", "nav", "semantic"]);
@@ -65,7 +66,7 @@ export default function InvestigationsWorkspace() {
                   <SeverityBadge severity={a.severity} label={a.anomaly_type?.replace(/_/g, " ")} />
                   <strong>{a.airline}</strong>
                   <span className="incident-metric">{a.metric}: {a.observed_value} vs {a.expected_value}</span>
-                  <time>{a.detected_at?.slice(0, 10)}</time>
+                  <time>{formatShortDate(a.detected_at)}</time>
                 </div>
               ))}
               {filteredAnomalies.length === 0 && <p className="muted-copy">{t("alerts:operationalAlerts.empty")}</p>}

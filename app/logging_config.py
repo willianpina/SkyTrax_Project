@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import logging
 import sys
+from datetime import datetime
 
 from pythonjsonlogger import jsonlogger
 
 from app.request_context import current_request_id, current_trace_id
+from app.timezone import BRASILIA_TZ
 
 
 class RequestContextFilter(logging.Filter):
@@ -24,11 +26,15 @@ class RequestContextFilter(logging.Filter):
         return True
 
 
+class _BrasiliaFormatter(jsonlogger.JsonFormatter):
+    converter = lambda *args: datetime.now(BRASILIA_TZ).timetuple()  # noqa: E731
+
+
 def configure_logging(level: str = "INFO") -> None:
     """Configure structured JSON logging for application and workers."""
     handler = logging.StreamHandler(sys.stdout)
     handler.addFilter(RequestContextFilter())
-    formatter = jsonlogger.JsonFormatter(
+    formatter = _BrasiliaFormatter(
         "%(asctime)s %(levelname)s %(name)s %(module)s %(message)s %(service)s %(spider)s "
         "%(airline)s %(duration_ms)s %(request_id)s %(trace_id)s %(retries)s %(error_type)s "
         "%(pathname)s %(lineno)d"

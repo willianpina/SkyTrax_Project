@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { baseChartTheme, axisStyle, PALANTIR_COLORS } from "../lib/chartTheme";
 import { LazyEChart } from "./ui/LazyEChart";
 import { PanelShell, SeverityBadge } from "./ui/PanelShell";
+import { formatShortDate } from "../utils/datetime";
 
 function translateAnomalyType(t, type) {
   if (!type) return "";
@@ -14,7 +15,7 @@ export const AnomalyTimeline = memo(function AnomalyTimeline({ anomalies }) {
   const sorted = [...(anomalies || [])].slice(0, 12).reverse();
 
   const timelineOption = useMemo(() => {
-    const categories = sorted.map((a) => a.detected_at?.slice(0, 10) || "");
+    const categories = sorted.map((a) => formatShortDate(a.detected_at));
     return {
       ...baseChartTheme({ grid: { left: 48, right: 16, top: 32, bottom: 52 } }),
       xAxis: { type: "category", data: categories, axisLabel: { ...axisStyle().axisLabel, rotate: 28 } },

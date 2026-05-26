@@ -5,6 +5,7 @@ import { WorkspaceShell } from "../../layouts/WorkspaceShell";
 import { PanelShell, SeverityBadge } from "../../components/ui/PanelShell";
 import { OperationalBadge } from "../../components/ui/OperationalBadge";
 import { AnomalyTimeline } from "../../components/AnomalyPanel";
+import { formatShortDate } from "../../utils/datetime";
 import {
   AlertTriangle, Shield, Radio, TrendingDown,
   BarChart3, Activity, ChevronDown, ChevronRight,
@@ -148,7 +149,7 @@ const IncidentRow = memo(function IncidentRow({ anomaly: a }) {
           </div>
         )}
       </div>
-      <time className="anm-incident-time">{a.detected_at?.slice(0, 10)}</time>
+      <time className="anm-incident-time">{formatShortDate(a.detected_at)}</time>
     </div>
   );
 });
@@ -190,7 +191,7 @@ function SignalStream({ anomalies, alerts }) {
                   {s.title || (s.anomaly_type || "").replace(/_/g, " ")}
                 </span>
               </div>
-              <time className="anm-signal-time">{s.detected_at?.slice(0, 10)}</time>
+              <time className="anm-signal-time">{formatShortDate(s.detected_at)}</time>
             </div>
           );
         })}
