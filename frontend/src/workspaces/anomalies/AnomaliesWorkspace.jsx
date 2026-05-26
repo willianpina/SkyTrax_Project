@@ -279,7 +279,6 @@ export default function AnomaliesWorkspace() {
   return (
     <WorkspaceShell
       id="anomalies"
-      title={t("nav:nav.anomalies")}
       subtitle={t("anomalies:subtitle", { count: totalSignals })}
       accent="risk"
     >

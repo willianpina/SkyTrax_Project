@@ -30,7 +30,7 @@ export default function InvestigationsWorkspace() {
   const conf = forecastConfidence(repForecast);
 
   return (
-    <WorkspaceShell id="investigations" title={t("nav:nav.investigations")} subtitle={t("nav:investigations.subtitle", { defaultValue: "Full investigative workflow" })} accent="warning">
+    <WorkspaceShell id="investigations" accent="warning">
       <div className="investigation-toolbar glass-panel">
         <FileSearch size={16} />
         <select value={selectedAirline} onChange={(e) => setSelectedAirline(e.target.value)} className="investigation-select">

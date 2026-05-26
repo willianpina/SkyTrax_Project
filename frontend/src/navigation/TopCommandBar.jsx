@@ -8,20 +8,21 @@ import { OperationalSyncModal } from "../components/OperationalSyncModal";
 import { useSharedAnalytics } from "../hooks/AnalyticsProvider";
 import { useOperations } from "../hooks/useOperations";
 import { exportReputationCsv } from "../lib/chartConfigs";
+import { safeT } from "../utils/i18nSafety";
 
 const WORKSPACE_LABELS = {
-  "/executive": "nav.executive",
-  "/benchmarking": "nav.benchmarking",
-  "/reputation": "nav.reputation",
-  "/semantic": "nav.semantic",
-  "/forecasting": "nav.forecasting",
-  "/anomalies": "nav.anomalies",
-  "/geospatial": "nav.geospatial",
-  "/investigations": "nav.investigations",
-  "/aviation": "nav.aviationIntel",
-  "/hubs": "nav.hubIntel",
-  "/alliances": "nav.allianceIntel",
-  "/coverage": "nav.coverageIntel"
+  "/executive": "modules.executive.title",
+  "/benchmarking": "modules.benchmarking.title",
+  "/reputation": "modules.reputation.title",
+  "/semantic": "modules.semantic.title",
+  "/forecasting": "modules.forecasting.title",
+  "/anomalies": "modules.anomalies.title",
+  "/geospatial": "modules.geospatial.title",
+  "/investigations": "modules.investigations.title",
+  "/aviation": "modules.aviation.title",
+  "/hubs": "modules.hubs.title",
+  "/alliances": "modules.alliances.title",
+  "/coverage": "modules.coverage.title",
 };
 
 function TopCommandBarInner() {
@@ -31,7 +32,7 @@ function TopCommandBarInner() {
   const location = useLocation();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const workspaceKey = WORKSPACE_LABELS[location.pathname] || "nav.executive";
+  const workspaceKey = WORKSPACE_LABELS[location.pathname] || "modules.executive.title";
   const isRefreshing = status.running === true;
 
   const handleSyncClick = useCallback(async () => {
@@ -51,7 +52,7 @@ function TopCommandBarInner() {
       <header className="command-header glass-panel">
         <div>
           <p className="eyebrow">{t("command:title")}</p>
-          <h1 className="topbar-workspace-title">{t(workspaceKey)}</h1>
+          <h1 className="topbar-workspace-title">{safeT(t, workspaceKey, "Command Center")}</h1>
         </div>
         <div className="topbar-actions">
           <ThemeToggle />

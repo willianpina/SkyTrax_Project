@@ -50,7 +50,7 @@ export default function ExecutiveWorkspace() {
   };
 
   return (
-    <WorkspaceShell id="executive" title={t("nav:nav.executive")} subtitle={t("command:subtitle")} accent="signal">
+    <WorkspaceShell id="executive" accent="signal">
       <ExecutiveMetricsStrip metrics={executiveMetrics} loading={isLoading} />
 
       {partialErrors.length > 0 && (

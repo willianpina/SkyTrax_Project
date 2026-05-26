@@ -8,7 +8,7 @@ export default function GeospatialWorkspace() {
   const { t } = useTranslation(["command", "nav"]);
 
   return (
-    <WorkspaceShell id="geospatial" title={t("nav:nav.geospatial")} subtitle={t("command:map.subtitle")} accent="signal">
+    <WorkspaceShell id="geospatial" accent="signal">
       <PanelShell title={t("command:map.title")} subtitle={t("command:map.subtitle")} accent="signal">
         <div className="geo-workspace-content">
           <article className="geo-map-area glass-panel">

@@ -1,17 +1,18 @@
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Activity, BarChart3, Layers, Radar, Search } from "lucide-react";
+import { safeT } from "../../utils/i18nSafety";
 
 const NAV = [
-  { id: "executive", icon: Radar, ns: "dashboard", key: "nav.executiveView" },
-  { id: "benchmark", icon: BarChart3, ns: "dashboard", key: "nav.benchmarking" },
-  { id: "reputation", icon: Activity, ns: "dashboard", key: "nav.reputation" },
-  { id: "semantic", icon: Search, ns: "dashboard", key: "nav.semanticOps" },
-  { id: "layers", icon: Layers, ns: "command", key: "nav.operations" }
+  { id: "executive", icon: Radar, key: "modules.executive.title" },
+  { id: "benchmark", icon: BarChart3, key: "modules.benchmarking.title" },
+  { id: "reputation", icon: Activity, key: "modules.reputation.title" },
+  { id: "semantic", icon: Search, key: "modules.semantic.title" },
+  { id: "layers", icon: Layers, key: "command:nav.operations" },
 ];
 
 function CommandRailInner({ activeSection = "executive", signalCount = 0, isLive }) {
-  const { t } = useTranslation(["dashboard", "command", "common"]);
+  const { t } = useTranslation(["nav", "command", "common"]);
 
   return (
     <aside className="command-rail" aria-label={t("command:rail.label")}>
@@ -20,16 +21,16 @@ function CommandRailInner({ activeSection = "executive", signalCount = 0, isLive
         <span className="rail-status" data-live={isLive} aria-hidden />
       </div>
       <nav className="rail-nav">
-        {NAV.map(({ id, icon: Icon, ns, key }) => (
+        {NAV.map(({ id, icon: Icon, key }) => (
           <button
             key={id}
             type="button"
             className={`rail-btn ${activeSection === id ? "active" : ""}`}
-            title={t(`${ns}:${key}`)}
+            title={safeT(t, key, id)}
             aria-current={activeSection === id ? "page" : undefined}
           >
             <Icon size={16} strokeWidth={1.75} />
-            <span className="rail-label">{t(`${ns}:${key}`)}</span>
+            <span className="rail-label">{safeT(t, key, id)}</span>
           </button>
         ))}
       </nav>

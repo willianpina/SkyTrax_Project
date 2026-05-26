@@ -1,22 +1,68 @@
 {
-  "sidebarLabel": "Workspace navigation",
-  "brand": "Airline Review Intelligence",
+  "sidebarLabel": "Platform navigation",
+  "platform": {
+    "brand": "SkyTrax Intelligence",
+    "tagline": "Aviation Intelligence Command Center",
+    "footer": "Fusion Command"
+  },
+  "groups": {
+    "command": "Command Center",
+    "operations": "Aviation Operations",
+    "spatial": "Spatial & Investigations"
+  },
+  "modules": {
+    "executive": {
+      "title": "Executive Command",
+      "subtitle": "Strategic intelligence overview and operational posture"
+    },
+    "reputation": {
+      "title": "Reputation Command",
+      "subtitle": "Operational reputation monitoring and risk intelligence"
+    },
+    "forecasting": {
+      "title": "Forecasting Engine",
+      "subtitle": "Predictive operational modeling and trend forecasting"
+    },
+    "benchmarking": {
+      "title": "Competitive Benchmarking",
+      "subtitle": "Peer comparison and competitive intelligence analysis"
+    },
+    "anomalies": {
+      "title": "Anomaly Center",
+      "subtitle": "Operational anomaly detection and incident monitoring"
+    },
+    "semantic": {
+      "title": "Semantic Operations",
+      "subtitle": "Semantic clustering, entity extraction and topic intelligence"
+    },
+    "aviation": {
+      "title": "Aviation Command",
+      "subtitle": "Global aviation metadata and operational intelligence"
+    },
+    "hubs": {
+      "title": "Hub Operations",
+      "subtitle": "Global hub connectivity and traffic intelligence"
+    },
+    "alliances": {
+      "title": "Alliance Network",
+      "subtitle": "Strategic alliance relationship analysis"
+    },
+    "coverage": {
+      "title": "Coverage Command",
+      "subtitle": "Metadata coverage, graph integrity and operational readiness"
+    },
+    "geospatial": {
+      "title": "Geospatial Command",
+      "subtitle": "Geospatial intelligence and route network analysis"
+    },
+    "investigations": {
+      "title": "Investigations Command",
+      "subtitle": "Full investigative workflow and deep-dive intelligence"
+    }
+  },
   "nav": {
-    "groupIntelligence": "Intelligence",
-    "groupAviation": "Aviation",
-    "groupSpatial": "Spatial",
-    "executive": "Executive",
-    "benchmarking": "Benchmarking",
-    "reputation": "Reputation",
-    "semantic": "Semantic Ops",
-    "forecasting": "Forecasting",
-    "anomalies": "Anomaly Center",
-    "aviationIntel": "Aviation Intel",
-    "hubIntel": "Hub Intel",
-    "allianceIntel": "Alliance Intel",
-    "coverageIntel": "Coverage Intel",
-    "geospatial": "Geospatial",
-    "investigations": "Investigations"
+    "expandSidebar": "Expand navigation",
+    "collapseSidebar": "Collapse navigation"
   },
   "geo": {
     "hubsTitle": "Hub intelligence",

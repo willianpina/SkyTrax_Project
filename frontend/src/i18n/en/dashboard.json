@@ -1,9 +1,9 @@
 {
   "nav": {
-    "executiveView": "Executive View",
-    "benchmarking": "Benchmarking",
-    "reputation": "Reputation",
-    "semanticOps": "Semantic Ops"
+    "executiveView": "Executive Command",
+    "benchmarking": "Competitive Benchmarking",
+    "reputation": "Reputation Command",
+    "semanticOps": "Semantic Operations"
   },
   "header": {
     "eyebrow": "Customer Experience Command Center",
@@ -36,8 +36,8 @@
     "prioritySignal": "priority signal"
   },
   "reputation": {
-    "title": "Reputation Intelligence",
-    "subtitle": "Operational reputation monitoring & risk intelligence",
+    "title": "Reputation Command",
+    "subtitle": "Operational reputation monitoring and risk intelligence",
     "kpi": {
       "avgScore": "Global Avg. Score",
       "critical": "Critical Risk",

@@ -85,6 +85,8 @@ export async function initI18n() {
     ? normalizeLanguage(stored)
     : normalizeLanguage(typeof navigator !== "undefined" ? navigator.language : "en");
 
+  const isDev = process.env.NODE_ENV === "development";
+
   await i18n
     .use(detector)
     .use(initReactI18next)
@@ -102,7 +104,13 @@ export async function initI18n() {
         order: ["skytraxStorage", "navigator"],
         caches: ["skytraxStorage"]
       },
-      react: { useSuspense: false }
+      react: { useSuspense: false },
+      saveMissing: isDev,
+      missingKeyHandler: isDev
+        ? (_lngs: readonly string[], ns: string, key: string) => {
+            console.warn(`[I18N] missing key: ${ns}:${key}`);
+          }
+        : false,
     });
 
   document.documentElement.lang = i18n.language === "pt" ? "pt-BR" : "en";

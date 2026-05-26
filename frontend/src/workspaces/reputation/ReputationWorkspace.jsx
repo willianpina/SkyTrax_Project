@@ -154,8 +154,6 @@ export default function ReputationWorkspace() {
   return (
     <WorkspaceShell
       id="reputation"
-      title={t("dashboard:reputation.title")}
-      subtitle={t("dashboard:reputation.subtitle")}
       accent="positive"
     >
       <ReputationKpiStrip kpis={kpis} />

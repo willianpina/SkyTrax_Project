@@ -96,6 +96,7 @@
     "airportDiscovery": "Descobrindo aeroportos",
     "aviationMetadata": "Metadados aeronáuticos",
     "hubIntelligence": "Inteligência de hubs",
+    "aviationMaster": "Dados canônicos de aviação",
     "stageDesc": {
       "discovery": "Descobrindo URLs de companhias",
       "crawl": "Ingestão incremental de avaliações",
@@ -109,7 +110,8 @@
       "snapshots": "Persistindo snapshots",
       "airportDiscovery": "Descoberta de aeroportos",
       "aviationMetadata": "Sincronização de metadados aeronáuticos",
-      "hubIntelligence": "Computação de inteligência de hubs"
+      "hubIntelligence": "Computação de inteligência de hubs",
+      "aviationMaster": "Sincronização de dados canônicos de aviação"
     },
     "stages": {
       "discovery": "Descoberta de companhias",
@@ -126,6 +128,7 @@
       "airport_discovery": "Descoberta de aeroportos",
       "aviation_metadata": "Metadados de aviação",
       "hub_intelligence": "Inteligência de hubs",
+      "aviation_master": "Dados canônicos de aviação",
       "pipeline": "Pipeline operacional"
     },
     "crawlTelemetry": {

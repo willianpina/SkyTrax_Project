@@ -96,6 +96,7 @@
     "airportDiscovery": "Discovering airports",
     "aviationMetadata": "Aviation metadata",
     "hubIntelligence": "Hub intelligence",
+    "aviationMaster": "Aviation master data",
     "stageDesc": {
       "discovery": "Discovering airline URLs",
       "crawl": "Incremental review ingestion",
@@ -109,7 +110,8 @@
       "snapshots": "Persisting snapshots",
       "airportDiscovery": "Airport discovery",
       "aviationMetadata": "Aviation metadata sync",
-      "hubIntelligence": "Hub intelligence compute"
+      "hubIntelligence": "Hub intelligence compute",
+      "aviationMaster": "Syncing canonical aviation master data"
     },
     "stages": {
       "discovery": "Airline discovery",
@@ -126,6 +128,7 @@
       "airport_discovery": "Airport discovery",
       "aviation_metadata": "Aviation metadata",
       "hub_intelligence": "Hub intelligence",
+      "aviation_master": "Aviation master data",
       "pipeline": "Operational pipeline"
     },
     "crawlTelemetry": {

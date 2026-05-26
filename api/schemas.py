@@ -112,9 +112,13 @@ class ReputationScoreResponse(BaseModel):
     complaint_count: int = 0
     negative_count: int = 0
     country: str | None = None
+    region: str | None = None
     alliance: str | None = None
     star_rating: int | None = None
     airline_type: str | None = None
+    iata_code: str | None = None
+    icao_code: str | None = None
+    primary_hub: str | None = None
     timeline: list[dict]
     categories: dict[str, float]
     history: list[dict] = []

@@ -11,7 +11,7 @@ export default function SemanticWorkspace() {
   const { data, clusters, reputation, apiBase } = useSharedAnalytics();
 
   return (
-    <WorkspaceShell id="semantic" title={t("nav:nav.semantic")} subtitle={t("semantic:lookup.subtitle")} accent="signal">
+    <WorkspaceShell id="semantic" accent="signal">
       <SemanticInvestigationPanel clusters={clusters} apiBase={apiBase} reputation={reputation} />
 
       <section className="tactical-grid">

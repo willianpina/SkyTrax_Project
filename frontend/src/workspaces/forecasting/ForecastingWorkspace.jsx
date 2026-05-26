@@ -40,8 +40,6 @@ export default function ForecastingWorkspace() {
   return (
     <WorkspaceShell
       id="forecasting"
-      title={t("nav:nav.forecasting")}
-      subtitle={t("charts:reputationForecast.subtitle")}
       accent="warning"
     >
       <ExecutiveSummary summary={executiveSummary} />

@@ -1,8 +1,8 @@
 {
   "nav": {
-    "executiveView": "Visão Executiva",
-    "benchmarking": "Benchmarking",
-    "reputation": "Reputação",
+    "executiveView": "Comando Executivo",
+    "benchmarking": "Benchmarking Competitivo",
+    "reputation": "Comando de Reputação",
     "semanticOps": "Operações Semânticas"
   },
   "header": {
@@ -36,7 +36,7 @@
     "prioritySignal": "sinal prioritário"
   },
   "reputation": {
-    "title": "Inteligência de Reputação",
+    "title": "Comando de Reputação",
     "subtitle": "Monitoramento operacional de reputação e inteligência de risco",
     "kpi": {
       "avgScore": "Score Médio Global",

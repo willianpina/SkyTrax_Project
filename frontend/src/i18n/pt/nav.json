@@ -1,22 +1,68 @@
 {
-  "sidebarLabel": "Navegação de workspaces",
-  "brand": "Inteligência de Avaliação Aérea",
+  "sidebarLabel": "Navegação da plataforma",
+  "platform": {
+    "brand": "SkyTrax Intelligence",
+    "tagline": "Centro de Comando de Inteligência Aeronáutica",
+    "footer": "Comando de Fusão"
+  },
+  "groups": {
+    "command": "Centro de Comando",
+    "operations": "Operações Aeronáuticas",
+    "spatial": "Espacial & Investigações"
+  },
+  "modules": {
+    "executive": {
+      "title": "Comando Executivo",
+      "subtitle": "Visão estratégica de inteligência e postura operacional"
+    },
+    "reputation": {
+      "title": "Comando de Reputação",
+      "subtitle": "Monitoramento operacional de reputação e inteligência de risco"
+    },
+    "forecasting": {
+      "title": "Motor de Previsão",
+      "subtitle": "Modelagem operacional preditiva e previsão de tendências"
+    },
+    "benchmarking": {
+      "title": "Benchmarking Competitivo",
+      "subtitle": "Comparação entre pares e análise de inteligência competitiva"
+    },
+    "anomalies": {
+      "title": "Centro de Anomalias",
+      "subtitle": "Detecção de anomalias operacionais e monitoramento de incidentes"
+    },
+    "semantic": {
+      "title": "Operações Semânticas",
+      "subtitle": "Clusterização semântica, extração de entidades e inteligência de tópicos"
+    },
+    "aviation": {
+      "title": "Comando Aeronáutico",
+      "subtitle": "Metadados globais de aviação e inteligência operacional"
+    },
+    "hubs": {
+      "title": "Operações de Hubs",
+      "subtitle": "Conectividade global de hubs e inteligência de tráfego"
+    },
+    "alliances": {
+      "title": "Rede de Alianças",
+      "subtitle": "Análise estratégica de relações entre alianças"
+    },
+    "coverage": {
+      "title": "Comando de Cobertura",
+      "subtitle": "Cobertura de metadados, integridade do grafo e prontidão operacional"
+    },
+    "geospatial": {
+      "title": "Comando Geoespacial",
+      "subtitle": "Inteligência geoespacial e análise de redes de rotas"
+    },
+    "investigations": {
+      "title": "Comando de Investigações",
+      "subtitle": "Fluxo investigativo completo e inteligência aprofundada"
+    }
+  },
   "nav": {
-    "groupIntelligence": "Inteligência",
-    "groupAviation": "Aviação",
-    "groupSpatial": "Espacial",
-    "executive": "Executivo",
-    "benchmarking": "Benchmarking",
-    "reputation": "Reputação",
-    "semantic": "Ops Semântico",
-    "forecasting": "Previsões",
-    "anomalies": "Centro de Anomalias",
-    "aviationIntel": "Intel Aeronáutica",
-    "hubIntel": "Intel de Hubs",
-    "allianceIntel": "Intel de Alianças",
-    "coverageIntel": "Intel de Cobertura",
-    "geospatial": "Geoespacial",
-    "investigations": "Investigações"
+    "expandSidebar": "Expandir navegação",
+    "collapseSidebar": "Recolher navegação"
   },
   "geo": {
     "hubsTitle": "Inteligência de hubs",

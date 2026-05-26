@@ -23,7 +23,7 @@ export default function BenchmarkingWorkspace() {
   const leaders = ranked.slice(0, 3);
 
   return (
-    <WorkspaceShell id="benchmarking" title={t("nav:nav.benchmarking")} subtitle={t("benchmarking:subtitle", { defaultValue: "Competitive intelligence and peer comparison" })} accent="signal">
+    <WorkspaceShell id="benchmarking" accent="signal">
       <section className="workspace-kpi-strip">
         {leaders.map((r, i) => (
           <div className={`peer-card glass-panel rank-${i + 1}`} key={r.slug}>

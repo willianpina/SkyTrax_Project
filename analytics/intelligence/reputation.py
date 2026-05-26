@@ -53,15 +53,23 @@ class ReputationService:
         if not meta:
             airline = self.session.query(Airline).filter(Airline.slug == airline_slug).first()
             country = airline.country if airline else None
-            return {"country": country, "alliance": None, "star_rating": None, "airline_type": None}
+            return {
+                "country": country, "region": None, "alliance": None,
+                "star_rating": None, "airline_type": None,
+                "iata_code": None, "icao_code": None, "primary_hub": None,
+            }
         alliance_name = None
         if meta.alliance_rel:
             alliance_name = meta.alliance_rel.name
         return {
             "country": meta.country,
+            "region": meta.region,
             "alliance": alliance_name,
             "star_rating": meta.star_rating,
             "airline_type": meta.airline_type,
+            "iata_code": meta.iata_code,
+            "icao_code": meta.icao_code,
+            "primary_hub": meta.primary_hub,
         }
 
     def score_airline(self, airline_slug: str) -> dict:

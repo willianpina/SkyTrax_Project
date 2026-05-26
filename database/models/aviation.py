@@ -38,13 +38,18 @@ class AirlineMetadata(TimestampMixin, Base):
     airline_id: Mapped[str | None] = mapped_column(ForeignKey("airlines.id"), index=True)
     airline_name: Mapped[str] = mapped_column(String(200), nullable=False)
     slug: Mapped[str] = mapped_column(String(200), unique=True, nullable=False, index=True)
+    iata_code: Mapped[str | None] = mapped_column(String(8), index=True)
+    icao_code: Mapped[str | None] = mapped_column(String(8), index=True)
+    callsign: Mapped[str | None] = mapped_column(String(120))
     country: Mapped[str | None] = mapped_column(String(120), index=True)
+    region: Mapped[str | None] = mapped_column(String(80), index=True)
     alliance_id: Mapped[str | None] = mapped_column(ForeignKey("alliances.id"), index=True)
     airline_type: Mapped[str | None] = mapped_column(String(60), index=True)
     star_rating: Mapped[int | None] = mapped_column(Integer)
     is_low_cost: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sql_text("false"))
     is_premium: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sql_text("false"))
     fleet_size: Mapped[int | None] = mapped_column(Integer)
+    primary_hub: Mapped[str | None] = mapped_column(String(8))
     certifications: Mapped[list[str]] = mapped_column(
         JSONB, default=list, server_default=sql_text("'[]'::jsonb"), nullable=False,
     )
