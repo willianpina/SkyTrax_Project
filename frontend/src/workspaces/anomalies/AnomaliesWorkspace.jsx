@@ -6,6 +6,7 @@ import { PanelShell, SeverityBadge } from "../../components/ui/PanelShell";
 import { OperationalBadge } from "../../components/ui/OperationalBadge";
 import { AnomalyTimeline } from "../../components/AnomalyPanel";
 import { formatShortDate } from "../../utils/datetime";
+import { formatScore, formatGap as fmtGap } from "../../utils/formatMetric";
 import {
   AlertTriangle, Shield, Radio, TrendingDown,
   BarChart3, Activity, ChevronDown, ChevronRight,
@@ -108,12 +109,7 @@ function categorizeAnomaly(type) {
 }
 
 function formatGap(observed, expected) {
-  const obs = parseFloat(observed);
-  const exp = parseFloat(expected);
-  if (isNaN(obs) || isNaN(exp)) return null;
-  const gap = obs - exp;
-  const sign = gap >= 0 ? "+" : "";
-  return `${sign}${gap.toFixed(1)}`;
+  return fmtGap(observed, expected);
 }
 
 const IncidentRow = memo(function IncidentRow({ anomaly: a }) {
@@ -136,11 +132,11 @@ const IncidentRow = memo(function IncidentRow({ anomaly: a }) {
       <div className="anm-incident-scores">
         <div className="anm-score-cell">
           <span className="anm-score-label">Observed</span>
-          <span className="anm-score-val">{a.observed_value ?? "—"}</span>
+          <span className="anm-score-val metric-num">{formatScore(a.observed_value, { allowZero: true })}</span>
         </div>
         <div className="anm-score-cell">
           <span className="anm-score-label">Threshold</span>
-          <span className="anm-score-val anm-score-val--dim">{a.expected_value ?? "—"}</span>
+          <span className="anm-score-val anm-score-val--dim metric-num">{formatScore(a.expected_value, { allowZero: true })}</span>
         </div>
         {gap && (
           <div className="anm-score-cell">

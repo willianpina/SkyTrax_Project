@@ -1,6 +1,7 @@
 import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { PanelShell } from "../ui/PanelShell";
+import { formatScore } from "../../utils/formatMetric";
 
 function AirlineComparisonMatrixInner({ reputation, benchmarking }) {
   const { t } = useTranslation("command");
@@ -38,17 +39,17 @@ function AirlineComparisonMatrixInner({ reputation, benchmarking }) {
             <span className="matrix-airline">{row.airline}</span>
             <div className="matrix-cell">
               <div className="matrix-bar positive" style={{ width: `${(row.score / maxScore) * 100}%` }} />
-              <span>{row.score}</span>
+              <span className="metric-num">{formatScore(row.score, { allowZero: true })}</span>
             </div>
             <div className="matrix-cell">
               <div className="matrix-bar risk" style={{ width: `${Math.min(100, row.complaint)}%` }} />
-              <span>{Math.round(row.complaint)}</span>
+              <span className="metric-num">{formatScore(row.complaint, { allowZero: false })}</span>
             </div>
             <div className="matrix-cell">
-              <span className={row.risk > 50 ? "risk-high" : "risk-low"}>{Math.round(row.risk)}</span>
+              <span className={`metric-num ${row.risk > 50 ? "risk-high" : "risk-low"}`}>{formatScore(row.risk, { allowZero: false })}</span>
             </div>
             <div className="matrix-cell">
-              <span>{Math.round(row.sentiment)}</span>
+              <span className="metric-num">{formatScore(row.sentiment, { allowZero: false })}</span>
             </div>
           </div>
         ))}

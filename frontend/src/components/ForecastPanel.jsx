@@ -2,6 +2,7 @@ import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { baseChartTheme, axisStyle, PALANTIR_COLORS } from "../lib/chartTheme";
 import { forecastConfidence } from "../lib/executiveMetrics";
+import { formatScore, formatDeltaNumeric } from "../utils/formatMetric";
 import { LazyEChart } from "./ui/LazyEChart";
 import { ConfidenceBadge, OperationalTag, PanelShell, TrendArrow } from "./ui/PanelShell";
 
@@ -102,6 +103,13 @@ function ForecastPanelInner({ forecasts }) {
           const row = (forecasts?.metrics?.[metric] || []).find((r) => r.horizon === "weekly");
           if (!row) return null;
           const fc = forecastConfidence(row);
+          const current = formatScore(row.current_value);
+          const forecast = formatScore(row.forecast_value);
+          const delta = formatDeltaNumeric(
+            row.forecast_value != null && row.current_value != null
+              ? row.forecast_value - row.current_value
+              : null
+          );
           const trendKey = row.trend_direction?.toLowerCase();
           const trendLabel = trendKey ? t(`common:trend.${trendKey}`, { defaultValue: row.trend_direction }) : row.trend_direction;
           return (
@@ -110,8 +118,9 @@ function ForecastPanelInner({ forecasts }) {
                 <strong>{t(`charts:metrics.${metric}`, { defaultValue: metric.replace("_", " ") })}</strong>
                 <ConfidenceBadge score={fc.score} insufficient={fc.insufficient} />
               </div>
-              <span>
-                {row.current_value ?? "—"} → {row.forecast_value ?? "—"}
+              <span className="metric-num">
+                {current} → {forecast}
+                {delta !== "—" && <small className={delta.startsWith("+") ? "delta-pos" : "delta-neg"}> ({delta})</small>}
               </span>
               <small>
                 <TrendArrow direction={row.trend_direction} /> {trendLabel}

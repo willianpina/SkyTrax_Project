@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
 import { computeExecutiveMetrics } from "../../lib/executiveMetrics";
 import { buildRatingOption, buildSentimentOption } from "../../lib/chartConfigs";
+import { formatScore } from "../../utils/formatMetric";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
 import { ChartPanel } from "../../components/charts/ChartPanel";
 import { ExecutiveInsightsPanel } from "../../components/command/ExecutiveInsightsPanel";
@@ -46,15 +47,18 @@ export default function ReputationWorkspace() {
   return (
     <WorkspaceShell id="reputation" title={t("nav:nav.reputation")} subtitle={t("dashboard:header.eyebrow")} accent="positive">
       <section className="workspace-kpi-strip">
-        {[frustration, deterioration, premium].filter(Boolean).map((m) => (
-          <div className={`strip-metric severity-${m.severity}`} key={m.id}>
-            <span className="strip-label">{t(`command:metrics.${m.id}`, { defaultValue: m.id })}</span>
-            <div className="strip-value-row">
-              <span className="strip-value">{m.value}{m.unit ? <small>{m.unit}</small> : null}</span>
-              <TrendArrow direction={m.trend} />
+        {[frustration, deterioration, premium].filter(Boolean).map((m) => {
+          const displayValue = typeof m.value === "number" ? formatScore(m.value, { allowZero: true }) : m.value;
+          return (
+            <div className={`strip-metric severity-${m.severity}`} key={m.id}>
+              <span className="strip-label">{t(`command:metrics.${m.id}`, { defaultValue: m.id })}</span>
+              <div className="strip-value-row">
+                <span className="strip-value metric-num">{displayValue}{m.unit ? <small>{m.unit}</small> : null}</span>
+                <TrendArrow direction={m.trend} />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       <section className="tactical-grid">
@@ -72,7 +76,7 @@ export default function ReputationWorkspace() {
           {reputation.map((r) => (
             <div className="reputation-row hover-intel" key={r.slug}>
               <strong>{r.airline}</strong>
-              <span className="reputation-score">{r.score}</span>
+              <span className="reputation-score metric-num">{formatScore(r.score, { allowZero: true })}</span>
               <SeverityBadge severity={r.score > 60 ? "positive" : r.score > 40 ? "medium" : "high"} />
               <span className="reputation-reviews">{r.review_count} reviews</span>
               <TrendArrow direction={r.score > 60 ? "up" : "down"} />

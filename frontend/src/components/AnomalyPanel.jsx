@@ -1,6 +1,7 @@
 import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { baseChartTheme, axisStyle, PALANTIR_COLORS } from "../lib/chartTheme";
+import { formatScore } from "../utils/formatMetric";
 import { LazyEChart } from "./ui/LazyEChart";
 import { PanelShell, SeverityBadge } from "./ui/PanelShell";
 import { formatShortDate } from "../utils/datetime";
@@ -78,9 +79,9 @@ export const AnomalyTimeline = memo(function AnomalyTimeline({ anomalies }) {
                   <span className="atp-row-type">{typeName}</span>
                 </div>
                 <div className="atp-row-score">
-                  <span className="atp-row-obs">{row.observed_value}</span>
+                  <span className="atp-row-obs metric-num">{formatScore(row.observed_value, { allowZero: true })}</span>
                   <span className="atp-row-sep">→</span>
-                  <span className="atp-row-exp">{row.expected_value}</span>
+                  <span className="atp-row-exp metric-num">{formatScore(row.expected_value, { allowZero: true })}</span>
                 </div>
               </div>
             );

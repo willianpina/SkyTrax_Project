@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
 import { buildComplaintDensityOption } from "../../lib/chartConfigs";
+import { formatScore } from "../../utils/formatMetric";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
 import { ChartPanel } from "../../components/charts/ChartPanel";
 import { BenchmarkingRadar } from "../../components/charts/BenchmarkingRadar";
@@ -28,7 +29,7 @@ export default function BenchmarkingWorkspace() {
           <div className={`peer-card glass-panel rank-${i + 1}`} key={r.slug}>
             <span className="peer-rank">#{i + 1}</span>
             <strong>{r.airline}</strong>
-            <span className="peer-score">{r.score}</span>
+            <span className="peer-score metric-num">{formatScore(r.score, { allowZero: true })}</span>
             <TrendArrow direction={r.score > 60 ? "up" : "down"} />
           </div>
         ))}
@@ -51,9 +52,9 @@ export default function BenchmarkingWorkspace() {
                 <span className="ranking-pos">#{i + 1}</span>
                 <span className="ranking-airline">{r.airline}</span>
                 <div className="ranking-bar-track">
-                  <div className="ranking-bar positive" style={{ width: `${r.score}%` }} />
+                  <div className="ranking-bar positive" style={{ width: `${Math.round(r.score)}%` }} />
                 </div>
-                <span className="ranking-score">{r.score}</span>
+                <span className="ranking-score metric-num">{formatScore(r.score, { allowZero: true })}</span>
               </div>
             ))}
           </div>

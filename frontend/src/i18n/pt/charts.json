@@ -45,5 +45,41 @@
   "forecastMetrics": {
     "title": "Visão geral de previsões",
     "subtitle": "Todas as métricas rastreadas"
+  },
+  "executive": {
+    "monitored": "Monitoradas",
+    "deteriorating": "Em deterioração",
+    "recovering": "Em recuperação",
+    "globalRisk": "Risco Global",
+    "topAlert": "Alerta Principal",
+    "modelConfidence": "Confiança do Modelo"
+  },
+  "topMovers": {
+    "title": "Maiores Mudanças"
+  },
+  "table": {
+    "title": "Previsões Operacionais",
+    "airline": "Companhia",
+    "current": "Atual",
+    "forecast": "Previsto",
+    "trend": "Tendência",
+    "risk": "Risco",
+    "confidence": "Conf.",
+    "complaints": "Reclamações",
+    "sentiment": "Sentimento",
+    "filters": "Filtros",
+    "all": "Todos",
+    "airlines": "companhias"
+  },
+  "heatmap": {
+    "title": "Matriz Temporal de Risco",
+    "subtitle": "Delta de score por janela temporal",
+    "d7": "7d",
+    "d30": "30d",
+    "d90": "90d",
+    "projected": "Projetado",
+    "recovery": "Recuperação",
+    "deterioration": "Deterioração",
+    "stable": "Estável"
   }
 }

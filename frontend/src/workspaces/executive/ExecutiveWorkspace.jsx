@@ -5,6 +5,7 @@ import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
 import { computeExecutiveMetrics } from "../../lib/executiveMetrics";
 import { buildIntelligenceFeed } from "../../lib/intelligenceFeed";
 import { buildRatingOption } from "../../lib/chartConfigs";
+import { formatScore, formatPercent } from "../../utils/formatMetric";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
 import { ExecutiveMetricsStrip } from "../../components/command/ExecutiveMetricsStrip";
 import { MetricCard } from "../../components/MetricCard";
@@ -57,10 +58,10 @@ export default function ExecutiveWorkspace() {
       )}
 
       <section className="kpi-row">
-        <MetricCard icon={Gauge} label={t("dashboard:kpi.ars")} value={topArs ? `${topArs.score}` : "—"} detail={topArs ? t("dashboard:kpi.arsDetailLeading", { airline: topArs.airline }) : t("dashboard:kpi.arsDetailDefault")} trend={topArs?.score > 60 ? "up" : "down"} />
-        <MetricCard icon={Activity} label={t("dashboard:kpi.recommendation")} value={`${Math.round((data.recommendation_rate || 0) * 100)}%`} detail={t("dashboard:kpi.recommendationDetail")} trend="up" />
+        <MetricCard icon={Gauge} label={t("dashboard:kpi.ars")} value={topArs ? formatScore(topArs.score, { allowZero: true }) : "—"} detail={topArs ? t("dashboard:kpi.arsDetailLeading", { airline: topArs.airline }) : t("dashboard:kpi.arsDetailDefault")} trend={topArs?.score > 60 ? "up" : "down"} />
+        <MetricCard icon={Activity} label={t("dashboard:kpi.recommendation")} value={formatPercent((data.recommendation_rate || 0) * 100, { allowZero: true })} detail={t("dashboard:kpi.recommendationDetail")} trend="up" />
         <MetricCard icon={BarChart3} label={t("dashboard:kpi.reviewsIndexed")} value={(data.review_count || 0).toLocaleString(i18n.language === "pt" ? "pt-BR" : "en-US")} detail={t("dashboard:kpi.reviewsDetail")} />
-        <MetricCard icon={AlertTriangle} label={t("dashboard:kpi.operationalAlerts")} value={alerts.length} detail={t("dashboard:kpi.operationalAlertsDetail")} tone="risk" trend={alerts.length > 3 ? "down" : "stable"} />
+        <MetricCard icon={AlertTriangle} label={t("dashboard:kpi.operationalAlerts")} value={alerts.length || "—"} detail={t("dashboard:kpi.operationalAlertsDetail")} tone="risk" trend={alerts.length > 3 ? "down" : "stable"} />
       </section>
 
       <div className="command-body">
