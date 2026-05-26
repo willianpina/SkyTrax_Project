@@ -2748,7 +2748,12 @@ h1, h2, h3, p { margin: 0; }
   min-width: 48px; color: var(--text-muted, #64748b);
   font-family: monospace; font-size: 0.58rem; flex-shrink: 0;
 }
-.osm-ev-msg { color: var(--text-secondary, #cbd5e1); }
+.osm-ev-msg { color: var(--text-secondary, #cbd5e1); flex: 1; }
+.osm-ev-dur {
+  font-size: 0.5rem; font-family: monospace; font-weight: 600;
+  color: var(--ops-cyan, #22d3ee); opacity: 0.8;
+  white-space: nowrap; margin-left: auto;
+}
 
 /* ── History ───────────────────────────────────────────────── */
 .osm-history { margin-top: 4px; }
@@ -3518,6 +3523,7 @@ h1, h2, h3, p { margin: 0; }
 [data-theme="light"] .osm-ev { border-bottom-color: rgba(0,0,0,0.03); }
 [data-theme="light"] .osm-ev-time { color: #64748b; }
 [data-theme="light"] .osm-ev-msg { color: #334155; }
+[data-theme="light"] .osm-ev-dur { color: #0891b2; }
 [data-theme="light"] .ev-icon { color: #94a3b8; }
 [data-theme="light"] .ev-icon--done { color: #059669; }
 [data-theme="light"] .ev-icon--error { color: #dc2626; }

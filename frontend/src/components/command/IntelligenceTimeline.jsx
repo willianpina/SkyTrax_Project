@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
+import { formatOperationalDateTime } from "../../utils/datetime";
 import { PanelShell } from "../ui/PanelShell";
 
 const TYPE_ICONS = {
@@ -59,12 +60,7 @@ function IntelligenceTimelineInner({ items }) {
 
 function formatTime(iso) {
   if (!iso) return "—";
-  try {
-    const d = new Date(iso);
-    return d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-  } catch {
-    return String(iso).slice(0, 16);
-  }
+  return formatOperationalDateTime(iso);
 }
 
 export const IntelligenceTimeline = memo(IntelligenceTimelineInner);
