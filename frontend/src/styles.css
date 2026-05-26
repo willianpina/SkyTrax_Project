@@ -2747,6 +2747,11 @@ h1, h2, h3, p { margin: 0; }
 .osm-ev-time {
   min-width: 48px; color: var(--text-muted, #64748b);
   font-family: monospace; font-size: 0.58rem; flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.osm-tz-badge {
+  font-size: 0.5rem; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--signal, #38bdf8); opacity: 0.8;
 }
 .osm-ev-msg { color: var(--text-secondary, #cbd5e1); flex: 1; }
 .osm-ev-dur {

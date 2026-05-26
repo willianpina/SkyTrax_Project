@@ -91,6 +91,64 @@
     "snapshots": "Snapshots",
     "airportDiscovery": "Discovering airports",
     "aviationMetadata": "Aviation metadata",
-    "hubIntelligence": "Hub intelligence"
+    "hubIntelligence": "Hub intelligence",
+    "stageDesc": {
+      "discovery": "Discovering airline URLs",
+      "crawl": "Incremental review ingestion",
+      "metadata": "Extracting structured metadata",
+      "semantic": "NLP enrichment & clustering",
+      "knowledgeGraph": "Building knowledge graph",
+      "forecasting": "Generating trend forecasts",
+      "anomalies": "Detecting anomalies",
+      "insights": "Executive intelligence",
+      "fusion": "Cross-correlation signals",
+      "snapshots": "Persisting snapshots",
+      "airportDiscovery": "Airport discovery",
+      "aviationMetadata": "Aviation metadata sync",
+      "hubIntelligence": "Hub intelligence compute"
+    },
+    "stages": {
+      "discovery": "Airline discovery",
+      "crawl": "Review ingestion",
+      "metadata": "Metadata extraction",
+      "semantic": "Semantic intelligence",
+      "semantic_pt": "Semantic intelligence",
+      "knowledge_graph": "Knowledge graph",
+      "forecasting": "Trend forecasting",
+      "anomalies": "Anomaly detection",
+      "insights": "Executive insights",
+      "fusion": "Correlation signals",
+      "snapshots": "Snapshot persistence",
+      "airport_discovery": "Airport discovery",
+      "aviation_metadata": "Aviation metadata",
+      "hub_intelligence": "Hub intelligence",
+      "pipeline": "Operational pipeline"
+    },
+    "crawl": {
+      "title": "Crawl Intelligence",
+      "stalled": "Crawler stalled — no new items in 90s",
+      "saturated": "Corpus saturated — {{count}} pages dry. Advancing.",
+      "corpusTotal": "Corpus Total",
+      "newReviews": "New Reviews",
+      "pages": "Pages",
+      "duplicates": "Duplicates",
+      "throughput": "Throughput",
+      "elapsed": "Elapsed",
+      "airlines": "Airlines"
+    },
+    "eventMessages": {
+      "stageStarted": "{{stage}} started",
+      "stageCompleted": "{{stage}} completed",
+      "stageFailed": "{{stage}} failed",
+      "pipelineStarted": "Pipeline started",
+      "pipelineCompleted": "Pipeline completed",
+      "pipelineFailed": "Pipeline failed",
+      "pipelineTriggered": "Pipeline triggered",
+      "aviationSyncStarted": "Aviation sync started",
+      "aviationSyncCompleted": "Aviation sync completed",
+      "aviationSyncFailed": "Aviation sync failed",
+      "aviationSyncTriggered": "Aviation sync triggered",
+      "corpusSaturated": "Corpus saturated — advancing"
+    }
   }
 }

@@ -22,13 +22,14 @@ const SEV_CONFIG = {
 };
 
 function SeverityStrip({ counts, total }) {
+  const { t } = useTranslation(["anomalies"]);
   const kpis = [
-    { icon: AlertTriangle, label: "Active Signals", value: total, sub: "Monitored anomaly events", accent: "risk" },
-    { icon: Zap, label: "Critical", value: counts.critical + counts.high, sub: "Requiring immediate action", accent: counts.critical + counts.high > 0 ? "risk" : "signal" },
-    { icon: Activity, label: "Medium", value: counts.medium, sub: "Under observation", accent: counts.medium > 0 ? "warning" : "signal" },
-    { icon: Radio, label: "Low Priority", value: counts.low, sub: "Informational signals", accent: "signal" },
-    { icon: Shield, label: "Carriers Affected", value: 0, sub: "Distinct airlines flagged", accent: "signal" },
-    { icon: BarChart3, label: "Detection Coverage", value: "—", sub: "Operational confidence", accent: "signal" },
+    { icon: AlertTriangle, label: t("anomalies:strip.activeSignals"), value: total, sub: t("anomalies:strip.activeSignalsSub"), accent: "risk" },
+    { icon: Zap, label: t("anomalies:strip.critical"), value: counts.critical + counts.high, sub: t("anomalies:strip.criticalSub"), accent: counts.critical + counts.high > 0 ? "risk" : "signal" },
+    { icon: Activity, label: t("anomalies:strip.medium"), value: counts.medium, sub: t("anomalies:strip.mediumSub"), accent: counts.medium > 0 ? "warning" : "signal" },
+    { icon: Radio, label: t("anomalies:strip.lowPriority"), value: counts.low, sub: t("anomalies:strip.lowPrioritySub"), accent: "signal" },
+    { icon: Shield, label: t("anomalies:strip.carriers"), value: 0, sub: t("anomalies:strip.carriersSub"), accent: "signal" },
+    { icon: BarChart3, label: t("anomalies:strip.detection"), value: "—", sub: t("anomalies:strip.detectionSub"), accent: "signal" },
   ];
 
   return (
@@ -69,6 +70,7 @@ function useGroupedAnomalies(anomalies) {
 }
 
 const AirlineGroup = memo(function AirlineGroup({ group }) {
+  const { t } = useTranslation(["anomalies"]);
   const [open, setOpen] = useState(group.severities.critical > 0 || group.severities.high > 0);
   const maxSev = SEV_ORDER.find((s) => group.severities[s] > 0) || "low";
   const conf = SEV_CONFIG[maxSev];
@@ -99,13 +101,13 @@ const AirlineGroup = memo(function AirlineGroup({ group }) {
 });
 
 function categorizeAnomaly(type) {
-  const t = (type || "").toLowerCase();
-  if (t.includes("reputation") || t.includes("score")) return "Reputation";
-  if (t.includes("sentiment") || t.includes("rating")) return "Sentiment";
-  if (t.includes("complaint") || t.includes("density")) return "Complaints";
-  if (t.includes("service") || t.includes("crew") || t.includes("cabin")) return "Service";
-  if (t.includes("delay") || t.includes("cancel")) return "Operations";
-  return "Signal";
+  const s = (type || "").toLowerCase();
+  if (s.includes("reputation") || s.includes("score")) return "reputation";
+  if (s.includes("sentiment") || s.includes("rating")) return "sentiment";
+  if (s.includes("complaint") || s.includes("density")) return "complaints";
+  if (s.includes("service") || s.includes("crew") || s.includes("cabin")) return "service";
+  if (s.includes("delay") || s.includes("cancel")) return "operations";
+  return "signal";
 }
 
 function formatGap(observed, expected) {
@@ -113,11 +115,13 @@ function formatGap(observed, expected) {
 }
 
 const IncidentRow = memo(function IncidentRow({ anomaly: a }) {
+  const { t } = useTranslation(["anomalies"]);
   const sev = a.severity || "low";
   const typeName = (a.anomaly_type || "").replace(/_/g, " ");
-  const category = categorizeAnomaly(a.anomaly_type);
+  const categoryKey = categorizeAnomaly(a.anomaly_type);
+  const category = t(`anomalies:categories.${categoryKey}`);
   const gap = formatGap(a.observed_value, a.expected_value);
-  const sevLabel = sev === "critical" ? "CRITICAL" : sev === "high" ? "HIGH" : sev === "medium" ? "ELEVATED" : "MONITORING";
+  const sevLabel = t(`anomalies:severity.${sev}`);
 
   return (
     <div className={`anm-incident anm-incident--${sev}`}>
@@ -131,16 +135,16 @@ const IncidentRow = memo(function IncidentRow({ anomaly: a }) {
       </div>
       <div className="anm-incident-scores">
         <div className="anm-score-cell">
-          <span className="anm-score-label">Observed</span>
+          <span className="anm-score-label">{t("anomalies:registry.observed")}</span>
           <span className="anm-score-val metric-num">{formatScore(a.observed_value, { allowZero: true })}</span>
         </div>
         <div className="anm-score-cell">
-          <span className="anm-score-label">Threshold</span>
+          <span className="anm-score-label">{t("anomalies:registry.threshold")}</span>
           <span className="anm-score-val anm-score-val--dim metric-num">{formatScore(a.expected_value, { allowZero: true })}</span>
         </div>
         {gap && (
           <div className="anm-score-cell">
-            <span className="anm-score-label">Gap</span>
+            <span className="anm-score-label">{t("anomalies:registry.gap")}</span>
             <span className={`anm-score-val anm-score-gap ${parseFloat(gap) < 0 ? "anm-score-gap--neg" : "anm-score-gap--pos"}`}>{gap}</span>
           </div>
         )}
@@ -151,6 +155,7 @@ const IncidentRow = memo(function IncidentRow({ anomaly: a }) {
 });
 
 function SignalStream({ anomalies, alerts }) {
+  const { t } = useTranslation(["anomalies"]);
   const combined = useMemo(() => {
     const all = [
       ...(alerts || []).map((a) => ({ ...a, _src: "alert" })),
@@ -162,17 +167,17 @@ function SignalStream({ anomalies, alerts }) {
 
   if (combined.length === 0) {
     return (
-      <PanelShell title="Signal Stream" subtitle="No active signals" accent="signal">
+      <PanelShell title={t("anomalies:stream.emptyTitle")} subtitle={t("anomalies:stream.emptySub")} accent="signal">
         <div className="anm-empty-sm">
           <Radio size={18} strokeWidth={1.2} />
-          <span>No anomaly signals detected in the current window</span>
+          <span>{t("anomalies:stream.emptyMsg")}</span>
         </div>
       </PanelShell>
     );
   }
 
   return (
-    <PanelShell title="Live Signal Stream" subtitle={`${combined.length} latest detections`} accent="risk" expandable>
+    <PanelShell title={t("anomalies:stream.title")} subtitle={t("anomalies:stream.subtitle", { count: combined.length })} accent="risk" expandable>
       <div className="anm-stream">
         {combined.map((s, i) => {
           const sev = s.severity || "low";
@@ -197,6 +202,7 @@ function SignalStream({ anomalies, alerts }) {
 }
 
 function ExecutiveAssessment({ anomalies }) {
+  const { t } = useTranslation(["anomalies"]);
   const insights = useMemo(() => {
     if (!anomalies || anomalies.length === 0) return [];
     const sevCounts = { critical: 0, high: 0, medium: 0, low: 0 };
@@ -213,22 +219,22 @@ function ExecutiveAssessment({ anomalies }) {
       .map(([name]) => name);
 
     if (criticalAirlines.length > 0) {
-      msgs.push({ sev: "high", text: `${criticalAirlines.length} carrier(s) with critical escalation signals: ${criticalAirlines.slice(0, 3).join(", ")}${criticalAirlines.length > 3 ? "…" : ""}` });
+      msgs.push({ sev: "high", text: t("anomalies:assessment.criticalEscalation", { count: criticalAirlines.length, airlines: criticalAirlines.slice(0, 3).join(", ") + (criticalAirlines.length > 3 ? "…" : "") }) });
     }
     if (sevCounts.medium > 3) {
-      msgs.push({ sev: "medium", text: `${sevCounts.medium} medium-priority anomalies detected — emerging deterioration patterns under observation` });
+      msgs.push({ sev: "medium", text: t("anomalies:assessment.mediumDetected", { count: sevCounts.medium }) });
     }
     if (sevCounts.low > 0) {
-      msgs.push({ sev: "low", text: `${sevCounts.low} informational signals tracked — operational baseline monitoring active` });
+      msgs.push({ sev: "low", text: t("anomalies:assessment.lowTracked", { count: sevCounts.low }) });
     }
     if (msgs.length === 0) {
-      msgs.push({ sev: "low", text: "All carriers within operational baselines. No escalation required." });
+      msgs.push({ sev: "low", text: t("anomalies:assessment.allStable") });
     }
     return msgs;
-  }, [anomalies]);
+  }, [anomalies, t]);
 
   return (
-    <PanelShell title="Executive Assessment" subtitle="Operational posture summary" accent="signal" expandable>
+    <PanelShell title={t("anomalies:assessment.title")} subtitle={t("anomalies:assessment.subtitle")} accent="signal" expandable>
       <div className="anm-assessment">
         {insights.map((ins, i) => (
           <div className={`anm-assess-row anm-assess--${ins.sev}`} key={i}>
@@ -242,7 +248,7 @@ function ExecutiveAssessment({ anomalies }) {
 }
 
 export default function AnomaliesWorkspace() {
-  const { t } = useTranslation(["alerts", "command", "common", "nav"]);
+  const { t } = useTranslation(["anomalies", "alerts", "command", "common", "nav"]);
   const { anomalies, alerts } = useSharedAnalytics();
   const [sevFilter, setSevFilter] = useState(null);
 
@@ -274,7 +280,7 @@ export default function AnomaliesWorkspace() {
     <WorkspaceShell
       id="anomalies"
       title={t("nav:nav.anomalies")}
-      subtitle={`${totalSignals} active signals monitored`}
+      subtitle={t("anomalies:subtitle", { count: totalSignals })}
       accent="risk"
     >
       <SeverityStrip counts={counts} total={totalSignals} />
@@ -285,7 +291,7 @@ export default function AnomaliesWorkspace() {
           type="button"
           className={`anm-filter-btn ${!sevFilter ? "anm-filter--active" : ""}`}
           onClick={() => setSevFilter(null)}
-        >All</button>
+        >{t("anomalies:filter.all")}</button>
         {SEV_ORDER.map((s) => (
           <button
             key={s}
@@ -301,15 +307,15 @@ export default function AnomaliesWorkspace() {
           <AnomalyTimeline anomalies={anomalies} />
 
           <PanelShell
-            title="Incident Registry"
-            subtitle={`${filtered.length} anomalies · ${groups.length} carriers`}
+            title={t("anomalies:registry.title")}
+            subtitle={t("anomalies:registry.subtitle", { anomalies: filtered.length, carriers: groups.length })}
             accent="risk"
             expandable
           >
             {groups.length === 0 ? (
               <div className="anm-empty-sm">
                 <Shield size={20} strokeWidth={1.2} />
-                <span>No anomalies detected. Operational baselines stable.</span>
+                <span>{t("anomalies:registry.empty")}</span>
               </div>
             ) : (
               <div className="anm-groups">

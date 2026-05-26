@@ -8,5 +8,9 @@
     "title": "Busca Semântica",
     "subtitle": "Recuperação pronta para RAG",
     "placeholder": "Buscar avaliações (ex.: reembolso bagagem atrasada)"
+  },
+  "friction": {
+    "title": "Matriz de Fricção Semântica Operacional",
+    "empty": "Sem dados de fricção disponíveis. Execute uma sincronização de pipeline para gerar inteligência."
   }
 }

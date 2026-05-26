@@ -11,7 +11,7 @@ function normalizeLanguage(language?: string | null): AppLanguage {
   return language.startsWith("pt") ? "pt" : "en";
 }
 
-export const NAMESPACES = ["common", "dashboard", "charts", "alerts", "semantic", "benchmarking", "command", "nav", "aviation"] as const;
+export const NAMESPACES = ["common", "dashboard", "charts", "alerts", "semantic", "benchmarking", "command", "nav", "aviation", "coverage", "alliances", "hubs", "anomalies"] as const;
 
 const STORAGE_KEY = "skytrax-language";
 
@@ -25,7 +25,11 @@ const localeLoaders: Record<AppLanguage, Record<string, () => Promise<{ default:
     benchmarking: () => import("./en/benchmarking.json"),
     command: () => import("./en/command.json"),
     nav: () => import("./en/nav.json"),
-    aviation: () => import("./en/aviation.json")
+    aviation: () => import("./en/aviation.json"),
+    coverage: () => import("./en/coverage.json"),
+    alliances: () => import("./en/alliances.json"),
+    hubs: () => import("./en/hubs.json"),
+    anomalies: () => import("./en/anomalies.json")
   },
   pt: {
     common: () => import("./pt/common.json"),
@@ -36,7 +40,11 @@ const localeLoaders: Record<AppLanguage, Record<string, () => Promise<{ default:
     benchmarking: () => import("./pt/benchmarking.json"),
     command: () => import("./pt/command.json"),
     nav: () => import("./pt/nav.json"),
-    aviation: () => import("./pt/aviation.json")
+    aviation: () => import("./pt/aviation.json"),
+    coverage: () => import("./pt/coverage.json"),
+    alliances: () => import("./pt/alliances.json"),
+    hubs: () => import("./pt/hubs.json"),
+    anomalies: () => import("./pt/anomalies.json")
   }
 };
 

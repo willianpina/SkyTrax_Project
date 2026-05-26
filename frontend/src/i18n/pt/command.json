@@ -91,6 +91,52 @@
     "snapshots": "Snapshots",
     "airportDiscovery": "Descobrindo aeroportos",
     "aviationMetadata": "Metadados aeronáuticos",
-    "hubIntelligence": "Inteligência de hubs"
+    "hubIntelligence": "Inteligência de hubs",
+    "stageDesc": {
+      "discovery": "Descobrindo URLs de companhias",
+      "crawl": "Ingestão incremental de avaliações",
+      "metadata": "Extraindo metadados estruturados",
+      "semantic": "Enriquecimento NLP e clusterização",
+      "knowledgeGraph": "Construindo grafo de conhecimento",
+      "forecasting": "Gerando previsões de tendência",
+      "anomalies": "Detectando anomalias",
+      "insights": "Inteligência executiva",
+      "fusion": "Sinais de correlação cruzada",
+      "snapshots": "Persistindo snapshots",
+      "airportDiscovery": "Descoberta de aeroportos",
+      "aviationMetadata": "Sincronização de metadados aeronáuticos",
+      "hubIntelligence": "Computação de inteligência de hubs"
+    },
+    "stages": {
+      "discovery": "Descoberta de companhias",
+      "crawl": "Ingestão de avaliações",
+      "metadata": "Extração de metadados",
+      "semantic": "Inteligência semântica",
+      "semantic_pt": "Inteligência semântica",
+      "knowledge_graph": "Grafo de conhecimento",
+      "forecasting": "Previsões de tendência",
+      "anomalies": "Detecção de anomalias",
+      "insights": "Insights executivos",
+      "fusion": "Sinais de correlação",
+      "snapshots": "Persistência de snapshots",
+      "airport_discovery": "Descoberta de aeroportos",
+      "aviation_metadata": "Metadados de aviação",
+      "hub_intelligence": "Inteligência de hubs",
+      "pipeline": "Pipeline operacional"
+    },
+    "eventMessages": {
+      "stageStarted": "{{stage}} iniciado",
+      "stageCompleted": "{{stage}} concluído",
+      "stageFailed": "{{stage}} falhou",
+      "pipelineStarted": "Pipeline iniciado",
+      "pipelineCompleted": "Pipeline concluído",
+      "pipelineFailed": "Pipeline falhou",
+      "pipelineTriggered": "Pipeline acionado",
+      "aviationSyncStarted": "Sincronização de aviação iniciada",
+      "aviationSyncCompleted": "Sincronização de aviação concluída",
+      "aviationSyncFailed": "Sincronização de aviação falhou",
+      "aviationSyncTriggered": "Sincronização de aviação acionada",
+      "corpusSaturated": "Corpus saturado — avançando"
+    }
   }
 }

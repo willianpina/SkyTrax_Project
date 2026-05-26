@@ -10,7 +10,7 @@ import { PanelShell, SeverityBadge, ConfidenceBadge, TrendArrow } from "../../co
 import { formatShortDate } from "../../utils/datetime";
 
 export default function InvestigationsWorkspace() {
-  const { t } = useTranslation(["command", "alerts", "charts", "nav", "semantic"]);
+  const { t } = useTranslation(["command", "alerts", "charts", "nav", "semantic", "dashboard"]);
   const { reputation, benchmarking, anomalies, forecasts, clusters, insights, apiBase } = useSharedAnalytics();
 
   const [selectedAirline, setSelectedAirline] = useState("");
@@ -98,7 +98,7 @@ export default function InvestigationsWorkspace() {
                   <p>{(ins.summary || ins.insight_text || "").slice(0, 100)}</p>
                 </div>
               ))}
-              {(!insights || insights.length === 0) && <p className="muted-copy">No insights available</p>}
+              {(!insights || insights.length === 0) && <p className="muted-copy">{t("dashboard:insights.noInsights")}</p>}
             </div>
           </PanelShell>
         </aside>
