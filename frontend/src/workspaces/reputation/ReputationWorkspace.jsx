@@ -14,7 +14,7 @@ import { ReputationKpiStrip } from "./ReputationKpiStrip";
 import { ReputationTable } from "./ReputationTable";
 import { AirlineDrilldownModal } from "./AirlineDrilldownModal";
 import {
-  TrendingDown, TrendingUp, AlertTriangle, Zap, BarChart3,
+  TrendingDown, TrendingUp, AlertTriangle, Zap, BarChart3, Radio,
 } from "lucide-react";
 
 const SIGNAL_ICONS = {
@@ -76,6 +76,61 @@ function PrioritySignals({ signals }) {
   );
 }
 
+function LiveIntelFeed({ registry }) {
+  const { t } = useTranslation(["dashboard"]);
+
+  const feed = useMemo(() => {
+    const items = [];
+    for (const r of registry) {
+      if (r.risk === "critical" && r.reviewCount >= 5) {
+        items.push({ type: "critical", airline: r.airline, slug: r.slug, value: r.score, label: t("dashboard:reputation.feed.critical") });
+      }
+      if (r.incidents >= 2) {
+        items.push({ type: "incident", airline: r.airline, slug: r.slug, value: r.incidents, label: t("dashboard:reputation.feed.incidents") });
+      }
+      if (r.forecastDelta < -4) {
+        items.push({ type: "deterioration", airline: r.airline, slug: r.slug, value: r.forecastDelta, label: t("dashboard:reputation.feed.deterioration") });
+      }
+      if (r.forecastDelta > 4) {
+        items.push({ type: "recovery", airline: r.airline, slug: r.slug, value: r.forecastDelta, label: t("dashboard:reputation.feed.recovery") });
+      }
+      if (r.complaints > 30) {
+        items.push({ type: "complaints", airline: r.airline, slug: r.slug, value: r.complaints, label: t("dashboard:reputation.feed.complaints") });
+      }
+    }
+    return items.slice(0, 12);
+  }, [registry, t]);
+
+  if (feed.length === 0) return null;
+
+  const typeIcons = { critical: AlertTriangle, incident: Zap, deterioration: TrendingDown, recovery: TrendingUp, complaints: BarChart3 };
+  const typeAccents = { critical: "risk", incident: "risk", deterioration: "risk", recovery: "positive", complaints: "warning" };
+
+  return (
+    <section className="rep-live-feed">
+      <div className="rep-live-feed-header">
+        <Radio size={12} className="rep-live-pulse" />
+        <h3>{t("dashboard:reputation.feed.title")}</h3>
+      </div>
+      <div className="rep-live-feed-items">
+        {feed.map((item, i) => {
+          const Icon = typeIcons[item.type] || AlertTriangle;
+          return (
+            <div className={`rep-live-item rep-live-item--${typeAccents[item.type]}`} key={`${item.slug}-${item.type}-${i}`}>
+              <Icon size={12} />
+              <span className="rep-live-airline">{item.airline}</span>
+              <span className="rep-live-label">{item.label}</span>
+              <span className="rep-live-value metric-num">
+                {item.type === "deterioration" || item.type === "recovery" ? formatDeltaNumeric(item.value) : item.value}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export default function ReputationWorkspace() {
   const { t } = useTranslation(["dashboard", "nav", "charts", "common"]);
   const { reputation, benchmarking, anomalies, alerts, forecasts } = useSharedAnalytics();
@@ -104,6 +159,8 @@ export default function ReputationWorkspace() {
       accent="positive"
     >
       <ReputationKpiStrip kpis={kpis} />
+
+      <LiveIntelFeed registry={registry} />
 
       <PrioritySignals signals={signals} />
 

@@ -121,6 +121,14 @@
       "operationalRisk": "Operational Risk",
       "close": "Close"
     },
-    "independent": "Independent"
+    "independent": "Independent",
+    "feed": {
+      "title": "Live Intelligence Feed",
+      "critical": "critical risk",
+      "incidents": "active incidents",
+      "deterioration": "deterioration",
+      "recovery": "recovering",
+      "complaints": "high complaints"
+    }
   }
 }

@@ -121,6 +121,14 @@
       "operationalRisk": "Risco Operacional",
       "close": "Fechar"
     },
-    "independent": "Independente"
+    "independent": "Independente",
+    "feed": {
+      "title": "Inteligência em Tempo Real",
+      "critical": "risco crítico",
+      "incidents": "incidentes ativos",
+      "deterioration": "deterioração",
+      "recovery": "em recuperação",
+      "complaints": "reclamações elevadas"
+    }
   }
 }
