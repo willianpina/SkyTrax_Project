@@ -72,6 +72,10 @@
     "syncing": "Sincronizando...",
     "synchronizing": "Sincronizando",
     "syncTitle": "Pipeline de inteligência por fusão",
+    "pipelineTitle": "Pipeline de Inteligência em Tempo Real",
+    "pipelineSubtitle": "Motor de inteligência por fusão aeronáutica",
+    "aviationSyncTitle": "Sincronização de Aviação",
+    "aviationSyncSubtitle": "Descoberta de aeroportos e inteligência de hubs",
     "running": "Executando",
     "completed": "Concluído",
     "failed": "Falhou",
@@ -123,6 +127,18 @@
       "aviation_metadata": "Metadados de aviação",
       "hub_intelligence": "Inteligência de hubs",
       "pipeline": "Pipeline operacional"
+    },
+    "crawlTelemetry": {
+      "title": "Inteligência de Coleta",
+      "stalled": "Crawler parado — nenhum item novo em 90s",
+      "saturated": "Corpus saturado — {{count}} páginas sem inserção. Avançando.",
+      "corpusTotal": "Total do Corpus",
+      "newReviews": "Novas Avaliações",
+      "pages": "Páginas",
+      "duplicates": "Duplicadas",
+      "throughput": "Vazão",
+      "elapsed": "Decorrido",
+      "airlines": "Companhias"
     },
     "eventMessages": {
       "stageStarted": "{{stage}} iniciado",

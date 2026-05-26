@@ -11,6 +11,7 @@
   },
   "friction": {
     "title": "Matriz de Fricção Semântica Operacional",
+    "subtitle": "Scores de fricção ponderados companhia x cluster operacional com decaimento temporal e sentimento",
     "empty": "Sem dados de fricção disponíveis. Execute uma sincronização de pipeline para gerar inteligência."
   }
 }

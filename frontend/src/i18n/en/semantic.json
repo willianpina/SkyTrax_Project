@@ -11,6 +11,7 @@
   },
   "friction": {
     "title": "Operational Semantic Friction Matrix",
+    "subtitle": "Weighted airline x operational-cluster friction scores with temporal decay and sentiment",
     "empty": "No friction data available. Run a pipeline sync to generate intelligence."
   }
 }

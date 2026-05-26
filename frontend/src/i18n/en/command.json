@@ -72,6 +72,10 @@
     "syncing": "Syncing...",
     "synchronizing": "Synchronizing",
     "syncTitle": "Fusion intelligence pipeline",
+    "pipelineTitle": "Live Intelligence Pipeline",
+    "pipelineSubtitle": "Aviation fusion intelligence engine",
+    "aviationSyncTitle": "Aviation Sync",
+    "aviationSyncSubtitle": "Airport discovery & hub intelligence",
     "running": "Running",
     "completed": "Completed",
     "failed": "Failed",
@@ -124,7 +128,7 @@
       "hub_intelligence": "Hub intelligence",
       "pipeline": "Operational pipeline"
     },
-    "crawl": {
+    "crawlTelemetry": {
       "title": "Crawl Intelligence",
       "stalled": "Crawler stalled — no new items in 90s",
       "saturated": "Corpus saturated — {{count}} pages dry. Advancing.",

@@ -83,7 +83,7 @@ const AirlineGroup = memo(function AirlineGroup({ group }) {
         <span className="anm-group-badges">
           {SEV_ORDER.filter((s) => group.severities[s] > 0).map((s) => (
             <OperationalBadge key={s} variant={SEV_CONFIG[s].variant} compact>
-              {group.severities[s]} {s}
+              {group.severities[s]} {t(`anomalies:filter.${s}`)}
             </OperationalBadge>
           ))}
         </span>
@@ -298,7 +298,7 @@ export default function AnomaliesWorkspace() {
             type="button"
             className={`anm-filter-btn anm-filter-btn--${s} ${sevFilter === s ? "anm-filter--active" : ""}`}
             onClick={() => setSevFilter(sevFilter === s ? null : s)}
-          >{s} ({counts[s]})</button>
+          >{t(`anomalies:filter.${s}`)} ({counts[s]})</button>
         ))}
       </div>
 
