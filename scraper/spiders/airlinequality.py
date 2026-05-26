@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import os
 import re
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin
 
 import scrapy
-import trafilatura
 from bs4 import BeautifulSoup, Tag
 
 from scraper.items import AirlineItem, ReviewItem
@@ -316,12 +314,6 @@ class AirlineQualitySpider(scrapy.Spider):
             text,
             flags=re.IGNORECASE,
         ).strip()
-
-        if should_continue:
-            self.logger.info(
-                "[OPS][PAGINATION] airline=%s page=%d url=%s",
-                airline["slug"], page + 1, next_url,
-            )
 
     def closed(self, reason):
         self.logger.info(

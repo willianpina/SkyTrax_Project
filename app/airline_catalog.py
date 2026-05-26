@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 """Shared airline seed catalog — importable by analytics, scraper, and any other layer."""
+from __future__ import annotations
 
 from typing import Literal
 

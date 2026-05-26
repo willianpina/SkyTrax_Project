@@ -58,7 +58,7 @@ class AirlineMetadataSpider(scrapy.Spider):
         star_rating = len(stars_els) if stars_els else None
 
         labels = response.css(".airline-label::text, .tag::text, .badge::text").getall()
-        labels = [l.strip() for l in labels if l.strip()]
+        labels = [lbl.strip() for lbl in labels if lbl.strip()]
 
         alliance = None
         for label in labels:
@@ -70,7 +70,7 @@ class AirlineMetadataSpider(scrapy.Spider):
             elif "skyteam" in low:
                 alliance = "SkyTeam"
 
-        is_low_cost = any("low" in l.lower() and "cost" in l.lower() for l in labels)
+        is_low_cost = any("low" in lbl.lower() and "cost" in lbl.lower() for lbl in labels)
         is_premium = star_rating is not None and star_rating >= 4
 
         hubs_text = response.css(".hub-airports::text, .hubs::text").getall()
