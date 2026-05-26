@@ -46,7 +46,6 @@ class SmartRetryMiddleware:
     def process_response(self, request, response, spider):
         if response.status not in self.retry_statuses:
             return response
-        retry_times = request.meta.get("retry_times", 0)
         spider.crawler.stats.inc_value("smart_retry/count")
         spider.crawler.stats.inc_value(f"smart_retry/status/{response.status}")
         retry_request = get_retry_request(

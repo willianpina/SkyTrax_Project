@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from sqlalchemy import Integer, func
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from analytics.constants import SEMANTIC_CLUSTER_LABELS
 from analytics.intelligence import ReputationService, TopicTrendService
-from analytics.semantic.search import SemanticClusterService
 from database.models import Airline, NLPResult, Review, SemanticCluster
 
 

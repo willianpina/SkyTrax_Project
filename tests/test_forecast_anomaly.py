@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import statistics
-from datetime import date
 
-from analytics.anomaly import AnomalyDetectionService
 from analytics.forecasting import TrendForecastingService
 
 

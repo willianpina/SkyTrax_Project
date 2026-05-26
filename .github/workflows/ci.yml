@@ -72,6 +72,8 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+      - name: Create .env for compose validation
+        run: cp .env.example .env
       - name: Validate compose files
         run: |
           docker compose config

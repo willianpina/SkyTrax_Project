@@ -1,7 +1,6 @@
 """Aviation Metadata Intelligence API endpoints."""
 from __future__ import annotations
 
-import threading
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.orm import Session

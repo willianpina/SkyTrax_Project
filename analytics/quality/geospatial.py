@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 
-from sqlalchemy import Integer, func
+from sqlalchemy import func
 from sqlalchemy.orm import Session, selectinload
 
 from analytics.constants import SEED_AIRPORTS, SEED_REGIONS

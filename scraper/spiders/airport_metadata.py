@@ -216,7 +216,7 @@ class AirportMetadataSpider(scrapy.Spider):
             ".airport-label::text, .tag::text, .badge::text, "
             ".airport-type::text, .entry-meta span::text"
         ).getall()
-        return [l.strip() for l in labels if l.strip()]
+        return [lbl.strip() for lbl in labels if lbl.strip()]
 
     def _errback(self, failure):
         self.logger.warning("[AIRPORT] request_failed: %s", failure.request.url)

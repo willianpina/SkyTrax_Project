@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from sqlalchemy import Integer, func
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from analytics.constants import BENCHMARK_AIRLINES

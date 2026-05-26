@@ -4,7 +4,6 @@ from datetime import date
 
 from analytics.constants import SEMANTIC_CLUSTER_LABELS
 from analytics.semantic_ops import SemanticClusterService
-from nlp.pipeline import ReviewNLPPipeline
 
 
 def test_semantic_cluster_assignment() -> None:

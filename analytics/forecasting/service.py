@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
 
-from sqlalchemy import Integer, func
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from analytics.constants import BENCHMARK_AIRLINES
@@ -94,7 +94,7 @@ class TrendForecastingService:
                 "history": [],
                 "rolling_average": current,
                 "ewma": current,
-                "forecast_points": [{"period": f"+7d", "value": current}],
+                "forecast_points": [{"period": "+7d", "value": current}],
             }
         values = [point["value"] for point in series]
         rolling = sum(values[-self.rolling_window :]) / min(len(values), self.rolling_window)

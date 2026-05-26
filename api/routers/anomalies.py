@@ -22,7 +22,7 @@ def anomaly_alerts(
 ) -> list[OperationalAlertResponse]:
     try:
         return AnomalyDetectionService(session).operational_alerts(limit=limit)
-    except SQLAlchemyError as exc:
+    except SQLAlchemyError:
         logger.exception("anomaly_alerts_failed")
         return []
 
@@ -44,6 +44,6 @@ def list_anomalies(
 ) -> list[AnomalyEventResponse]:
     try:
         return AnomalyDetectionService(session).list_recent(limit=limit, airline_slug=airline)
-    except SQLAlchemyError as exc:
+    except SQLAlchemyError:
         logger.exception("anomaly_list_failed")
         return []

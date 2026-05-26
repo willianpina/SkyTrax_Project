@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from unittest.mock import MagicMock
 
 from database.postgis_support import (
