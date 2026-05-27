@@ -1,63 +1,63 @@
 {
   "sidebarLabel": "Navegação da plataforma",
   "platform": {
-    "brand": "SkyTrax Intelligence",
-    "tagline": "Centro de Comando de Inteligência Aeronáutica",
-    "footer": "Comando de Fusão"
+    "brand": "SkyTrax Analytics",
+    "tagline": "Plataforma Global de Analytics de Aviação",
+    "footer": "SkyTrax Platform"
   },
   "groups": {
-    "command": "Centro de Comando",
-    "operations": "Operações Aeronáuticas",
-    "spatial": "Espacial & Investigações"
+    "intelligence": "Inteligência",
+    "aviation": "Aviação",
+    "spatial": "Espacial"
   },
   "modules": {
     "executive": {
-      "title": "Comando Executivo",
-      "subtitle": "Visão estratégica de inteligência e postura operacional"
+      "title": "Executivo",
+      "subtitle": "Visão estratégica e postura operacional"
     },
     "reputation": {
-      "title": "Comando de Reputação",
-      "subtitle": "Monitoramento operacional de reputação e inteligência de risco"
+      "title": "Reputação",
+      "subtitle": "Monitoramento de reputação e análise de risco"
     },
     "forecasting": {
-      "title": "Motor de Previsão",
-      "subtitle": "Modelagem operacional preditiva e previsão de tendências"
+      "title": "Previsão",
+      "subtitle": "Análise preditiva de tendências de aviação"
     },
     "benchmarking": {
-      "title": "Benchmarking Competitivo",
-      "subtitle": "Comparação entre pares e análise de inteligência competitiva"
+      "title": "Benchmarking",
+      "subtitle": "Comparação entre pares e análise competitiva"
     },
     "anomalies": {
-      "title": "Centro de Anomalias",
-      "subtitle": "Detecção de anomalias operacionais e monitoramento de incidentes"
+      "title": "Anomalias",
+      "subtitle": "Detecção de anomalias e monitoramento de incidentes"
     },
     "semantic": {
-      "title": "Operações Semânticas",
-      "subtitle": "Clusterização semântica, extração de entidades e inteligência de tópicos"
+      "title": "Análise Semântica",
+      "subtitle": "Clusterização de tópicos e extração de entidades"
     },
     "aviation": {
-      "title": "Comando Aeronáutico",
-      "subtitle": "Metadados globais de aviação e inteligência operacional"
+      "title": "Aviação",
+      "subtitle": "Registro operacional global de companhias aéreas"
     },
     "hubs": {
-      "title": "Operações de Hubs",
-      "subtitle": "Conectividade global de hubs e inteligência de tráfego"
+      "title": "Hubs",
+      "subtitle": "Conectividade de hubs e análise de tráfego"
     },
     "alliances": {
-      "title": "Rede de Alianças",
-      "subtitle": "Análise estratégica de relações entre alianças"
+      "title": "Alianças",
+      "subtitle": "Membros de alianças e análise de rede"
     },
     "coverage": {
-      "title": "Comando de Cobertura",
-      "subtitle": "Cobertura de metadados, integridade do grafo e prontidão operacional"
+      "title": "Cobertura",
+      "subtitle": "Completude de metadados e prontidão do grafo"
     },
     "geospatial": {
-      "title": "Comando Geoespacial",
-      "subtitle": "Inteligência geoespacial e análise de redes de rotas"
+      "title": "Geoespacial",
+      "subtitle": "Analytics espacial e mapeamento de rotas"
     },
     "investigations": {
-      "title": "Comando de Investigações",
-      "subtitle": "Fluxo investigativo completo e inteligência aprofundada"
+      "title": "Investigações",
+      "subtitle": "Análise aprofundada e fluxos investigativos"
     }
   },
   "nav": {
@@ -65,13 +65,13 @@
     "collapseSidebar": "Recolher navegação"
   },
   "geo": {
-    "hubsTitle": "Inteligência de hubs",
-    "hubsDesc": "Conecte PostGIS para overlays de inteligência de hubs e rotas em tempo real.",
+    "hubsTitle": "Analytics de hubs",
+    "hubsDesc": "Conecte PostGIS para overlays de analytics de hubs e rotas em tempo real.",
     "layersTitle": "Camadas do mapa",
     "layersDesc": "Preparado para integração Deck.gl / Mapbox. Atualmente em modo leve."
   },
   "investigations": {
-    "subtitle": "Fluxo investigativo completo",
+    "subtitle": "Fluxo investigativo",
     "insights": "Insights relacionados"
   }
 }

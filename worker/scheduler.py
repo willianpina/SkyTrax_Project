@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from logging import getLogger
 
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -28,24 +29,67 @@ from worker.jobs import (
 logger = getLogger(__name__)
 
 
+def _safe_log(level: str, event: str, **fields) -> None:
+    """Emit a structured log that never raises."""
+    try:
+        getattr(logger, level)(event, extra=fields)
+    except Exception as exc:
+        print(f"[SCHEDULER_LOG_ERROR] {event} | {fields} | {exc}")
+
+
 def enqueue(job_fn, *args, **kwargs) -> None:
+    job_name = getattr(job_fn, "__name__", str(job_fn))
     settings = get_settings()
     connection = Redis.from_url(settings.redis_url)
     queue = Queue("default", connection=connection)
-    queue.enqueue(
-        job_fn,
-        *args,
-        **kwargs,
-        job_timeout=3600,
-        result_ttl=86400,
-        retry=Retry(max=settings.job_retry_attempts),
-    )
-    logger.info("scheduler_enqueued", extra={"job": getattr(job_fn, "__name__", str(job_fn)), "args": args})
+
+    _safe_log("info", "scheduler_enqueuing", job_name=job_name, job_args=str(args), queue_name=queue.name)
+
+    t0 = time.monotonic()
+    try:
+        queue.enqueue(
+            job_fn,
+            *args,
+            **kwargs,
+            job_timeout=3600,
+            result_ttl=86400,
+            retry=Retry(max=settings.job_retry_attempts),
+        )
+        elapsed_ms = round((time.monotonic() - t0) * 1000, 1)
+        _safe_log("info", "scheduler_enqueued", job_name=job_name, job_args=str(args), queue_name=queue.name, enqueue_ms=elapsed_ms)
+    except Exception as exc:
+        elapsed_ms = round((time.monotonic() - t0) * 1000, 1)
+        _safe_log("error", "scheduler_enqueue_failed", job_name=job_name, job_args=str(args), error_type=type(exc).__name__, error_detail=str(exc)[:300], enqueue_ms=elapsed_ms)
+        raise
+
+
+def _on_job_missed(event) -> None:
+    _safe_log("warning", "scheduler_job_missed", job_id=event.job_id, scheduled_run_time=str(getattr(event, "scheduled_run_time", "")))
+
+
+def _on_job_error(event) -> None:
+    _safe_log("error", "scheduler_job_error", job_id=event.job_id, error_detail=str(getattr(event, "exception", ""))[:300])
+
+
+def _on_job_executed(event) -> None:
+    _safe_log("info", "scheduler_job_executed", job_id=event.job_id, scheduled_run_time=str(getattr(event, "scheduled_run_time", "")))
 
 
 def build_scheduler() -> BlockingScheduler:
     settings = get_settings()
-    scheduler = BlockingScheduler(timezone=settings.scheduler_timezone)
+    scheduler = BlockingScheduler(
+        timezone=settings.scheduler_timezone,
+        job_defaults={
+            "misfire_grace_time": 300,
+            "max_instances": 1,
+            "coalesce": True,
+        },
+    )
+
+    from apscheduler.events import EVENT_JOB_MISSED, EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
+    scheduler.add_listener(_on_job_missed, EVENT_JOB_MISSED)
+    scheduler.add_listener(_on_job_error, EVENT_JOB_ERROR)
+    scheduler.add_listener(_on_job_executed, EVENT_JOB_EXECUTED)
 
     scheduler.add_job(
         lambda: enqueue(schedule_priority_crawls),
@@ -166,10 +210,11 @@ def main() -> None:
     settings = get_settings()
     configure_logging(settings.log_level)
     if not settings.scheduler_enabled:
-        logger.warning("scheduler_disabled")
+        _safe_log("warning", "scheduler_disabled")
         return
     scheduler = build_scheduler()
-    logger.info("scheduler_started", extra={"timezone": settings.scheduler_timezone})
+    job_ids = [j.id for j in scheduler.get_jobs()]
+    _safe_log("info", "scheduler_started", timezone=settings.scheduler_timezone, jobs_registered=len(job_ids), job_ids=str(job_ids))
     scheduler.start()
 
 

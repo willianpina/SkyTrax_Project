@@ -72,8 +72,8 @@
     "airlines": "companhias"
   },
   "heatmap": {
-    "title": "Matriz Temporal de Risco",
-    "subtitle": "Delta de score por janela temporal",
+    "title": "Matriz de Tendência de Risco",
+    "subtitle": "Delta de score de reputação por janela temporal",
     "d7": "7d",
     "d30": "30d",
     "d90": "90d",

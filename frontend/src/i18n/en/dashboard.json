@@ -1,13 +1,13 @@
 {
   "nav": {
-    "executiveView": "Executive Command",
-    "benchmarking": "Competitive Benchmarking",
-    "reputation": "Reputation Command",
-    "semanticOps": "Semantic Operations"
+    "executiveView": "Executive",
+    "benchmarking": "Benchmarking",
+    "reputation": "Reputation",
+    "semanticOps": "Semantic Analysis"
   },
   "header": {
-    "eyebrow": "Customer Experience Command Center",
-    "title": "Airline reputation intelligence"
+    "eyebrow": "Aviation Analytics Platform",
+    "title": "Airline reputation analytics"
   },
   "kpi": {
     "ars": "Airline Reputation Score",
@@ -36,8 +36,8 @@
     "prioritySignal": "priority signal"
   },
   "reputation": {
-    "title": "Reputation Command",
-    "subtitle": "Operational reputation monitoring and risk intelligence",
+    "title": "Reputation",
+    "subtitle": "Airline reputation monitoring and risk analysis",
     "kpi": {
       "avgScore": "Global Avg. Score",
       "critical": "Critical Risk",
@@ -112,7 +112,7 @@
       "trend": "Temporal Trend",
       "incidents": "Incidents",
       "opRisk": "Op. Risk",
-      "tooltipComposition": "Operational Reputation Score derived from multi-factor aviation intelligence signals.",
+      "tooltipComposition": "Operational Reputation Score derived from multi-factor aviation analytics signals.",
       "reviews": "{{count}} reviews",
       "alliance": "Alliance",
       "region": "Region",
@@ -123,7 +123,7 @@
     },
     "independent": "Independent",
     "feed": {
-      "title": "Live Intelligence Feed",
+      "title": "Live Analytics Feed",
       "critical": "critical risk",
       "incidents": "active incidents",
       "deterioration": "deterioration",

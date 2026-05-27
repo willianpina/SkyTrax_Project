@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 import re
+import time
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin
 
@@ -10,6 +12,9 @@ from bs4 import BeautifulSoup, Tag
 from scraper.items import AirlineItem, ReviewItem
 
 MAX_PAGES_ABSOLUTE = 500
+DEFAULT_MAX_PAGES = int(os.getenv("CRAWL_DEFAULT_MAX_PAGES", "50"))
+MAX_EMPTY_PAGES = int(os.getenv("CRAWL_MAX_EMPTY_PAGES", "5"))
+MAX_CRAWL_MINUTES_PER_AIRLINE = int(os.getenv("CRAWL_MAX_MINUTES_PER_AIRLINE", "10"))
 
 SEED_AIRLINES = [
     {
@@ -65,18 +70,26 @@ class AirlineQualitySpider(scrapy.Spider):
                  operation_id: str = "", **kwargs):
         super().__init__(**kwargs)
         self.airline_filter = airline
-        self.max_pages = int(max_pages)
+        raw_max = int(max_pages)
+        self.max_pages = raw_max if raw_max > 0 else DEFAULT_MAX_PAGES
         self.mode = mode
         self.skip_recent_hours = int(skip_recent_hours)
         self.operation_id = operation_id
 
         self._airlines_queued = 0
         self._airlines_skipped = 0
+        self._airlines_saturated = 0
         self._pages_crawled = 0
         self._reviews_parsed = 0
         self._reviews_dropped = 0
         self._current_airline = ""
         self._saturated = False
+
+        # Per-airline saturation tracking
+        self._airline_empty_pages: dict[str, int] = {}
+        self._airline_start_time: dict[str, float] = {}
+        self._airline_inserted: dict[str, int] = {}
+        self._airline_pages: dict[str, int] = {}
 
     def _build_airline_list(self) -> list[dict]:
         if self.airline_filter:
@@ -135,34 +148,51 @@ class AirlineQualitySpider(scrapy.Spider):
     def start_requests(self):
         airlines = self._build_airline_list()
         self._airlines_queued = len(airlines)
-        effective_limit = self.max_pages if self.max_pages > 0 else "unlimited"
         self.logger.info(
-            "[CRAWLER] Starting: airlines=%d max_pages=%s mode=%s skip_recent=%dh",
-            len(airlines), effective_limit, self.mode, self.skip_recent_hours,
+            "[CRAWL] Starting: airlines=%d max_pages=%d mode=%s skip_recent=%dh empty_limit=%d",
+            len(airlines), self.max_pages, self.mode, self.skip_recent_hours, MAX_EMPTY_PAGES,
         )
         for airline in airlines:
+            slug = airline["slug"]
+            self._airline_start_time[slug] = time.time()
+            self._airline_empty_pages[slug] = 0
+            self._airline_inserted[slug] = 0
+            self._airline_pages[slug] = 0
             yield scrapy.Request(
                 airline["review_url"],
                 callback=self.parse_listing,
                 cb_kwargs={"airline": airline, "page": 1},
-                meta={"airline_slug": airline["slug"]},
+                meta={"airline_slug": slug},
             )
 
     def parse_listing(self, response, airline: dict, page: int):
+        slug = airline.get("slug", "")
+
+        # ── Global saturation check ──────────────────────────────
         if self._saturated:
-            self.logger.info(
-                "[OPS][SATURATION] Corpus saturated — skipping %s page %d",
-                airline.get("slug"), page,
+            self.logger.info("[SATURATION] global stop — skipping %s page %d", slug, page)
+            return
+
+        # ── Per-airline time-limit circuit breaker ────────────────
+        airline_started = self._airline_start_time.get(slug, time.time())
+        airline_elapsed_min = (time.time() - airline_started) / 60
+        if airline_elapsed_min > MAX_CRAWL_MINUTES_PER_AIRLINE:
+            self._airlines_saturated += 1
+            self.logger.warning(
+                "[CRAWL][BREAKER] airline=%s exceeded %d min — stopping (inserted=%d pages=%d)",
+                slug, MAX_CRAWL_MINUTES_PER_AIRLINE,
+                self._airline_inserted.get(slug, 0), self._airline_pages.get(slug, 0),
             )
             return
 
         self._pages_crawled += 1
-        self._current_airline = airline.get("name", airline.get("slug", ""))
+        self._airline_pages[slug] = self._airline_pages.get(slug, 0) + 1
+        self._current_airline = airline.get("name", slug)
 
         if page == 1:
             yield AirlineItem(
                 name=airline["name"],
-                slug=airline["slug"],
+                slug=slug,
                 country=airline.get("country"),
                 review_url=airline.get("review_url"),
                 source="airlinequality",
@@ -181,29 +211,51 @@ class AirlineQualitySpider(scrapy.Spider):
                 page_reviews += 1
                 yield item
 
+        # Track inserts (page_reviews = items parsed, actual dedup happens in pipeline)
+        prev_inserted = self._airline_inserted.get(slug, 0)
+        self._airline_inserted[slug] = prev_inserted + page_reviews
+
+        # ── Per-airline saturation: track empty pages ─────────────
+        if page_reviews == 0:
+            self._airline_empty_pages[slug] = self._airline_empty_pages.get(slug, 0) + 1
+        else:
+            self._airline_empty_pages[slug] = 0
+
+        empty_seq = self._airline_empty_pages.get(slug, 0)
+
         self.logger.info(
-            "[OPS][CRAWL] airline=%s page=%d cards=%d reviews=%d total_pages=%d",
-            airline["slug"], page, len(cards), page_reviews, self._pages_crawled,
+            "[CRAWL] airline=%s page=%d cards=%d parsed=%d empty_seq=%d elapsed=%.0fs total_pages=%d",
+            slug, page, len(cards), page_reviews, empty_seq,
+            time.time() - airline_started, self._pages_crawled,
         )
 
+        # ── No cards at all → end of content ─────────────────────
         if not cards:
+            self.logger.info("[CRAWL] airline=%s page=%d — no cards, ending", slug, page)
             return
 
-        should_continue = (
-            (self.max_pages == 0 or page < self.max_pages)
-            and page < MAX_PAGES_ABSOLUTE
-        )
-        if should_continue:
-            next_url = self._next_page_url(response.url, page + 1)
-            self.logger.info(
-                "[OPS][PAGINATION] airline=%s next_page=%d",
-                airline["slug"], page + 1,
+        # ── Per-airline saturation breaker ────────────────────────
+        if empty_seq >= MAX_EMPTY_PAGES:
+            self._airlines_saturated += 1
+            self.logger.warning(
+                "[SATURATION] airline=%s saturated after %d empty pages — moving to next airline",
+                slug, empty_seq,
             )
+            return
+
+        # ── Pagination decision ──────────────────────────────────
+        if page < self.max_pages and page < MAX_PAGES_ABSOLUTE:
+            next_url = self._next_page_url(response.url, page + 1)
             yield scrapy.Request(
                 next_url,
                 callback=self.parse_listing,
                 cb_kwargs={"airline": airline, "page": page + 1},
-                meta={"airline_slug": airline["slug"]},
+                meta={"airline_slug": slug},
+            )
+        else:
+            self.logger.info(
+                "[CRAWL] airline=%s page_limit reached (max=%d) — stopping",
+                slug, self.max_pages,
             )
 
     @staticmethod
@@ -317,9 +369,9 @@ class AirlineQualitySpider(scrapy.Spider):
 
     def closed(self, reason):
         self.logger.info(
-            "[OPS][CRAWL] spider_closed airlines=%d pages=%d reviews=%d "
-            "dropped=%d skipped=%d max_pages=%d mode=%s reason=%s",
+            "[CRAWL] spider_closed airlines=%d pages=%d reviews=%d "
+            "dropped=%d skipped=%d saturated_airlines=%d max_pages=%d mode=%s reason=%s",
             self._airlines_queued, self._pages_crawled, self._reviews_parsed,
-            self._reviews_dropped, self._airlines_skipped,
+            self._reviews_dropped, self._airlines_skipped, self._airlines_saturated,
             self.max_pages, self.mode, reason,
         )

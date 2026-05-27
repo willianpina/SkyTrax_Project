@@ -72,8 +72,8 @@
     "airlines": "airlines"
   },
   "heatmap": {
-    "title": "Temporal Risk Matrix",
-    "subtitle": "Score delta by time window",
+    "title": "Risk Trend Matrix",
+    "subtitle": "Reputation score delta by time window",
     "d7": "7d",
     "d30": "30d",
     "d90": "90d",

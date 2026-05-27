@@ -1,13 +1,13 @@
 {
   "nav": {
-    "executiveView": "Comando Executivo",
-    "benchmarking": "Benchmarking Competitivo",
-    "reputation": "Comando de Reputação",
-    "semanticOps": "Operações Semânticas"
+    "executiveView": "Executivo",
+    "benchmarking": "Benchmarking",
+    "reputation": "Reputação",
+    "semanticOps": "Análise Semântica"
   },
   "header": {
-    "eyebrow": "Centro de Comando da Experiência do Cliente",
-    "title": "Inteligência de reputação aérea"
+    "eyebrow": "Plataforma de Analytics de Aviação",
+    "title": "Analytics de reputação aérea"
   },
   "kpi": {
     "ars": "Índice de Reputação da Companhia",
@@ -36,8 +36,8 @@
     "prioritySignal": "sinal prioritário"
   },
   "reputation": {
-    "title": "Comando de Reputação",
-    "subtitle": "Monitoramento operacional de reputação e inteligência de risco",
+    "title": "Reputação",
+    "subtitle": "Monitoramento de reputação e análise de risco",
     "kpi": {
       "avgScore": "Score Médio Global",
       "critical": "Risco Crítico",
@@ -112,7 +112,7 @@
       "trend": "Tendência Temporal",
       "incidents": "Incidentes",
       "opRisk": "Risco Op.",
-      "tooltipComposition": "Score de Reputação Operacional derivado de sinais de inteligência aeronáutica multifatoriais.",
+      "tooltipComposition": "Score de Reputação Operacional derivado de sinais analíticos multifatoriais de aviação.",
       "reviews": "{{count}} avaliações",
       "alliance": "Aliança",
       "region": "Região",
@@ -123,7 +123,7 @@
     },
     "independent": "Independente",
     "feed": {
-      "title": "Inteligência em Tempo Real",
+      "title": "Feed de Analytics em Tempo Real",
       "critical": "risco crítico",
       "incidents": "incidentes ativos",
       "deterioration": "deterioração",

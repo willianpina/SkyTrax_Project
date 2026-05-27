@@ -1,6 +1,5 @@
 import React, { memo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation } from "react-router-dom";
 import { Download, RefreshCw, Radio } from "lucide-react";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { ThemeToggle } from "../components/ui/ThemeToggle";
@@ -8,31 +7,13 @@ import { OperationalSyncModal } from "../components/OperationalSyncModal";
 import { useSharedAnalytics } from "../hooks/AnalyticsProvider";
 import { useOperations } from "../hooks/useOperations";
 import { exportReputationCsv } from "../lib/chartConfigs";
-import { safeT } from "../utils/i18nSafety";
-
-const WORKSPACE_LABELS = {
-  "/executive": "modules.executive.title",
-  "/benchmarking": "modules.benchmarking.title",
-  "/reputation": "modules.reputation.title",
-  "/semantic": "modules.semantic.title",
-  "/forecasting": "modules.forecasting.title",
-  "/anomalies": "modules.anomalies.title",
-  "/geospatial": "modules.geospatial.title",
-  "/investigations": "modules.investigations.title",
-  "/aviation": "modules.aviation.title",
-  "/hubs": "modules.hubs.title",
-  "/alliances": "modules.alliances.title",
-  "/coverage": "modules.coverage.title",
-};
 
 function TopCommandBarInner() {
   const { t } = useTranslation(["nav", "common", "command"]);
   const { isLive, isLoading, error, partialErrors, reload, reputation, benchmarking } = useSharedAnalytics();
-  const { status, history, loading, triggerRefresh } = useOperations();
-  const location = useLocation();
+  const { status, history, loading, triggerRefresh, resetPipeline } = useOperations();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const workspaceKey = WORKSPACE_LABELS[location.pathname] || "modules.executive.title";
   const isRefreshing = status.running === true;
 
   const handleSyncClick = useCallback(async () => {
@@ -50,9 +31,8 @@ function TopCommandBarInner() {
   return (
     <>
       <header className="command-header glass-panel">
-        <div>
-          <p className="eyebrow">{t("command:title")}</p>
-          <h1 className="topbar-workspace-title">{safeT(t, workspaceKey, "Command Center")}</h1>
+        <div className="topbar-brand">
+          <span className="topbar-brand-name">{t("command:title")}</span>
         </div>
         <div className="topbar-actions">
           <ThemeToggle />
@@ -94,6 +74,7 @@ function TopCommandBarInner() {
         onClose={() => setModalOpen(false)}
         status={status}
         history={history}
+        onReset={resetPipeline}
       />
     </>
   );

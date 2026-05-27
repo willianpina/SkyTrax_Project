@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import logging
 import statistics
+import time
 from datetime import date, timedelta
+from typing import Callable
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.alerting import emit_alert
 from database.models import Airline, AnomalyEvent, NLPResult, Review, TopicSnapshot
+
+logger = logging.getLogger(__name__)
+
+ANOMALY_TIMEOUT_S = 300
 
 
 class AnomalyDetectionService:
@@ -17,14 +24,44 @@ class AnomalyDetectionService:
         self.session = session
         self.z_threshold = z_threshold
 
-    def detect_and_persist(self, lookback_days: int = 30) -> dict:
+    def detect_and_persist(
+        self,
+        lookback_days: int = 30,
+        heartbeat_fn: Callable | None = None,
+    ) -> dict:
         since = date.today() - timedelta(days=lookback_days)
         created = 0
+        errors: list[str] = []
+        t0 = time.monotonic()
         airlines = self.session.query(Airline).filter(Airline.is_active.is_(True)).all()
-        for airline in airlines:
-            created += self._detect_airline_anomalies(airline, since)
-        self.session.commit()
-        return {"anomalies_created": created}
+        logger.info("[ANOMALY] Starting: airlines=%d lookback=%dd", len(airlines), lookback_days)
+
+        for i, airline in enumerate(airlines):
+            if time.monotonic() - t0 > ANOMALY_TIMEOUT_S:
+                logger.warning("[ANOMALY] Timeout after %ds, processed %d/%d", ANOMALY_TIMEOUT_S, i, len(airlines))
+                break
+            if heartbeat_fn and i % 5 == 0:
+                heartbeat_fn(f"anomaly {i+1}/{len(airlines)} {airline.slug}")
+            try:
+                created += self._detect_airline_anomalies(airline, since)
+            except Exception as exc:
+                logger.warning("[ANOMALY] Error processing %s: %s", airline.slug, exc)
+                errors.append(f"{airline.slug}: {exc}")
+                try:
+                    self.session.rollback()
+                except Exception:
+                    pass
+
+        try:
+            self.session.commit()
+        except Exception as exc:
+            logger.warning("[ANOMALY] Commit failed: %s", exc)
+            self.session.rollback()
+            errors.append(f"commit: {exc}")
+
+        elapsed_ms = int((time.monotonic() - t0) * 1000)
+        logger.info("[ANOMALY] Done: created=%d errors=%d elapsed=%dms", created, len(errors), elapsed_ms)
+        return {"anomalies_created": created, "airlines_scanned": len(airlines), "errors": errors[:10], "elapsed_ms": elapsed_ms}
 
     def list_recent(self, limit: int = 50, airline_slug: str | None = None) -> list[dict]:
         query = (

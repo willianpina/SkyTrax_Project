@@ -1,63 +1,63 @@
 {
   "sidebarLabel": "Platform navigation",
   "platform": {
-    "brand": "SkyTrax Intelligence",
-    "tagline": "Aviation Intelligence Command Center",
-    "footer": "Fusion Command"
+    "brand": "SkyTrax Analytics",
+    "tagline": "Global Aviation Analytics Platform",
+    "footer": "SkyTrax Platform"
   },
   "groups": {
-    "command": "Command Center",
-    "operations": "Aviation Operations",
-    "spatial": "Spatial & Investigations"
+    "intelligence": "Intelligence",
+    "aviation": "Aviation",
+    "spatial": "Spatial"
   },
   "modules": {
     "executive": {
-      "title": "Executive Command",
-      "subtitle": "Strategic intelligence overview and operational posture"
+      "title": "Executive",
+      "subtitle": "Strategic overview and operational posture"
     },
     "reputation": {
-      "title": "Reputation Command",
-      "subtitle": "Operational reputation monitoring and risk intelligence"
+      "title": "Reputation",
+      "subtitle": "Airline reputation monitoring and risk analysis"
     },
     "forecasting": {
-      "title": "Forecasting Engine",
-      "subtitle": "Predictive operational modeling and trend forecasting"
+      "title": "Forecasting",
+      "subtitle": "Predictive aviation trend analysis"
     },
     "benchmarking": {
-      "title": "Competitive Benchmarking",
-      "subtitle": "Peer comparison and competitive intelligence analysis"
+      "title": "Benchmarking",
+      "subtitle": "Peer comparison and competitive analysis"
     },
     "anomalies": {
-      "title": "Anomaly Center",
-      "subtitle": "Operational anomaly detection and incident monitoring"
+      "title": "Anomalies",
+      "subtitle": "Anomaly detection and incident monitoring"
     },
     "semantic": {
-      "title": "Semantic Operations",
-      "subtitle": "Semantic clustering, entity extraction and topic intelligence"
+      "title": "Semantic Analysis",
+      "subtitle": "Topic clustering and entity extraction"
     },
     "aviation": {
-      "title": "Aviation Command",
-      "subtitle": "Global aviation metadata and operational intelligence"
+      "title": "Aviation",
+      "subtitle": "Global airline operational registry"
     },
     "hubs": {
-      "title": "Hub Operations",
-      "subtitle": "Global hub connectivity and traffic intelligence"
+      "title": "Hubs",
+      "subtitle": "Hub connectivity and traffic analysis"
     },
     "alliances": {
-      "title": "Alliance Network",
-      "subtitle": "Strategic alliance relationship analysis"
+      "title": "Alliances",
+      "subtitle": "Alliance membership and network analysis"
     },
     "coverage": {
-      "title": "Coverage Command",
-      "subtitle": "Metadata coverage, graph integrity and operational readiness"
+      "title": "Coverage",
+      "subtitle": "Metadata completeness and graph readiness"
     },
     "geospatial": {
-      "title": "Geospatial Command",
-      "subtitle": "Geospatial intelligence and route network analysis"
+      "title": "Geospatial",
+      "subtitle": "Spatial analytics and route mapping"
     },
     "investigations": {
-      "title": "Investigations Command",
-      "subtitle": "Full investigative workflow and deep-dive intelligence"
+      "title": "Investigations",
+      "subtitle": "Deep-dive analysis and investigative workflows"
     }
   },
   "nav": {
@@ -65,13 +65,13 @@
     "collapseSidebar": "Collapse navigation"
   },
   "geo": {
-    "hubsTitle": "Hub intelligence",
-    "hubsDesc": "Connect PostGIS for live hub and route intelligence overlays.",
+    "hubsTitle": "Hub analytics",
+    "hubsDesc": "Connect PostGIS for live hub and route analytics overlays.",
     "layersTitle": "Map layers",
     "layersDesc": "Prepared for Deck.gl / Mapbox integration. Currently in lightweight mode."
   },
   "investigations": {
-    "subtitle": "Full investigative workflow",
+    "subtitle": "Investigative workflow",
     "insights": "Related insights"
   }
 }

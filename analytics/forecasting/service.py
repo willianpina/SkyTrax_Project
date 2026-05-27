@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import logging
+import time
 from datetime import date, datetime, timedelta, timezone
+from typing import Callable
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -9,8 +12,12 @@ from analytics.constants import BENCHMARK_AIRLINES
 from analytics.intelligence import ReputationService
 from database.models import Airline, ForecastSnapshot, NLPResult, ReputationScoreHistory, Review
 
+logger = logging.getLogger(__name__)
 
 METRICS = ("reputation_score", "sentiment", "complaint_density")
+MIN_SERIES_LENGTH = 2
+MAX_LOOKBACK_DAYS = 365
+STAGE_TIMEOUT_S = 600
 
 
 class TrendForecastingService:
@@ -21,34 +28,82 @@ class TrendForecastingService:
         self.alpha = alpha
         self.rolling_window = rolling_window
         self.reputation = ReputationService(session)
+        self._score_cache: dict[str, dict] = {}
 
-    def generate_and_persist(self, airline_slugs: list[str] | None = None) -> dict:
+    def _cached_score(self, slug: str) -> dict:
+        if slug not in self._score_cache:
+            self._score_cache[slug] = self.reputation.score_airline(slug)
+        return self._score_cache[slug]
+
+    def generate_and_persist(
+        self,
+        airline_slugs: list[str] | None = None,
+        heartbeat_fn: Callable | None = None,
+    ) -> dict:
         slugs = airline_slugs or BENCHMARK_AIRLINES
         created = 0
-        for slug in slugs:
-            airline = self.session.query(Airline).filter(Airline.slug == slug).first()
-            if not airline:
-                continue
-            for metric in METRICS:
-                for horizon in ("weekly", "monthly"):
-                    payload = self._build_forecast(airline, metric, horizon)
-                    if not payload:
-                        continue
-                    self.session.add(
-                        ForecastSnapshot(
-                            airline_id=airline.id,
-                            metric=metric,
-                            horizon=horizon,
-                            method="ewma+rolling",
-                            current_value=payload["current"],
-                            forecast_value=payload["forecast_value"],
-                            trend_direction=payload["trend"],
-                            payload=payload,
+        skipped = 0
+        errors: list[str] = []
+        t0 = time.monotonic()
+
+        logger.info("[FORECAST] Starting: airlines=%d metrics=%d", len(slugs), len(METRICS))
+
+        for i, slug in enumerate(slugs):
+            if time.monotonic() - t0 > STAGE_TIMEOUT_S:
+                logger.warning("[FORECAST] Stage timeout after %ds, processed %d/%d airlines", STAGE_TIMEOUT_S, i, len(slugs))
+                break
+
+            if heartbeat_fn:
+                heartbeat_fn(f"forecasting {i+1}/{len(slugs)} {slug}")
+
+            try:
+                airline = self.session.query(Airline).filter(Airline.slug == slug).first()
+                if not airline:
+                    skipped += 1
+                    continue
+                for metric in METRICS:
+                    for horizon in ("weekly", "monthly"):
+                        payload = self._build_forecast(airline, metric, horizon)
+                        if not payload:
+                            continue
+                        self.session.add(
+                            ForecastSnapshot(
+                                airline_id=airline.id,
+                                metric=metric,
+                                horizon=horizon,
+                                method="ewma+rolling",
+                                current_value=payload["current"],
+                                forecast_value=payload["forecast_value"],
+                                trend_direction=payload["trend"],
+                                payload=payload,
+                            )
                         )
-                    )
-                    created += 1
-        self.session.commit()
-        return {"forecasts_persisted": created}
+                        created += 1
+            except Exception as exc:
+                logger.warning("[FORECAST] Error processing %s: %s", slug, exc)
+                errors.append(f"{slug}: {exc}")
+                try:
+                    self.session.rollback()
+                except Exception:
+                    pass
+
+        try:
+            self.session.commit()
+        except Exception as exc:
+            logger.warning("[FORECAST] Commit failed: %s", exc)
+            self.session.rollback()
+            errors.append(f"commit: {exc}")
+
+        elapsed_ms = int((time.monotonic() - t0) * 1000)
+        logger.info("[FORECAST] Done: created=%d skipped=%d errors=%d elapsed=%dms", created, skipped, len(errors), elapsed_ms)
+
+        return {
+            "forecasts_persisted": created,
+            "airlines_processed": len(slugs) - skipped,
+            "airlines_skipped": skipped,
+            "errors": errors[:10],
+            "elapsed_ms": elapsed_ms,
+        }
 
     def list_forecasts(
         self,
@@ -126,7 +181,7 @@ class TrendForecastingService:
         return self._complaint_series(airline.id, days)
 
     def _reputation_series(self, airline_id: str, days: int) -> list[dict]:
-        since = datetime.now(timezone.utc) - timedelta(days=days)
+        since = datetime.now(timezone.utc) - timedelta(days=min(days, MAX_LOOKBACK_DAYS))
         rows = (
             self.session.query(ReputationScoreHistory)
             .filter(
@@ -142,11 +197,11 @@ class TrendForecastingService:
         airline = self.session.get(Airline, airline_id)
         if not airline:
             return []
-        score = self.reputation.score_airline(airline.slug)
+        score = self._cached_score(airline.slug)
         return [{"period": date.today().isoformat(), "value": score["score"]}]
 
     def _sentiment_series(self, airline_id: str, days: int) -> list[dict]:
-        since = date.today() - timedelta(days=days)
+        since = date.today() - timedelta(days=min(days, MAX_LOOKBACK_DAYS))
         rows = (
             self.session.query(Review.review_date, NLPResult.sentiment_score)
             .join(NLPResult)
@@ -162,7 +217,7 @@ class TrendForecastingService:
         ]
 
     def _complaint_series(self, airline_id: str, days: int) -> list[dict]:
-        since = date.today() - timedelta(days=days)
+        since = date.today() - timedelta(days=min(days, MAX_LOOKBACK_DAYS))
         rows = (
             self.session.query(Review.review_date, func.count(Review.id))
             .filter(Review.airline_id == airline_id, Review.review_date >= since)
@@ -189,7 +244,7 @@ class TrendForecastingService:
         return series
 
     def _current_value(self, airline_slug: str, metric: str) -> float:
-        score = self.reputation.score_airline(airline_slug)
+        score = self._cached_score(airline_slug)
         mapping = {
             "reputation_score": "score",
             "sentiment": "sentiment_component",

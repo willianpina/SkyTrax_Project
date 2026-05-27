@@ -218,13 +218,21 @@ def run_forecasting_job() -> dict:
 
 def _run_forecasting() -> dict:
     session = SessionLocal()
+    t0 = time.perf_counter()
     try:
         result = TrendForecastingService(session).generate_and_persist()
+        duration = time.perf_counter() - t0
         record_worker_metric("skytrax_forecasting_jobs_total", 1.0)
         record_worker_metric("skytrax_forecasts_persisted", float(result.get("forecasts_persisted", 0)))
+        record_worker_metric("skytrax_forecasting_duration_seconds", duration)
+        logger.info("forecasting_completed", extra={
+            "forecasts_persisted": result.get("forecasts_persisted", 0),
+            "duration_ms": int(duration * 1000),
+        })
         return result
-    except Exception:
+    except Exception as exc:
         session.rollback()
+        logger.exception("forecasting_failed", extra={"duration_ms": int((time.perf_counter() - t0) * 1000)})
         raise
     finally:
         session.close()
@@ -236,12 +244,20 @@ def run_anomaly_detection_job() -> dict:
 
 def _run_anomaly_detection() -> dict:
     session = SessionLocal()
+    t0 = time.perf_counter()
     try:
         result = AnomalyDetectionService(session).detect_and_persist()
+        duration = time.perf_counter() - t0
         record_worker_metric("skytrax_anomalies_total", float(result.get("anomalies_created", 0)))
+        record_worker_metric("skytrax_anomaly_duration_seconds", duration)
+        logger.info("anomaly_detection_completed", extra={
+            "anomalies_created": result.get("anomalies_created", 0),
+            "duration_ms": int(duration * 1000),
+        })
         return result
-    except Exception:
+    except Exception as exc:
         session.rollback()
+        logger.exception("anomaly_detection_failed", extra={"duration_ms": int((time.perf_counter() - t0) * 1000)})
         raise
     finally:
         session.close()
