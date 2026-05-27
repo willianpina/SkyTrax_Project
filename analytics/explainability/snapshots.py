@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import func
@@ -7,6 +8,8 @@ from sqlalchemy.orm import Session
 
 from analytics.intelligence import ReputationService
 from database.models import Airline, MetricSnapshot, NLPResult, Review, TopicSnapshot
+
+logger = logging.getLogger(__name__)
 
 
 class SnapshotService:
@@ -51,7 +54,13 @@ class SnapshotService:
                 metrics=portfolio,
             )
         )
-        self.session.commit()
+        try:
+            self.session.commit()
+        except Exception as exc:
+            logger.warning("[SNAPSHOT] commit failed type=%s: %s", snapshot_type, exc)
+            self.session.rollback()
+            return {"error": str(exc), "snapshot_type": snapshot_type, "created": 0}
+        logger.info("[SNAPSHOT] persisted type=%s created=%d", snapshot_type, created + 1)
         return {"snapshot_type": snapshot_type, "created": created + 1}
 
     def _airline_metrics(self, airline_id: str, period_start: datetime, period_end: datetime) -> dict:

@@ -185,6 +185,29 @@
       "telemetryStatic": "Telemetria congelada — sem atividade",
       "crawlExit": "Processo de coleta encerrado",
       "reactorHanging": "Reactor Scrapy travado — encerrando"
+    },
+    "integrity": {
+      "title": "Integridade do Pipeline",
+      "metadataCoverage": "Cobertura de metadados",
+      "graphDensity": "Nós do grafo",
+      "signals": "Sinais",
+      "anomalies": "Anomalias",
+      "snapshots": "Snapshots"
+    },
+    "linkage": {
+      "metadata": "Persistência de metadados bloqueada por schema drift (review_intelligence)",
+      "knowledge_graph": "Grafo ignorado — airline_metadata incompleto",
+      "fusion": "Sinais indisponíveis — grafo ou metadados upstream vazios",
+      "anomalies": "Detecção de anomalias ignorada — baseline de forecast insuficiente",
+      "insights": "Insights executivos falharam — verifique NLP ou schema",
+      "snapshots": "Persistência de snapshots degradada",
+      "aviation_master": "Aviation master degradado — coluna airline_metadata.iata_code ausente"
+    },
+    "alembic": {
+      "repaired": "Schema Alembic reparado automaticamente",
+      "chainValid": "Cadeia de migrations validada",
+      "semanticRevisions": "Revision IDs semânticos suportados",
+      "truncationRisk": "version_num Alembic muito curto — migration bloqueada"
     }
   }
 }

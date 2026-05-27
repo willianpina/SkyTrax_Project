@@ -185,6 +185,29 @@
       "telemetryStatic": "Telemetry frozen — no activity",
       "crawlExit": "Crawl process exited",
       "reactorHanging": "Scrapy reactor hanging — terminating"
+    },
+    "integrity": {
+      "title": "Pipeline Integrity",
+      "metadataCoverage": "Metadata coverage",
+      "graphDensity": "Graph nodes",
+      "signals": "Signals",
+      "anomalies": "Anomalies",
+      "snapshots": "Snapshots"
+    },
+    "linkage": {
+      "metadata": "Metadata persistence blocked by schema drift (review_intelligence)",
+      "knowledge_graph": "Knowledge graph skipped — airline_metadata incomplete",
+      "fusion": "Signals unavailable — upstream graph or metadata empty",
+      "anomalies": "Anomaly detection skipped — insufficient forecast baseline",
+      "insights": "Executive insights failed — check NLP enrichment or schema",
+      "snapshots": "Snapshot persistence degraded",
+      "aviation_master": "Aviation master data degraded — airline_metadata.iata_code missing"
+    },
+    "alembic": {
+      "repaired": "Alembic schema repaired automatically",
+      "chainValid": "Migration chain validated",
+      "semanticRevisions": "Semantic revision IDs supported",
+      "truncationRisk": "Alembic version_num too short — migration blocked"
     }
   }
 }

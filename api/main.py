@@ -14,9 +14,9 @@ from pydantic import ValidationError
 from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 
 from api.routes import router
+from api.router_registry import log_registered_health_routes, validate_health_routes
 from api.routers.anomalies import router as anomalies_router
 from api.routers.forecasting import router as forecasting_router
-from api.routers.ops_health import router as ops_health_router
 from api.schemas import ServiceStatusResponse
 from app.config import get_settings
 from app.logging_config import configure_logging
@@ -45,12 +45,24 @@ configure_tracing("skytrax-api")
 async def lifespan(_app: FastAPI):
     if settings.schema_validate_on_startup:
         try:
-            from database.schema_health import log_schema_startup
+            from app.startup_governance import (
+                StartupBlockedError,
+                log_startup_summary,
+                run_startup_governance,
+            )
 
-            auto = settings.schema_auto_migrate_dev and settings.environment == "development"
-            log_schema_startup(engine, auto_migrate_dev=auto)
+            report = run_startup_governance(engine, service="api")
+            log_startup_summary(report)
+        except StartupBlockedError:
+            raise
         except Exception as exc:
             logger.error("[SCHEMA] Startup validation failed: %s", exc)
+
+    log_registered_health_routes(_app)
+    route_check = validate_health_routes(_app)
+    if not route_check.get("valid"):
+        logger.error("[BOOTSTRAP] Health route validation failed: %s", route_check.get("missing"))
+
     yield
 
 
@@ -78,7 +90,6 @@ app.add_middleware(
 app.include_router(router)
 app.include_router(forecasting_router, prefix="/api")
 app.include_router(anomalies_router, prefix="/api")
-app.include_router(ops_health_router)
 
 
 @app.get("/", response_model=ServiceStatusResponse)

@@ -13,11 +13,19 @@ def main() -> None:
 
     if settings.schema_validate_on_startup:
         try:
-            from database.schema_health import log_schema_startup
+            from app.startup_governance import (
+                StartupBlockedError,
+                log_startup_summary,
+                run_startup_governance,
+            )
             from database.session import engine
 
-            auto = settings.schema_auto_migrate_dev and settings.environment == "development"
-            log_schema_startup(engine, auto_migrate_dev=auto)
+            report = run_startup_governance(engine, service="worker")
+            log_startup_summary(report)
+        except StartupBlockedError as exc:
+            import logging
+            logging.getLogger(__name__).critical("[SCHEMA] Worker startup blocked: %s", exc)
+            raise SystemExit(1) from exc
         except Exception as exc:
             import logging
             logging.getLogger(__name__).error("[SCHEMA] Worker startup validation failed: %s", exc)

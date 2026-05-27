@@ -2759,6 +2759,22 @@ h1, h2, h3, p { margin: 0; }
 }
 
 /* ── Live KPI strip ────────────────────────────────────────── */
+.osm-integrity-strip {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+  padding: 6px 10px; margin-bottom: 8px; border-radius: 5px;
+  background: rgba(34, 211, 238, 0.04);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+  font-size: 0.72rem;
+}
+.osm-integrity-title {
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--ops-cyan, #22d3ee);
+}
+.osm-integrity-metric { color: var(--text-muted, #8899aa); }
+.osm-stage-degraded-hint {
+  display: block; font-size: 0.65rem; color: var(--ops-amber, #f59e0b);
+  margin-top: 2px; line-height: 1.3;
+}
 .osm-kpi-strip {
   display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px;
   margin-bottom: 10px;
@@ -6222,6 +6238,53 @@ h1, h2, h3, p { margin: 0; }
 }
 [data-theme="light"] .workspace-content > * {
   transition: box-shadow 0.2s ease;
+}
+
+/* ═══ PLATFORM HEALTH BADGES ═══════════════════════════════════ */
+.osm-platform-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.osm-platform-badges--compact {
+  margin-left: 8px;
+}
+.osm-platform-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.osm-platform-badge--warn {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+.osm-platform-badge--error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+.osm-platform-badge--info {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+[data-theme="light"] .osm-platform-badge--warn {
+  background: rgba(217, 119, 6, 0.1);
+  color: #d97706;
+}
+[data-theme="light"] .osm-platform-badge--error {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+[data-theme="light"] .osm-platform-badge--info {
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
 }
 
 /* ═══ GOVERNOR BADGES ═══════════════════════════════════════════ */

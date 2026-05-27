@@ -19,7 +19,16 @@ class ExecutiveInsightEngine:
         self.trends = TopicTrendService(session)
 
     def generate_and_persist(self, lookback_days: int = 14) -> dict:
-        self.session.query(ExecutiveInsight).delete()
+        import logging
+
+        log = logging.getLogger(__name__)
+        try:
+            self.session.query(ExecutiveInsight).delete()
+            self.session.flush()
+        except Exception as exc:
+            log.warning("[INSIGHTS] delete existing failed: %s", exc)
+            self.session.rollback()
+            return {"error": str(exc), "insights_created": 0}
         since = date.today() - timedelta(days=lookback_days)
         previous_since = date.today() - timedelta(days=lookback_days * 2)
         created = 0

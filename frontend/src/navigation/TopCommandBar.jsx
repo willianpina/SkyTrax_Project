@@ -6,12 +6,14 @@ import { ThemeToggle } from "../components/ui/ThemeToggle";
 import { OperationalSyncModal } from "../components/OperationalSyncModal";
 import { useSharedAnalytics } from "../hooks/AnalyticsProvider";
 import { useOperations } from "../hooks/useOperations";
+import { usePlatformHealth } from "../hooks/usePlatformHealth";
 import { exportReputationCsv } from "../lib/chartConfigs";
 
 function TopCommandBarInner() {
   const { t } = useTranslation(["nav", "common", "command"]);
   const { isLive, isLoading, error, partialErrors, reload, reputation, benchmarking } = useSharedAnalytics();
   const { status, history, loading, triggerRefresh, resetPipeline } = useOperations();
+  const { badges: platformBadges } = usePlatformHealth();
   const [modalOpen, setModalOpen] = useState(false);
 
   const isRefreshing = status.running === true;
@@ -33,6 +35,15 @@ function TopCommandBarInner() {
       <header className="command-header glass-panel">
         <div className="topbar-brand">
           <span className="topbar-brand-name">{t("command:title")}</span>
+          {platformBadges.length > 0 && (
+            <div className="osm-platform-badges osm-platform-badges--compact">
+              {platformBadges.map((b) => (
+                <span key={b.key} className={`osm-platform-badge osm-platform-badge--${b.severity}`}>
+                  {b.label}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="topbar-actions">
           <ThemeToggle />

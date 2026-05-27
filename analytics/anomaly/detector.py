@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import statistics
 import time
 from datetime import date, timedelta
@@ -61,7 +62,20 @@ class AnomalyDetectionService:
 
         elapsed_ms = int((time.monotonic() - t0) * 1000)
         logger.info("[ANOMALY] Done: created=%d errors=%d elapsed=%dms", created, len(errors), elapsed_ms)
-        return {"anomalies_created": created, "airlines_scanned": len(airlines), "errors": errors[:10], "elapsed_ms": elapsed_ms}
+        result = {
+            "anomalies_created": created,
+            "airlines_scanned": len(airlines),
+            "errors": errors[:10],
+            "elapsed_ms": elapsed_ms,
+        }
+        if os.getenv("ANOMALY_DIAGNOSTIC", "0") == "1":
+            result["diagnostic"] = {
+                "z_threshold": self.z_threshold,
+                "lookback_days": lookback_days,
+                "timeout_s": ANOMALY_TIMEOUT_S,
+            }
+            logger.info("[ANOMALY][DIAGNOSTIC] %s", result["diagnostic"])
+        return result
 
     def list_recent(self, limit: int = 50, airline_slug: str | None = None) -> list[dict]:
         query = (
