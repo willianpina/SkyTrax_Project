@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -15,6 +16,7 @@ from sqlalchemy.exc import NoResultFound, SQLAlchemyError
 from api.routes import router
 from api.routers.anomalies import router as anomalies_router
 from api.routers.forecasting import router as forecasting_router
+from api.routers.ops_health import router as ops_health_router
 from api.schemas import ServiceStatusResponse
 from app.config import get_settings
 from app.logging_config import configure_logging
@@ -38,10 +40,25 @@ logger = logging.getLogger(__name__)
 instrument_sqlalchemy(engine)
 configure_tracing("skytrax-api")
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    if settings.schema_validate_on_startup:
+        try:
+            from database.schema_health import log_schema_startup
+
+            auto = settings.schema_auto_migrate_dev and settings.environment == "development"
+            log_schema_startup(engine, auto_migrate_dev=auto)
+        except Exception as exc:
+            logger.error("[SCHEMA] Startup validation failed: %s", exc)
+    yield
+
+
 app = FastAPI(
     title="Airline Review Intelligence API",
     version="0.2.0",
     description="Customer experience, marketing intelligence and reputation analytics for airline reviews.",
+    lifespan=lifespan,
 )
 
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=[host.strip() for host in settings.api_trusted_hosts.split(",")])
@@ -61,6 +78,7 @@ app.add_middleware(
 app.include_router(router)
 app.include_router(forecasting_router, prefix="/api")
 app.include_router(anomalies_router, prefix="/api")
+app.include_router(ops_health_router)
 
 
 @app.get("/", response_model=ServiceStatusResponse)

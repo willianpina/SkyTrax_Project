@@ -10,7 +10,6 @@ from rq import Queue, Retry
 
 from analytics.anomaly import AnomalyDetectionService
 from analytics.data_quality import DataQualityMonitor
-from analytics.forecasting import TrendForecastingService
 from analytics.insights_engine import ExecutiveInsightEngine
 from analytics.intelligence import ReputationService
 from analytics.semantic_ops import SemanticClusterService
@@ -49,6 +48,8 @@ def run_scrapy_airlinequality(airline_slug: str | None = None, max_pages: int = 
 
 
 def _run_scrapy(airline_slug: str | None, max_pages: int, use_playwright: bool) -> dict:
+    from worker.subprocess_governor import SubprocessGovernor
+
     started_at = time.perf_counter()
     command = [
         "scrapy",
@@ -61,19 +62,40 @@ def _run_scrapy(airline_slug: str | None, max_pages: int, use_playwright: bool) 
     ]
     if airline_slug:
         command.extend(["-a", f"airline={airline_slug}"])
-    result = subprocess.run(command, check=False, capture_output=True, text=True)
+
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    def _redis_fn():
+        from redis import Redis
+        return Redis.from_url(get_settings().redis_url, decode_responses=True)
+
+    governor = SubprocessGovernor(
+        proc=proc,
+        redis_status_key="skytrax:ops:refresh:status",
+        redis_fn=_redis_fn,
+        operation_id=airline_slug or "standalone",
+        metrics_fn=record_worker_metric,
+    )
+
+    gov_result = governor.run()
+
     duration = time.perf_counter() - started_at
     record_worker_metric("skytrax_worker_last_scrapy_duration_seconds", duration)
-    success = result.returncode == 0
+    success = gov_result.get("returncode") == 0
     record_worker_metric("skytrax_worker_last_scrapy_success", 1.0 if success else 0.0)
     record_worker_metric("skytrax_spider_runs_total", 1.0)
     if not success:
-        emit_alert("crawl_failure", {"airline": airline_slug, "returncode": result.returncode}, severity="critical")
+        emit_alert("crawl_failure", {"airline": airline_slug, "returncode": gov_result.get("returncode")}, severity="critical")
     logger.info(
         "scrapy_job_finished",
-        extra={"returncode": result.returncode, "airline": airline_slug, "stderr": result.stderr[-2000:]},
+        extra={
+            "returncode": gov_result.get("returncode"),
+            "airline": airline_slug,
+            "governor_state": gov_result.get("state"),
+            "termination": gov_result.get("termination"),
+        },
     )
-    return {"returncode": result.returncode, "stdout_tail": result.stdout[-2000:], "stderr_tail": result.stderr[-2000:]}
+    return gov_result
 
 
 def schedule_priority_crawls() -> dict:
@@ -217,25 +239,33 @@ def run_forecasting_job() -> dict:
 
 
 def _run_forecasting() -> dict:
-    session = SessionLocal()
+    from worker.forecasting_isolation import run_forecasting_isolated
+
     t0 = time.perf_counter()
     try:
-        result = TrendForecastingService(session).generate_and_persist()
+        result = run_forecasting_isolated()
         duration = time.perf_counter() - t0
         record_worker_metric("skytrax_forecasting_jobs_total", 1.0)
         record_worker_metric("skytrax_forecasts_persisted", float(result.get("forecasts_persisted", 0)))
         record_worker_metric("skytrax_forecasting_duration_seconds", duration)
-        logger.info("forecasting_completed", extra={
-            "forecasts_persisted": result.get("forecasts_persisted", 0),
-            "duration_ms": int(duration * 1000),
-        })
+        if result.get("native_crash"):
+            record_worker_metric("skytrax_forecast_segfault_total", 1.0)
+        logger.info(
+            "forecasting_completed",
+            extra={
+                "forecasts_persisted": result.get("forecasts_persisted", 0),
+                "duration_ms": int(duration * 1000),
+                "isolation": result.get("isolation"),
+                "safe_mode": result.get("safe_mode"),
+            },
+        )
         return result
     except Exception as exc:
-        session.rollback()
-        logger.exception("forecasting_failed", extra={"duration_ms": int((time.perf_counter() - t0) * 1000)})
-        raise
-    finally:
-        session.close()
+        logger.exception(
+            "forecasting_failed",
+            extra={"duration_ms": int((time.perf_counter() - t0) * 1000)},
+        )
+        return {"forecasts_persisted": 0, "error": str(exc)}
 
 
 def run_anomaly_detection_job() -> dict:

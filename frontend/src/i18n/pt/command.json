@@ -145,17 +145,25 @@
       "aviation_master": "Dados canônicos de aviação",
       "pipeline": "Pipeline de processamento"
     },
+    "governorTerminated": "Governor encerrou subprocess",
+    "zombie": "Subprocess zombie detectado",
+    "noProgress": "Executando — sem progresso",
     "crawlTelemetry": {
       "title": "Telemetria de Coleta",
       "stalled": "Crawler parado — nenhum item novo em 90s",
       "saturated": "Corpus saturado — {{count}} páginas sem inserção. Avançando.",
+      "terminated": "Subprocess encerrado pelo governor",
+      "noProgress": "Sem progresso operacional — {{seconds}}s sem inserções",
+      "dupeStreak": "Sequência de duplicatas: {{count}} páginas consecutivas",
       "corpusTotal": "Total do Corpus",
       "newReviews": "Novas Avaliações",
       "pages": "Páginas",
       "duplicates": "Duplicadas",
       "throughput": "Vazão",
       "elapsed": "Decorrido",
-      "airlines": "Companhias"
+      "airlines": "Companhias",
+      "noInsert": "Sem Inserção",
+      "governor": "Governor"
     },
     "eventMessages": {
       "stageStarted": "{{stage}} iniciado",
@@ -169,7 +177,14 @@
       "aviationSyncCompleted": "Sincronização de aviação concluída",
       "aviationSyncFailed": "Sincronização de aviação falhou",
       "aviationSyncTriggered": "Sincronização de aviação acionada",
-      "corpusSaturated": "Corpus saturado — avançando"
+      "corpusSaturated": "Corpus saturado — avançando",
+      "governorTerminated": "Subprocess encerrado pelo governor",
+      "hardKill": "Hard kill — subprocess forçadamente encerrado",
+      "zombie": "Subprocess zombie detectado",
+      "noProgress": "Subprocess executando sem progresso",
+      "telemetryStatic": "Telemetria congelada — sem atividade",
+      "crawlExit": "Processo de coleta encerrado",
+      "reactorHanging": "Reactor Scrapy travado — encerrando"
     }
   }
 }

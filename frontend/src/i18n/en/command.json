@@ -145,17 +145,25 @@
       "aviation_master": "Aviation master data",
       "pipeline": "Processing pipeline"
     },
+    "governorTerminated": "Governor terminated subprocess",
+    "zombie": "Zombie subprocess detected",
+    "noProgress": "Running — no progress",
     "crawlTelemetry": {
       "title": "Crawl Telemetry",
       "stalled": "Crawler stalled — no new items in 90s",
       "saturated": "Corpus saturated — {{count}} pages dry. Advancing.",
+      "terminated": "Subprocess terminated by governor",
+      "noProgress": "No operational progress — {{seconds}}s without inserts",
+      "dupeStreak": "Duplicate streak: {{count}} consecutive pages",
       "corpusTotal": "Corpus Total",
       "newReviews": "New Reviews",
       "pages": "Pages",
       "duplicates": "Duplicates",
       "throughput": "Throughput",
       "elapsed": "Elapsed",
-      "airlines": "Airlines"
+      "airlines": "Airlines",
+      "noInsert": "No Insert",
+      "governor": "Governor"
     },
     "eventMessages": {
       "stageStarted": "{{stage}} started",
@@ -169,7 +177,14 @@
       "aviationSyncCompleted": "Aviation sync completed",
       "aviationSyncFailed": "Aviation sync failed",
       "aviationSyncTriggered": "Aviation sync triggered",
-      "corpusSaturated": "Corpus saturated — advancing"
+      "corpusSaturated": "Corpus saturated — advancing",
+      "governorTerminated": "Subprocess terminated by governor",
+      "hardKill": "Hard kill — subprocess force-terminated",
+      "zombie": "Zombie subprocess detected",
+      "noProgress": "Subprocess running without progress",
+      "telemetryStatic": "Telemetry frozen — no activity",
+      "crawlExit": "Crawl process exited",
+      "reactorHanging": "Scrapy reactor hanging — terminating"
     }
   }
 }

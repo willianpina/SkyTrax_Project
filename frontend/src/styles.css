@@ -6224,6 +6224,57 @@ h1, h2, h3, p { margin: 0; }
   transition: box-shadow 0.2s ease;
 }
 
+/* ═══ GOVERNOR BADGES ═══════════════════════════════════════════ */
+.osm-governor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.osm-governor--terminated {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #60a5fa;
+}
+.osm-governor--zombie {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  animation: pulse-risk 2s ease-in-out infinite;
+}
+.osm-governor--noprogress {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+}
+
+.osm-status--terminated { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.osm-status--zombie { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.osm-status--noprogress { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+[data-theme="light"] .osm-governor--terminated {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.2);
+  color: #2563eb;
+}
+[data-theme="light"] .osm-governor--zombie {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.2);
+  color: #dc2626;
+}
+[data-theme="light"] .osm-governor--noprogress {
+  background: rgba(217, 119, 6, 0.08);
+  border-color: rgba(217, 119, 6, 0.2);
+  color: #d97706;
+}
+[data-theme="light"] .osm-status--terminated { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+[data-theme="light"] .osm-status--zombie { background: rgba(220, 38, 38, 0.1); color: #dc2626; }
+[data-theme="light"] .osm-status--noprogress { background: rgba(217, 119, 6, 0.1); color: #d97706; }
+
 /* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 1200px) {
   .rep-kpi-strip { grid-template-columns: repeat(4, 1fr); }

@@ -67,6 +67,14 @@ class Settings:
         "british-airways,emirates,qatar-airways,lufthansa,latam-airlines",
     )
     enable_postgis: bool = getenv("ENABLE_POSTGIS", "false").lower() in {"true", "1", "yes", "on"}
+    schema_validate_on_startup: bool = getenv("SCHEMA_VALIDATE_ON_STARTUP", "true").lower() in {
+        "true", "1", "yes", "on",
+    }
+    schema_auto_migrate_dev: bool = getenv("SCHEMA_AUTO_MIGRATE_DEV", "false").lower() in {
+        "true", "1", "yes", "on",
+    }
+    forecast_safe_mode: bool = getenv("FORECAST_SAFE_MODE", "0").lower() in {"true", "1", "yes", "on"}
+    forecast_isolated: bool = getenv("FORECAST_ISOLATED", "1").lower() in {"true", "1", "yes", "on"}
 
 
 @lru_cache(maxsize=1)
