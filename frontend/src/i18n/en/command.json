@@ -201,7 +201,11 @@
       "graphDensity": "Graph nodes",
       "signals": "Signals",
       "anomalies": "Anomalies",
-      "snapshots": "Snapshots"
+      "snapshots": "Snapshots",
+      "live": "LIVE",
+      "reconciled": "RECONCILED",
+      "liveBadge": "Authoritative runtime KPIs from pipeline status",
+      "reconciledBadge": "Merged with Postgres counts — stale zeros removed"
     },
     "linkage": {
       "metadata": "Metadata persistence blocked by schema drift (review_intelligence)",

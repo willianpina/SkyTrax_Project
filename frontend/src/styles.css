@@ -2771,6 +2771,24 @@ h1, h2, h3, p { margin: 0; }
   color: var(--ops-cyan, #22d3ee);
 }
 .osm-integrity-metric { color: var(--text-muted, #8899aa); }
+.osm-integrity-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.12rem 0.35rem;
+  border-radius: 4px;
+  margin-right: 0.25rem;
+}
+.osm-integrity-badge--live {
+  color: var(--ops-cyan, #22d3ee);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  background: rgba(34, 211, 238, 0.08);
+}
+.osm-integrity-badge--reconciled {
+  color: var(--ops-green, #22c55e);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.08);
+}
 .osm-stage-degraded-hint {
   display: block; font-size: 0.65rem; color: var(--ops-amber, #f59e0b);
   margin-top: 2px; line-height: 1.3;

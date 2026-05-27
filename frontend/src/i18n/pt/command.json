@@ -201,7 +201,11 @@
       "graphDensity": "Nós do grafo",
       "signals": "Sinais",
       "anomalies": "Anomalias",
-      "snapshots": "Snapshots"
+      "snapshots": "Snapshots",
+      "live": "AO VIVO",
+      "reconciled": "RECONCILIADO",
+      "liveBadge": "KPIs autoritativos do runtime do pipeline",
+      "reconciledBadge": "Mesclado com contagens Postgres — zeros stale removidos"
     },
     "linkage": {
       "metadata": "Persistência de metadados bloqueada por schema drift (review_intelligence)",
