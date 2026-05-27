@@ -170,10 +170,13 @@ def generate_metric_snapshots(snapshot_type: str = "hourly") -> dict:
     return _with_lock(f"snapshot:{snapshot_type}", _generate_snapshots, snapshot_type)
 
 
-def _generate_snapshots(snapshot_type: str) -> dict:
+def _generate_snapshots(
+    snapshot_type: str,
+    heartbeat_fn=None,
+) -> dict:
     session = SessionLocal()
     try:
-        result = SnapshotService(session).generate(snapshot_type)
+        result = SnapshotService(session).generate(snapshot_type, heartbeat_fn=heartbeat_fn)
         record_worker_metric("skytrax_snapshots_created_total", float(result.get("created", 0)))
         return result
     finally:

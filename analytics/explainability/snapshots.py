@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
+from typing import Any
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from analytics.intelligence import ReputationService
+from app.heartbeat import TimedHeartbeat, heartbeat_guard
 from database.models import Airline, MetricSnapshot, NLPResult, Review, TopicSnapshot
 
 logger = logging.getLogger(__name__)
@@ -19,7 +22,12 @@ class SnapshotService:
         self.session = session
         self.reputation = ReputationService(session)
 
-    def generate(self, snapshot_type: str) -> dict:
+    @heartbeat_guard(interval_s=25)
+    def generate(
+        self,
+        snapshot_type: str,
+        heartbeat_fn: Callable[[str | dict[str, Any]], None] | None = None,
+    ) -> dict:
         now = datetime.now(timezone.utc)
         period_map = {
             "hourly": timedelta(hours=1),
@@ -30,7 +38,18 @@ class SnapshotService:
         period_start = now - delta
         created = 0
         airlines = self.session.query(Airline).filter(Airline.is_active.is_(True)).all()
-        for airline in airlines:
+        total = len(airlines)
+        timer = TimedHeartbeat(heartbeat_fn, stage="snapshots", substage="snapshot_generate", interval_s=25)
+        timer.pulse_if_needed(detail=f"snapshot: building {total} airline metrics", processed=0, total=total, force=True)
+        logger.info("[SNAPSHOT] generate type=%s airlines=%d", snapshot_type, total)
+
+        for idx, airline in enumerate(airlines):
+            timer.pulse_if_needed(
+                detail=f"snapshot: airline {idx}/{total} {airline.slug}",
+                processed=idx,
+                total=total,
+                current_substage="airline_metrics",
+            )
             metrics = self._airline_metrics(airline.id, period_start, now)
             if metrics["review_volume"] == 0 and snapshot_type == "hourly":
                 continue
@@ -44,6 +63,14 @@ class SnapshotService:
                 )
             )
             created += 1
+
+        timer.pulse_if_needed(
+            detail="snapshot: portfolio aggregate",
+            processed=total,
+            total=total,
+            current_substage="portfolio_aggregate",
+            force=True,
+        )
         portfolio = self._portfolio_metrics(period_start, now)
         self.session.add(
             MetricSnapshot(
@@ -54,10 +81,17 @@ class SnapshotService:
                 metrics=portfolio,
             )
         )
+        timer.pulse_if_needed(
+            detail="snapshot: committing",
+            processed=total,
+            total=total,
+            current_substage="committing",
+            force=True,
+        )
         try:
             self.session.commit()
         except Exception as exc:
-            logger.warning("[SNAPSHOT] commit failed type=%s: %s", snapshot_type, exc)
+            logger.exception("[SNAPSHOT] commit failed type=%s: %s", snapshot_type, exc)
             self.session.rollback()
             return {"error": str(exc), "snapshot_type": snapshot_type, "created": 0}
         logger.info("[SNAPSHOT] persisted type=%s created=%d", snapshot_type, created + 1)

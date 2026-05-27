@@ -79,6 +79,12 @@ class Settings:
     schema_block_on_drift: bool = getenv("SCHEMA_BLOCK_ON_DRIFT", "false").lower() in {
         "true", "1", "yes", "on",
     }
+    aviation_schema_auto_repair: bool = getenv("AVIATION_SCHEMA_AUTO_REPAIR", "false").lower() in {
+        "true", "1", "yes", "on",
+    }
+    aviation_schema_block_on_drift: bool = getenv("AVIATION_SCHEMA_BLOCK_ON_DRIFT", "false").lower() in {
+        "true", "1", "yes", "on",
+    }
     alembic_version_auto_repair: bool = getenv("ALEMBIC_VERSION_AUTO_REPAIR", "true").lower() in {
         "true", "1", "yes", "on",
     }
