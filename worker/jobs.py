@@ -293,6 +293,42 @@ def _run_anomaly_detection() -> dict:
         session.close()
 
 
+def run_metadata_backfill(batch_size: int = 1000, max_batches: int = 100) -> dict:
+    """RQ/inline job: backfill review_intelligence from reviews without running full pipeline."""
+    return _with_lock("metadata:backfill", _metadata_backfill, batch_size, max_batches)
+
+
+def _metadata_backfill(batch_size: int, max_batches: int) -> dict:
+    from analytics.metadata_extractor import run_metadata_extraction_until_done
+    from analytics.pipeline_integrity import collect_table_counts, collect_count_errors
+
+    session = SessionLocal()
+    try:
+        before = collect_table_counts(session)
+        if before.get("review_intelligence", 0) < 0:
+            return {
+                "error": "review_intelligence_table_unreadable",
+                "count_errors": collect_count_errors(before),
+            }
+        result = run_metadata_extraction_until_done(
+            session, batch_size=batch_size, max_batches=max_batches,
+        )
+        after = collect_table_counts(session)
+        result["metadata_total"] = max(after.get("review_intelligence", 0), 0)
+        result["reviews_total"] = max(after.get("reviews", 0), 0)
+        record_worker_metric("skytrax_metadata_extracted_total", float(result.get("reviews_analyzed", 0)))
+        record_worker_metric("skytrax_metadata_records", float(result["metadata_total"]))
+        logger.info(
+            "[METADATA] backfill done analyzed=%s total=%s remaining=%s",
+            result.get("reviews_analyzed"),
+            result.get("metadata_total"),
+            result.get("remaining"),
+        )
+        return result
+    finally:
+        session.close()
+
+
 def run_operational_refresh(
     operation_id: str | None = None,
     airline_slug: str | None = None,
