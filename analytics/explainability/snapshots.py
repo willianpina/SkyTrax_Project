@@ -40,7 +40,9 @@ class SnapshotService:
         airlines = self.session.query(Airline).filter(Airline.is_active.is_(True)).all()
         total = len(airlines)
         timer = TimedHeartbeat(heartbeat_fn, stage="snapshots", substage="snapshot_generate", interval_s=25)
-        timer.pulse_if_needed(detail=f"snapshot: building {total} airline metrics", processed=0, total=total, force=True)
+        timer.pulse_if_needed(
+            detail=f"snapshot: building {total} airline metrics", processed=0, total=total, force=True
+        )
         logger.info("[SNAPSHOT] generate type=%s airlines=%d", snapshot_type, total)
 
         for idx, airline in enumerate(airlines):
@@ -128,7 +130,9 @@ class SnapshotService:
         return {
             "reputation_score": score.get("score", 0),
             "sentiment_distribution": sentiment,
-            "top_topics": [{"label": label, "weight": weight, "polarity": polarity} for label, weight, polarity in topics],
+            "top_topics": [
+                {"label": label, "weight": weight, "polarity": polarity} for label, weight, polarity in topics
+            ],
             "review_volume": int(volume),
             "trends": score.get("timeline", [])[-6:],
             "categories": score.get("categories", {}),
@@ -136,7 +140,9 @@ class SnapshotService:
 
     def _portfolio_metrics(self, period_start: datetime, period_end: datetime) -> dict:
         sentiment_rows = (
-            self.session.query(NLPResult.sentiment_label, func.count(NLPResult.id)).group_by(NLPResult.sentiment_label).all()
+            self.session.query(NLPResult.sentiment_label, func.count(NLPResult.id))
+            .group_by(NLPResult.sentiment_label)
+            .all()
         )
         volume = (
             self.session.query(func.count(Review.id)).filter(Review.created_at >= period_start).scalar() or 0

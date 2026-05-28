@@ -1,4 +1,5 @@
 """Enrich incoming reviews with aviation metadata context."""
+
 from __future__ import annotations
 
 import re
@@ -45,7 +46,9 @@ class ReviewEnrichmentPipeline:
         self.session = session
         self.normalizer = NormalizationEngine(session)
 
-    def enrich(self, airline_slug: str, route: str | None = None, text: str | None = None) -> EnrichmentResult:
+    def enrich(
+        self, airline_slug: str, route: str | None = None, text: str | None = None
+    ) -> EnrichmentResult:
         result = EnrichmentResult()
         methods = []
         aliases = []
@@ -121,7 +124,8 @@ class ReviewEnrichmentPipeline:
                         result.hub_classification = ap.hub_level
                     if ap.latitude is not None and ap.longitude is not None:
                         result.geospatial_context[ap.iata or ap.airport_name] = {
-                            "lat": ap.latitude, "lon": ap.longitude,
+                            "lat": ap.latitude,
+                            "lon": ap.longitude,
                         }
 
                     methods.append(f"airport:{ap_norm.method}")

@@ -73,7 +73,9 @@ class ExecutiveInsightEngine:
             for insight, airline in rows
         ]
 
-    def _airline_insights(self, airline: Airline, since: date, previous_since: date, lookback_days: int) -> int:
+    def _airline_insights(
+        self, airline: Airline, since: date, previous_since: date, lookback_days: int
+    ) -> int:
         created = 0
         score = self.reputation.score_airline(airline.slug)
         if score["review_count"] == 0:
@@ -111,7 +113,10 @@ class ExecutiveInsightEngine:
                 severity="high",
                 confidence=0.88,
                 text=f"{airline.name} shows elevated reputation risk with an ARS of {score['score']}.",
-                metrics={"ars": score["score"], "drivers": ["rating", "recommendation", "complaint severity"]},
+                metrics={
+                    "ars": score["score"],
+                    "drivers": ["rating", "recommendation", "complaint severity"],
+                },
             )
         elif score["score"] >= 75:
             created += self._add(
@@ -123,7 +128,9 @@ class ExecutiveInsightEngine:
                 metrics={"ars": score["score"], "drivers": ["rating", "recommendation"]},
             )
 
-        emerging = [row for row in self.trends.trends(airline.slug, days=lookback_days) if row["growth_rate"] >= 0.5][:2]
+        emerging = [
+            row for row in self.trends.trends(airline.slug, days=lookback_days) if row["growth_rate"] >= 0.5
+        ][:2]
         for row in emerging:
             created += self._add(
                 airline,
@@ -139,7 +146,11 @@ class ExecutiveInsightEngine:
         created = 0
         scores = {airline.slug: self.reputation.score_airline(airline.slug) for airline in airlines}
         premium_slugs = {"emirates", "qatar-airways", "british-airways", "lufthansa"}
-        premium_scores = [scores[s]["sentiment_component"] for s in premium_slugs if s in scores and scores[s]["review_count"]]
+        premium_scores = [
+            scores[s]["sentiment_component"]
+            for s in premium_slugs
+            if s in scores and scores[s]["review_count"]
+        ]
         if premium_scores and sum(premium_scores) / len(premium_scores) < 55:
             created += self._add(
                 None,
@@ -184,7 +195,9 @@ class ExecutiveInsightEngine:
             if end:
                 q = q.filter(Review.review_date < end)
             complaints = q.scalar() or 0
-            total_q = self.session.query(func.count(Review.id)).filter(Review.airline_id == airline_id, Review.review_date >= start)
+            total_q = self.session.query(func.count(Review.id)).filter(
+                Review.airline_id == airline_id, Review.review_date >= start
+            )
             if end:
                 total_q = total_q.filter(Review.review_date < end)
             total = total_q.scalar() or 1

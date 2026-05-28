@@ -41,6 +41,12 @@ class Route(TimestampMixin, Base):
     origin_airport_id: Mapped[str | None] = mapped_column(ForeignKey("airports.id"))
     dest_airport_id: Mapped[str | None] = mapped_column(ForeignKey("airports.id"))
     route_label: Mapped[str] = mapped_column(String(64), nullable=False)
-    review_count: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"), nullable=False)
-    complaint_density: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"), nullable=False)
-    avg_sentiment_score: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"), nullable=False)
+    review_count: Mapped[int] = mapped_column(
+        Integer, default=0, server_default=sql_text("0"), nullable=False
+    )
+    complaint_density: Mapped[float] = mapped_column(
+        Float, default=0.0, server_default=sql_text("0"), nullable=False
+    )
+    avg_sentiment_score: Mapped[float] = mapped_column(
+        Float, default=0.0, server_default=sql_text("0"), nullable=False
+    )

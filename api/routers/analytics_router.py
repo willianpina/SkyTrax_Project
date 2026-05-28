@@ -17,7 +17,9 @@ router = APIRouter(tags=["analytics"])
 
 
 @router.get("/analytics", response_model=AnalyticsSummaryResponse)
-def analytics(airline: str | None = None, session: Session = Depends(get_session)) -> AnalyticsSummaryResponse:
+def analytics(
+    airline: str | None = None, session: Session = Depends(get_session)
+) -> AnalyticsSummaryResponse:
     return AnalyticsService(session).executive_summary(airline_slug=airline)
 
 
@@ -27,7 +29,9 @@ def rankings(session: Session = Depends(get_session)) -> list[RankingResponse]:
 
 
 @router.get("/sentiment", response_model=SentimentSummaryResponse)
-def sentiment(airline: str | None = None, session: Session = Depends(get_session)) -> SentimentSummaryResponse:
+def sentiment(
+    airline: str | None = None, session: Session = Depends(get_session)
+) -> SentimentSummaryResponse:
     return AnalyticsService(session).sentiment_summary(airline_slug=airline)
 
 

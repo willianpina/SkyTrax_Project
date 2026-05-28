@@ -69,9 +69,7 @@ def reputation_diagnostics(session: Session = Depends(get_session)) -> dict:
 
     metadata_count = session.query(AirlineMetadata).count()
     metadata_with_airline = (
-        session.query(AirlineMetadata)
-        .filter(AirlineMetadata.airline_id.isnot(None))
-        .count()
+        session.query(AirlineMetadata).filter(AirlineMetadata.airline_id.isnot(None)).count()
     )
 
     top_airlines = sorted(review_distribution.items(), key=lambda x: x[1], reverse=True)[:20]
@@ -88,7 +86,5 @@ def reputation_diagnostics(session: Session = Depends(get_session)) -> dict:
             "metadata_records": metadata_count,
             "metadata_linked": metadata_with_airline,
         },
-        "top_airlines_by_reviews": [
-            {"slug": slug, "review_count": cnt} for slug, cnt in top_airlines
-        ],
+        "top_airlines_by_reviews": [{"slug": slug, "review_count": cnt} for slug, cnt in top_airlines],
     }

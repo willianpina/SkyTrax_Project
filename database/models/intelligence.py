@@ -22,7 +22,9 @@ class ExecutiveInsight(TimestampMixin, Base):
     airline_id: Mapped[str | None] = mapped_column(ForeignKey("airlines.id"), index=True)
     category: Mapped[str] = mapped_column(String(80), nullable=False)
     severity: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
-    confidence: Mapped[float] = mapped_column(Float, default=0.5, server_default=sql_text("0.5"), nullable=False)
+    confidence: Mapped[float] = mapped_column(
+        Float, default=0.5, server_default=sql_text("0.5"), nullable=False
+    )
     generated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=lambda: datetime.now(timezone.utc),
@@ -59,7 +61,9 @@ class SemanticCluster(TimestampMixin, Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     airline_id: Mapped[str | None] = mapped_column(ForeignKey("airlines.id"), index=True)
     cluster_label: Mapped[str] = mapped_column(String(120), nullable=False)
-    review_count: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"), nullable=False)
+    review_count: Mapped[int] = mapped_column(
+        Integer, default=0, server_default=sql_text("0"), nullable=False
+    )
     centroid_terms: Mapped[list[str]] = mapped_column(
         JSONB,
         default=list,
@@ -72,8 +76,12 @@ class SemanticCluster(TimestampMixin, Base):
         server_default=sql_text("'[]'::jsonb"),
         nullable=False,
     )
-    relevance_score: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"), nullable=False)
-    confidence: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"), nullable=False)
+    relevance_score: Mapped[float] = mapped_column(
+        Float, default=0.0, server_default=sql_text("0"), nullable=False
+    )
+    confidence: Mapped[float] = mapped_column(
+        Float, default=0.0, server_default=sql_text("0"), nullable=False
+    )
 
 
 class DataQualityReport(TimestampMixin, Base):
@@ -131,7 +139,9 @@ class ScheduledJob(TimestampMixin, Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     job_name: Mapped[str] = mapped_column(String(120), nullable=False)
-    status: Mapped[str] = mapped_column(String(32), default="idle", server_default=sql_text("'idle'"), nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(32), default="idle", server_default=sql_text("'idle'"), nullable=False
+    )
     last_started_at: Mapped[datetime | None] = mapped_column(DateTime)
     last_finished_at: Mapped[datetime | None] = mapped_column(DateTime)
     last_error: Mapped[str | None] = mapped_column(Text)

@@ -30,8 +30,9 @@ def main() -> int:
         "api_health": lambda: _get_json(f"{api_base}/health")["status"] == "online",
         "db": lambda: engine.connect().execute(text("select 1")).scalar_one() == 1,
         "redis": lambda: Redis.from_url(settings.redis_url).ping(),
-        "scrapy_spider_registered": lambda: "airlinequality_reviews"
-        in subprocess.check_output(["scrapy", "list"], text=True),
+        "scrapy_spider_registered": lambda: (
+            "airlinequality_reviews" in subprocess.check_output(["scrapy", "list"], text=True)
+        ),
     }
     failed: list[str] = []
     for name, check in checks.items():

@@ -59,7 +59,9 @@ def upgrade() -> None:
             sa.ForeignKeyConstraint(["airline_id"], ["airlines.id"]),
             sa.PrimaryKeyConstraint("id"),
         )
-        op.create_index("ix_forecast_snapshots_lookup", "forecast_snapshots", ["airline_id", "metric", "horizon"])
+        op.create_index(
+            "ix_forecast_snapshots_lookup", "forecast_snapshots", ["airline_id", "metric", "horizon"]
+        )
 
 
 def downgrade() -> None:

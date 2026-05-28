@@ -4,6 +4,7 @@ Revision ID: 0001_initial_schema
 Revises:
 Create Date: 2026-05-21
 """
+
 from alembic import op
 import sqlalchemy as sa
 from pgvector.sqlalchemy import Vector

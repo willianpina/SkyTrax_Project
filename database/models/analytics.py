@@ -89,7 +89,9 @@ class ForecastSnapshot(TimestampMixin, Base):
     confidence_score: Mapped[float | None] = mapped_column(Float)
     sample_size: Mapped[int | None] = mapped_column(Integer)
     window_size: Mapped[int | None] = mapped_column(Integer)
-    insufficient_data: Mapped[bool] = mapped_column(default=False, server_default=sql_text("false"), nullable=False)
+    insufficient_data: Mapped[bool] = mapped_column(
+        default=False, server_default=sql_text("false"), nullable=False
+    )
     generated_from_reviews: Mapped[int | None] = mapped_column(Integer)
     explanation: Mapped[str | None] = mapped_column(Text)
     trend_direction: Mapped[str] = mapped_column(String(32), nullable=False)

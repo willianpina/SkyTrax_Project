@@ -41,7 +41,9 @@ def _with_lock(job_name: str, fn, *args, **kwargs):
         raise
 
 
-def run_scrapy_airlinequality(airline_slug: str | None = None, max_pages: int = 3, use_playwright: bool = False) -> dict:
+def run_scrapy_airlinequality(
+    airline_slug: str | None = None, max_pages: int = 3, use_playwright: bool = False
+) -> dict:
     """RQ job: execute Scrapy spider for one or all configured airlines."""
     job_name = f"crawl:{airline_slug or 'all'}"
     return _with_lock(job_name, _run_scrapy, airline_slug, max_pages, use_playwright)
@@ -67,6 +69,7 @@ def _run_scrapy(airline_slug: str | None, max_pages: int, use_playwright: bool) 
 
     def _redis_fn():
         from redis import Redis
+
         return Redis.from_url(get_settings().redis_url, decode_responses=True)
 
     governor = SubprocessGovernor(
@@ -85,7 +88,11 @@ def _run_scrapy(airline_slug: str | None, max_pages: int, use_playwright: bool) 
     record_worker_metric("skytrax_worker_last_scrapy_success", 1.0 if success else 0.0)
     record_worker_metric("skytrax_spider_runs_total", 1.0)
     if not success:
-        emit_alert("crawl_failure", {"airline": airline_slug, "returncode": gov_result.get("returncode")}, severity="critical")
+        emit_alert(
+            "crawl_failure",
+            {"airline": airline_slug, "returncode": gov_result.get("returncode")},
+            severity="critical",
+        )
     logger.info(
         "scrapy_job_finished",
         extra={
@@ -283,14 +290,19 @@ def _run_anomaly_detection() -> dict:
         duration = time.perf_counter() - t0
         record_worker_metric("skytrax_anomalies_total", float(result.get("anomalies_created", 0)))
         record_worker_metric("skytrax_anomaly_duration_seconds", duration)
-        logger.info("anomaly_detection_completed", extra={
-            "anomalies_created": result.get("anomalies_created", 0),
-            "duration_ms": int(duration * 1000),
-        })
+        logger.info(
+            "anomaly_detection_completed",
+            extra={
+                "anomalies_created": result.get("anomalies_created", 0),
+                "duration_ms": int(duration * 1000),
+            },
+        )
         return result
-    except Exception as exc:
+    except Exception:
         session.rollback()
-        logger.exception("anomaly_detection_failed", extra={"duration_ms": int((time.perf_counter() - t0) * 1000)})
+        logger.exception(
+            "anomaly_detection_failed", extra={"duration_ms": int((time.perf_counter() - t0) * 1000)}
+        )
         raise
     finally:
         session.close()
@@ -314,7 +326,9 @@ def _metadata_backfill(batch_size: int, max_batches: int) -> dict:
                 "count_errors": collect_count_errors(before),
             }
         result = run_metadata_extraction_until_done(
-            session, batch_size=batch_size, max_batches=max_batches,
+            session,
+            batch_size=batch_size,
+            max_batches=max_batches,
         )
         after = collect_table_counts(session)
         result["metadata_total"] = max(after.get("review_intelligence", 0), 0)
@@ -392,7 +406,13 @@ def run_aviation_bootstrap() -> dict:
 
 
 def _aviation_bootstrap() -> dict:
-    from scripts.bootstrap_aviation import run_spiders, run_enrichment_pass, run_coverage_validation, persist_coverage_report
+    from scripts.bootstrap_aviation import (
+        run_spiders,
+        run_enrichment_pass,
+        run_coverage_validation,
+        persist_coverage_report,
+    )
+
     spiders = run_spiders()
     enrichment = run_enrichment_pass()
     report = run_coverage_validation()
@@ -410,6 +430,7 @@ def run_aviation_coverage_audit() -> dict:
 def _coverage_audit() -> dict:
     from aviation.coverage.engine import CoverageAuditEngine
     from database.models.aviation import AviationCoverageReport
+
     session = SessionLocal()
     try:
         report = CoverageAuditEngine(session).generate_report()
@@ -448,9 +469,7 @@ def _cleanup(retention_days: int) -> dict:
     cutoff = datetime.now(timezone.utc) - timedelta(days=retention_days)
     try:
         old_runs = (
-            session.query(SpiderRun)
-            .filter(SpiderRun.started_at < cutoff)
-            .delete(synchronize_session=False)
+            session.query(SpiderRun).filter(SpiderRun.started_at < cutoff).delete(synchronize_session=False)
         )
         session.commit()
         return {"spider_runs_deleted": old_runs}

@@ -2,6 +2,15 @@
 
 from __future__ import annotations
 
+import os
+
+# Defaults for collection/import before CI or local env is fully configured.
+os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
+os.environ.setdefault("NLP_ENABLE_EMBEDDINGS", "false")
+os.environ.setdefault("SCHEMA_VALIDATE_ON_STARTUP", "false")
+os.environ.setdefault("API_TRUSTED_HOSTS", "testserver,localhost,127.0.0.1")
+
 from datetime import datetime, timezone
 from unittest.mock import MagicMock
 

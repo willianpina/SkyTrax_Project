@@ -68,37 +68,65 @@ class Settings:
     )
     enable_postgis: bool = getenv("ENABLE_POSTGIS", "false").lower() in {"true", "1", "yes", "on"}
     schema_validate_on_startup: bool = getenv("SCHEMA_VALIDATE_ON_STARTUP", "true").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
     schema_auto_migrate_dev: bool = getenv("SCHEMA_AUTO_MIGRATE_DEV", "false").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
     schema_auto_migrate_staging: bool = getenv("SCHEMA_AUTO_MIGRATE_STAGING", "false").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
     schema_block_on_drift: bool = getenv("SCHEMA_BLOCK_ON_DRIFT", "false").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
     aviation_schema_auto_repair: bool = getenv("AVIATION_SCHEMA_AUTO_REPAIR", "false").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
     aviation_schema_block_on_drift: bool = getenv("AVIATION_SCHEMA_BLOCK_ON_DRIFT", "false").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
     alembic_version_auto_repair: bool = getenv("ALEMBIC_VERSION_AUTO_REPAIR", "true").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
     alembic_version_min_length: int = int(getenv("ALEMBIC_VERSION_MIN_LENGTH", "128"))
     alembic_block_on_truncation_risk: bool = getenv(
-        "ALEMBIC_BLOCK_ON_TRUNCATION_RISK", "false",
+        "ALEMBIC_BLOCK_ON_TRUNCATION_RISK",
+        "false",
     ).lower() in {"true", "1", "yes", "on"}
     startup_native_probe: bool = getenv("STARTUP_NATIVE_PROBE", "true").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
     forecast_safe_mode: bool = getenv("FORECAST_SAFE_MODE", "0").lower() in {"true", "1", "yes", "on"}
     forecast_isolated: bool = getenv("FORECAST_ISOLATED", "1").lower() in {"true", "1", "yes", "on"}
     forecast_auto_safe_mode: bool = getenv("FORECAST_AUTO_SAFE_MODE", "true").lower() in {
-        "true", "1", "yes", "on",
+        "true",
+        "1",
+        "yes",
+        "on",
     }
 
 

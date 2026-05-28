@@ -3,6 +3,7 @@
 Crawls both the paginated /airports listing and the /a-z-of-airport-ratings
 table for maximum coverage. Supports incremental crawl, deduplication, and retry.
 """
+
 from __future__ import annotations
 
 import re
@@ -119,17 +120,29 @@ class AirportMetadataSpider(scrapy.Spider):
         self._seen_airports.add(name_key)
 
         iata = self._extract_iata(response, name)
-        country = self._extract_field(response, [
-            ".airport-country::text", ".country::text",
-            "meta[name='country']::attr(content)",
-        ])
-        city = self._extract_field(response, [
-            ".airport-city::text", ".city::text",
-            "meta[name='city']::attr(content)",
-        ])
-        region = self._extract_field(response, [
-            ".airport-region::text", ".region::text",
-        ])
+        country = self._extract_field(
+            response,
+            [
+                ".airport-country::text",
+                ".country::text",
+                "meta[name='country']::attr(content)",
+            ],
+        )
+        city = self._extract_field(
+            response,
+            [
+                ".airport-city::text",
+                ".city::text",
+                "meta[name='city']::attr(content)",
+            ],
+        )
+        region = self._extract_field(
+            response,
+            [
+                ".airport-region::text",
+                ".region::text",
+            ],
+        )
 
         rating = az_rating or self._extract_rating(response)
         hub_level = self._extract_hub_level(response)
@@ -137,8 +150,13 @@ class AirportMetadataSpider(scrapy.Spider):
         self._items_yielded += 1
         self.logger.info(
             "[AIRPORT] #%d %s (%s) — %s, %s — %s★ — hub=%s",
-            self._items_yielded, name, iata or "???",
-            city or "?", country or "?", rating or "?", hub_level or "none",
+            self._items_yielded,
+            name,
+            iata or "???",
+            city or "?",
+            country or "?",
+            rating or "?",
+            hub_level or "none",
         )
 
         yield AirportMetadataItem(
@@ -213,8 +231,7 @@ class AirportMetadataSpider(scrapy.Spider):
 
     def _extract_labels(self, response):
         labels = response.css(
-            ".airport-label::text, .tag::text, .badge::text, "
-            ".airport-type::text, .entry-meta span::text"
+            ".airport-label::text, .tag::text, .badge::text, .airport-type::text, .entry-meta span::text"
         ).getall()
         return [lbl.strip() for lbl in labels if lbl.strip()]
 
@@ -224,6 +241,9 @@ class AirportMetadataSpider(scrapy.Spider):
     def closed(self, reason):
         self.logger.info(
             "[AIRPORT] spider_closed: pages=%d items=%d dropped=%d urls_seen=%d reason=%s",
-            self._pages_crawled, self._items_yielded, self._items_dropped,
-            len(self._seen_urls), reason,
+            self._pages_crawled,
+            self._items_yielded,
+            self._items_dropped,
+            len(self._seen_urls),
+            reason,
         )

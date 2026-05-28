@@ -50,11 +50,16 @@ class TrendForecastingService:
 
         for i, slug in enumerate(slugs):
             if time.monotonic() - t0 > STAGE_TIMEOUT_S:
-                logger.warning("[FORECAST] Stage timeout after %ds, processed %d/%d airlines", STAGE_TIMEOUT_S, i, len(slugs))
+                logger.warning(
+                    "[FORECAST] Stage timeout after %ds, processed %d/%d airlines",
+                    STAGE_TIMEOUT_S,
+                    i,
+                    len(slugs),
+                )
                 break
 
             if heartbeat_fn:
-                heartbeat_fn(f"forecasting {i+1}/{len(slugs)} {slug}")
+                heartbeat_fn(f"forecasting {i + 1}/{len(slugs)} {slug}")
 
             try:
                 airline = self.session.query(Airline).filter(Airline.slug == slug).first()
@@ -95,7 +100,13 @@ class TrendForecastingService:
             errors.append(f"commit: {exc}")
 
         elapsed_ms = int((time.monotonic() - t0) * 1000)
-        logger.info("[FORECAST] Done: created=%d skipped=%d errors=%d elapsed=%dms", created, skipped, len(errors), elapsed_ms)
+        logger.info(
+            "[FORECAST] Done: created=%d skipped=%d errors=%d elapsed=%dms",
+            created,
+            skipped,
+            len(errors),
+            elapsed_ms,
+        )
 
         return {
             "forecasts_persisted": created,
@@ -205,7 +216,9 @@ class TrendForecastingService:
         rows = (
             self.session.query(Review.review_date, NLPResult.sentiment_score)
             .join(NLPResult)
-            .filter(Review.airline_id == airline_id, Review.review_date.isnot(None), Review.review_date >= since)
+            .filter(
+                Review.airline_id == airline_id, Review.review_date.isnot(None), Review.review_date >= since
+            )
             .all()
         )
         buckets: dict[date, list[float]] = {}

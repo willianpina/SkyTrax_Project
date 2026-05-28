@@ -65,9 +65,15 @@ class AirlineQualitySpider(scrapy.Spider):
     name = "airlinequality_reviews"
     allowed_domains = ["airlinequality.com", "www.airlinequality.com"]
 
-    def __init__(self, airline: str | None = None, max_pages: str = "0",
-                 mode: str = "seed", skip_recent_hours: str = "0",
-                 operation_id: str = "", **kwargs):
+    def __init__(
+        self,
+        airline: str | None = None,
+        max_pages: str = "0",
+        mode: str = "seed",
+        skip_recent_hours: str = "0",
+        operation_id: str = "",
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.airline_filter = airline
         raw_max = int(max_pages)
@@ -102,6 +108,7 @@ class AirlineQualitySpider(scrapy.Spider):
         try:
             from database.session import SessionLocal
             from database.models.core import Airline
+
             session = SessionLocal()
             try:
                 rows = session.query(Airline).filter(Airline.is_active.is_(True)).all()
@@ -116,17 +123,20 @@ class AirlineQualitySpider(scrapy.Spider):
                         skipped += 1
                         continue
                     url = row.review_url or f"https://www.airlinequality.com/airline-reviews/{row.slug}/"
-                    result.append({
-                        "name": row.name,
-                        "slug": row.slug,
-                        "country": row.country,
-                        "review_url": url,
-                        "priority": 5,
-                    })
+                    result.append(
+                        {
+                            "name": row.name,
+                            "slug": row.slug,
+                            "country": row.country,
+                            "review_url": url,
+                            "priority": 5,
+                        }
+                    )
                 self._airlines_skipped = skipped
                 self.logger.info(
                     "[CRAWLER] Loaded %d airlines from DB, skipped %d (recently scraped), mode=all",
-                    len(result), skipped,
+                    len(result),
+                    skipped,
                 )
                 return result
             finally:
@@ -150,7 +160,11 @@ class AirlineQualitySpider(scrapy.Spider):
         self._airlines_queued = len(airlines)
         self.logger.info(
             "[CRAWL] Starting: airlines=%d max_pages=%d mode=%s skip_recent=%dh empty_limit=%d",
-            len(airlines), self.max_pages, self.mode, self.skip_recent_hours, MAX_EMPTY_PAGES,
+            len(airlines),
+            self.max_pages,
+            self.mode,
+            self.skip_recent_hours,
+            MAX_EMPTY_PAGES,
         )
         for airline in airlines:
             slug = airline["slug"]
@@ -180,8 +194,10 @@ class AirlineQualitySpider(scrapy.Spider):
             self._airlines_saturated += 1
             self.logger.warning(
                 "[CRAWL][BREAKER] airline=%s exceeded %d min — stopping (inserted=%d pages=%d)",
-                slug, MAX_CRAWL_MINUTES_PER_AIRLINE,
-                self._airline_inserted.get(slug, 0), self._airline_pages.get(slug, 0),
+                slug,
+                MAX_CRAWL_MINUTES_PER_AIRLINE,
+                self._airline_inserted.get(slug, 0),
+                self._airline_pages.get(slug, 0),
             )
             return
 
@@ -199,8 +215,7 @@ class AirlineQualitySpider(scrapy.Spider):
             )
 
         cards = response.css(
-            "article[itemprop='review'], article.review, article[class*='review'], "
-            ".comp_media-review-rated"
+            "article[itemprop='review'], article.review, article[class*='review'], .comp_media-review-rated"
         )
 
         page_reviews = 0
@@ -225,8 +240,13 @@ class AirlineQualitySpider(scrapy.Spider):
 
         self.logger.info(
             "[CRAWL] airline=%s page=%d cards=%d parsed=%d empty_seq=%d elapsed=%.0fs total_pages=%d",
-            slug, page, len(cards), page_reviews, empty_seq,
-            time.time() - airline_started, self._pages_crawled,
+            slug,
+            page,
+            len(cards),
+            page_reviews,
+            empty_seq,
+            time.time() - airline_started,
+            self._pages_crawled,
         )
 
         # ── No cards at all → end of content ─────────────────────
@@ -239,7 +259,8 @@ class AirlineQualitySpider(scrapy.Spider):
             self._airlines_saturated += 1
             self.logger.warning(
                 "[SATURATION] airline=%s saturated after %d empty pages — moving to next airline",
-                slug, empty_seq,
+                slug,
+                empty_seq,
             )
             return
 
@@ -255,7 +276,8 @@ class AirlineQualitySpider(scrapy.Spider):
         else:
             self.logger.info(
                 "[CRAWL] airline=%s page_limit reached (max=%d) — stopping",
-                slug, self.max_pages,
+                slug,
+                self.max_pages,
             )
 
     @staticmethod
@@ -306,7 +328,10 @@ class AirlineQualitySpider(scrapy.Spider):
 
     @staticmethod
     def _rating(card: Tag, metrics: dict[str, str]) -> float | None:
-        candidates = [metrics.get("rating"), AirlineQualitySpider._text(card.select_one(".rating-10, .review-rating"))]
+        candidates = [
+            metrics.get("rating"),
+            AirlineQualitySpider._text(card.select_one(".rating-10, .review-rating")),
+        ]
         rating_value = AirlineQualitySpider._text(card.select_one("[itemprop='ratingValue']"))
         if rating_value:
             candidates.insert(0, rating_value)
@@ -337,7 +362,9 @@ class AirlineQualitySpider(scrapy.Spider):
         date_node = card.select_one("time, [itemprop='datePublished'], .date, .published-date")
         value = ""
         if date_node:
-            value = date_node.get("datetime") or date_node.get("content") or AirlineQualitySpider._text(date_node)
+            value = (
+                date_node.get("datetime") or date_node.get("content") or AirlineQualitySpider._text(date_node)
+            )
         if not value:
             return None
         value = re.sub(r"^published\s+", "", value.strip(), flags=re.IGNORECASE)
@@ -371,7 +398,13 @@ class AirlineQualitySpider(scrapy.Spider):
         self.logger.info(
             "[CRAWL] spider_closed airlines=%d pages=%d reviews=%d "
             "dropped=%d skipped=%d saturated_airlines=%d max_pages=%d mode=%s reason=%s",
-            self._airlines_queued, self._pages_crawled, self._reviews_parsed,
-            self._reviews_dropped, self._airlines_skipped, self._airlines_saturated,
-            self.max_pages, self.mode, reason,
+            self._airlines_queued,
+            self._pages_crawled,
+            self._reviews_parsed,
+            self._reviews_dropped,
+            self._airlines_skipped,
+            self._airlines_saturated,
+            self.max_pages,
+            self.mode,
+            reason,
         )

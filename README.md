@@ -215,11 +215,23 @@ Detalhes: [docs/roadmap/roadmap.md](docs/roadmap/roadmap.md)
 
 ---
 
+## CI/CD
+
+O pipeline GitHub Actions executa: **lint** (Ruff), **test** (Alembic + pytest), **frontend build**, **Docker** e **pip-audit** (não bloqueante).
+
+Documentação completa: [docs/ci_cd/](docs/ci_cd/)
+
+```bash
+pip install -r requirements-dev.txt
+ruff check . && ruff format --check .
+pytest -q --ignore=tests/test_metadata_extractor.py
+```
+
 ## Desenvolvimento
 
 ```bash
 make help          # Targets disponíveis
-make test          # Pytest + coverage
+make test          # Pytest + coverage (via Docker service app)
 make lint          # Ruff
 make frontend-dev  # Vite :5173
 ```

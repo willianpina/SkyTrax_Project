@@ -30,7 +30,9 @@ class AntiBanHeadersMiddleware:
 
     def process_request(self, request, spider):
         request.headers.setdefault("Accept-Language", "en-US,en;q=0.9")
-        request.headers.setdefault("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+        request.headers.setdefault(
+            "Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        )
         request.headers.setdefault("DNT", "1")
         request.headers.setdefault("Upgrade-Insecure-Requests", "1")
         request.headers.setdefault("Sec-Fetch-Site", "none")

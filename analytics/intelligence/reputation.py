@@ -42,7 +42,9 @@ class ReputationService:
         )
         logger.info(
             "[OPS][REPUTATION] airline_scores total_airlines=%d with_reviews=%d min_reviews=%d",
-            total_airlines, len(slugs_with_reviews), min_reviews,
+            total_airlines,
+            len(slugs_with_reviews),
+            min_reviews,
         )
         scored = [self.score_airline(slug) for (slug,) in slugs_with_reviews]
         return sorted(scored, key=lambda r: r["score"], reverse=True)
@@ -54,9 +56,14 @@ class ReputationService:
             airline = self.session.query(Airline).filter(Airline.slug == airline_slug).first()
             country = airline.country if airline else None
             return {
-                "country": country, "region": None, "alliance": None,
-                "star_rating": None, "airline_type": None,
-                "iata_code": None, "icao_code": None, "primary_hub": None,
+                "country": country,
+                "region": None,
+                "alliance": None,
+                "star_rating": None,
+                "airline_type": None,
+                "iata_code": None,
+                "icao_code": None,
+                "primary_hub": None,
             }
         alliance_name = None
         if meta.alliance_rel:
@@ -103,8 +110,12 @@ class ReputationService:
 
         ratings = [review.rating for review, _ in rows if review.rating is not None]
         rating_component = (sum(ratings) / len(ratings) / 10) if ratings else 0
-        recommendation_values = [1 if review.recommended else 0 for review, _ in rows if review.recommended is not None]
-        recommendation_component = sum(recommendation_values) / len(recommendation_values) if recommendation_values else 0
+        recommendation_values = [
+            1 if review.recommended else 0 for review, _ in rows if review.recommended is not None
+        ]
+        recommendation_component = (
+            sum(recommendation_values) / len(recommendation_values) if recommendation_values else 0
+        )
         sentiment_component = self._sentiment_component([nlp.sentiment_label for _, nlp in rows if nlp])
         complaint_severity = self._complaint_severity([review.text for review, _ in rows])
         topic_negativity = self._topic_negativity(airline.id if airline else None)
@@ -127,8 +138,13 @@ class ReputationService:
         logger.debug(
             "[OPS][SCORE_ENGINE] airline=%s reviews=%d complaints=%d negative=%d "
             "nlp_coverage=%d ars=%.1f country=%s",
-            airline_slug, len(rows), complaint_count, negative_reviews,
-            nlp_coverage, round(score * 100, 2), metadata.get("country"),
+            airline_slug,
+            len(rows),
+            complaint_count,
+            negative_reviews,
+            nlp_coverage,
+            round(score * 100, 2),
+            metadata.get("country"),
         )
 
         return {
@@ -193,7 +209,9 @@ class ReputationService:
             return []
         rows = (
             self.session.query(ReputationScoreHistory)
-            .filter(ReputationScoreHistory.airline_id == airline.id, ReputationScoreHistory.category.is_(None))
+            .filter(
+                ReputationScoreHistory.airline_id == airline.id, ReputationScoreHistory.category.is_(None)
+            )
             .order_by(ReputationScoreHistory.recorded_at.desc())
             .limit(limit)
             .all()
@@ -224,7 +242,9 @@ class ReputationService:
         return [
             {
                 "period": str(month.date()),
-                "score": round((((avg_rating or 0) / 10) * 0.7 + float(recommendation_rate or 0) * 0.3) * 100, 2),
+                "score": round(
+                    (((avg_rating or 0) / 10) * 0.7 + float(recommendation_rate or 0) * 0.3) * 100, 2
+                ),
                 "review_count": int(review_count),
             }
             for month, avg_rating, recommendation_rate, review_count in rows
@@ -289,7 +309,10 @@ class ReputationService:
             or 0
         )
         total_weight = (
-            self.session.query(func.sum(TopicSnapshot.weight)).filter(TopicSnapshot.airline_id == airline_id).scalar() or 0
+            self.session.query(func.sum(TopicSnapshot.weight))
+            .filter(TopicSnapshot.airline_id == airline_id)
+            .scalar()
+            or 0
         )
         return float(negative_weight) / float(total_weight) if total_weight else 0
 

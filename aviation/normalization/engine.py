@@ -1,4 +1,5 @@
 """Normalization engine for airline and airport entities."""
+
 from __future__ import annotations
 
 import re

@@ -1,4 +1,5 @@
 """Aviation metadata models -- airlines, airports, alliances, taxonomy."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -6,8 +7,14 @@ from typing import Any
 from uuid import uuid4
 
 from sqlalchemy import (
-    Boolean, DateTime, Float, ForeignKey, Integer,
-    String, Text, UniqueConstraint,
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
 )
 from sqlalchemy import text as sql_text
 from sqlalchemy.dialects.postgresql import JSONB
@@ -32,6 +39,7 @@ class Alliance(TimestampMixin, Base):
 
 class AirlineMetadata(TimestampMixin, Base):
     """Extended metadata beyond the core Airline record."""
+
     __tablename__ = "airline_metadata"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
@@ -54,35 +62,65 @@ class AirlineMetadata(TimestampMixin, Base):
     fleet_size: Mapped[int | None] = mapped_column(Integer)
     primary_hub: Mapped[str | None] = mapped_column(String(8))
     certifications: Mapped[list[str]] = mapped_column(
-        JSONB, default=list, server_default=sql_text("'[]'::jsonb"), nullable=False,
+        JSONB,
+        default=list,
+        server_default=sql_text("'[]'::jsonb"),
+        nullable=False,
     )
     hub_airports: Mapped[list[str]] = mapped_column(
-        JSONB, default=list, server_default=sql_text("'[]'::jsonb"), nullable=False,
+        JSONB,
+        default=list,
+        server_default=sql_text("'[]'::jsonb"),
+        nullable=False,
     )
     operational_labels: Mapped[list[str]] = mapped_column(
-        JSONB, default=list, server_default=sql_text("'[]'::jsonb"), nullable=False,
+        JSONB,
+        default=list,
+        server_default=sql_text("'[]'::jsonb"),
+        nullable=False,
     )
     skytrax_url: Mapped[str | None] = mapped_column(String(500))
     enrichment_confidence: Mapped[float] = mapped_column(
-        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+        Float,
+        default=0.0,
+        server_default=sql_text("0"),
+        nullable=False,
     )
     normalization_confidence: Mapped[float] = mapped_column(
-        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+        Float,
+        default=0.0,
+        server_default=sql_text("0"),
+        nullable=False,
     )
     metadata_quality_score: Mapped[float] = mapped_column(
-        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+        Float,
+        default=0.0,
+        server_default=sql_text("0"),
+        nullable=False,
     )
     enrichment_status: Mapped[str] = mapped_column(
-        String(32), default="pending", server_default=sql_text("'pending'"), nullable=False,
+        String(32),
+        default="pending",
+        server_default=sql_text("'pending'"),
+        nullable=False,
     )
     coverage_status: Mapped[str] = mapped_column(
-        String(32), default="partial", server_default=sql_text("'partial'"), nullable=False,
+        String(32),
+        default="partial",
+        server_default=sql_text("'partial'"),
+        nullable=False,
     )
     source_confidence: Mapped[float] = mapped_column(
-        Float, default=0.5, server_default=sql_text("0.5"), nullable=False,
+        Float,
+        default=0.5,
+        server_default=sql_text("0.5"),
+        nullable=False,
     )
     raw_metadata: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
+        JSONB,
+        default=dict,
+        server_default=sql_text("'{}'::jsonb"),
+        nullable=False,
     )
     last_enriched_at: Mapped[datetime | None] = mapped_column(DateTime)
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime)
@@ -92,6 +130,7 @@ class AirlineMetadata(TimestampMixin, Base):
 
 class AirportMetadata(TimestampMixin, Base):
     """Extended airport metadata from SkyTrax ratings."""
+
     __tablename__ = "airport_metadata"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
@@ -108,29 +147,53 @@ class AirportMetadata(TimestampMixin, Base):
     airport_rating: Mapped[int | None] = mapped_column(Integer)
     hub_level: Mapped[str | None] = mapped_column(String(40))
     operational_labels: Mapped[list[str]] = mapped_column(
-        JSONB, default=list, server_default=sql_text("'[]'::jsonb"), nullable=False,
+        JSONB,
+        default=list,
+        server_default=sql_text("'[]'::jsonb"),
+        nullable=False,
     )
     skytrax_url: Mapped[str | None] = mapped_column(String(500))
     enrichment_confidence: Mapped[float] = mapped_column(
-        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+        Float,
+        default=0.0,
+        server_default=sql_text("0"),
+        nullable=False,
     )
     normalization_confidence: Mapped[float] = mapped_column(
-        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+        Float,
+        default=0.0,
+        server_default=sql_text("0"),
+        nullable=False,
     )
     metadata_quality_score: Mapped[float] = mapped_column(
-        Float, default=0.0, server_default=sql_text("0"), nullable=False,
+        Float,
+        default=0.0,
+        server_default=sql_text("0"),
+        nullable=False,
     )
     enrichment_status: Mapped[str] = mapped_column(
-        String(32), default="pending", server_default=sql_text("'pending'"), nullable=False,
+        String(32),
+        default="pending",
+        server_default=sql_text("'pending'"),
+        nullable=False,
     )
     coverage_status: Mapped[str] = mapped_column(
-        String(32), default="partial", server_default=sql_text("'partial'"), nullable=False,
+        String(32),
+        default="partial",
+        server_default=sql_text("'partial'"),
+        nullable=False,
     )
     source_confidence: Mapped[float] = mapped_column(
-        Float, default=0.5, server_default=sql_text("0.5"), nullable=False,
+        Float,
+        default=0.5,
+        server_default=sql_text("0.5"),
+        nullable=False,
     )
     raw_metadata: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
+        JSONB,
+        default=dict,
+        server_default=sql_text("'{}'::jsonb"),
+        nullable=False,
     )
     last_enriched_at: Mapped[datetime | None] = mapped_column(DateTime)
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime)
@@ -138,17 +201,27 @@ class AirportMetadata(TimestampMixin, Base):
 
 class AirlineAirport(TimestampMixin, Base):
     """Association between airlines and hub airports."""
+
     __tablename__ = "airline_airports"
-    __table_args__ = (UniqueConstraint("airline_metadata_id", "airport_metadata_id", name="uq_airline_airport"),)
+    __table_args__ = (
+        UniqueConstraint("airline_metadata_id", "airport_metadata_id", name="uq_airline_airport"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
-    airline_metadata_id: Mapped[str] = mapped_column(ForeignKey("airline_metadata.id"), nullable=False, index=True)
-    airport_metadata_id: Mapped[str] = mapped_column(ForeignKey("airport_metadata.id"), nullable=False, index=True)
-    relationship_type: Mapped[str] = mapped_column(String(40), default="hub", server_default=sql_text("'hub'"))
+    airline_metadata_id: Mapped[str] = mapped_column(
+        ForeignKey("airline_metadata.id"), nullable=False, index=True
+    )
+    airport_metadata_id: Mapped[str] = mapped_column(
+        ForeignKey("airport_metadata.id"), nullable=False, index=True
+    )
+    relationship_type: Mapped[str] = mapped_column(
+        String(40), default="hub", server_default=sql_text("'hub'")
+    )
 
 
 class AviationTaxonomy(TimestampMixin, Base):
     """Hierarchical taxonomy for aviation classification."""
+
     __tablename__ = "aviation_taxonomy"
     __table_args__ = (UniqueConstraint("category", "label", name="uq_taxonomy_cat_label"),)
 
@@ -158,12 +231,17 @@ class AviationTaxonomy(TimestampMixin, Base):
     parent_label: Mapped[str | None] = mapped_column(String(160))
     description: Mapped[str | None] = mapped_column(Text)
     taxonomy_data: Mapped[dict[str, Any]] = mapped_column(
-        "metadata", JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
+        "metadata",
+        JSONB,
+        default=dict,
+        server_default=sql_text("'{}'::jsonb"),
+        nullable=False,
     )
 
 
 class AviationCoverageReport(TimestampMixin, Base):
     """Point-in-time coverage audit snapshot."""
+
     __tablename__ = "aviation_coverage_reports"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
@@ -183,5 +261,8 @@ class AviationCoverageReport(TimestampMixin, Base):
     enrichment_score: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"))
     graph_readiness: Mapped[float] = mapped_column(Float, default=0.0, server_default=sql_text("0"))
     report_data: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, default=dict, server_default=sql_text("'{}'::jsonb"), nullable=False,
+        JSONB,
+        default=dict,
+        server_default=sql_text("'{}'::jsonb"),
+        nullable=False,
     )

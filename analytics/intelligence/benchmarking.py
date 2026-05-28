@@ -22,7 +22,9 @@ class BenchmarkingService:
         reputation_service = ReputationService(self.session)
         reputation = [reputation_service.score_airline(slug) for slug in target_slugs]
         topics = (
-            self.session.query(Airline.slug, TopicSnapshot.label, TopicSnapshot.polarity, TopicSnapshot.weight)
+            self.session.query(
+                Airline.slug, TopicSnapshot.label, TopicSnapshot.polarity, TopicSnapshot.weight
+            )
             .join(Airline, TopicSnapshot.airline_id == Airline.id)
             .filter(Airline.slug.in_(target_slugs))
             .order_by(TopicSnapshot.weight.desc())

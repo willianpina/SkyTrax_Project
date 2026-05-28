@@ -64,7 +64,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["airline_id"], ["airlines.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_reputation_history_airline", "reputation_score_history", ["airline_id", "recorded_at"])
+    op.create_index(
+        "ix_reputation_history_airline", "reputation_score_history", ["airline_id", "recorded_at"]
+    )
 
     op.create_table(
         "scheduled_jobs",

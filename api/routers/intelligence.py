@@ -64,6 +64,7 @@ def refresh_insights(session: Session = Depends(get_session)) -> dict:
 
 # ── Operational Intelligence endpoints ──────────────────────────────────
 
+
 @router.get("/operational/dashboard")
 def operational_dashboard(session: Session = Depends(get_session)):
     return OperationalIntelligenceService(session).operational_dashboard()
@@ -141,6 +142,7 @@ def geospatial_overview(session: Session = Depends(get_session)):
 @router.get("/graph/stats")
 def graph_stats(session: Session = Depends(get_session)):
     from analytics.knowledge_graph import AviationKnowledgeGraph
+
     return AviationKnowledgeGraph(session).get_stats()
 
 
@@ -150,6 +152,7 @@ def fusion_signals(
     session: Session = Depends(get_session),
 ):
     from database.models.graph import FusionSignal
+
     rows = (
         session.query(FusionSignal)
         .filter(FusionSignal.is_active.is_(True))
@@ -177,10 +180,12 @@ def fusion_signals(
 def disruption_summary(session: Session = Depends(get_session)):
     from sqlalchemy import func
     from database.models.graph import ReviewIntelligence
+
     total = session.query(func.count(ReviewIntelligence.id)).scalar() or 0
     severities = dict(
         session.query(ReviewIntelligence.operational_severity, func.count(ReviewIntelligence.id))
-        .group_by(ReviewIntelligence.operational_severity).all()
+        .group_by(ReviewIntelligence.operational_severity)
+        .all()
     )
     return {
         "total_analyzed": total,
@@ -190,12 +195,14 @@ def disruption_summary(session: Session = Depends(get_session)):
 
 # ── Operational Semantic Friction Matrix ────────────────────────────────
 
+
 @router.get("/friction-matrix")
 def friction_matrix(
     top: int = Query(default=15, ge=5, le=30),
     session: Session = Depends(get_session),
 ):
     from analytics.friction_matrix import FrictionMatrixService
+
     return FrictionMatrixService(session).compute(top_airlines=top)
 
 
@@ -207,4 +214,5 @@ def friction_drilldown(
     session: Session = Depends(get_session),
 ):
     from analytics.friction_matrix import FrictionMatrixService
+
     return FrictionMatrixService(session).cluster_drilldown(airline, cluster, limit=limit)

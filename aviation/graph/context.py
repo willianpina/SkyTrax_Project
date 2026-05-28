@@ -3,6 +3,7 @@
 Builds adjacency structures without requiring Neo4j.
 Designed to be portable to a graph DB in the future.
 """
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -27,47 +28,62 @@ class AviationGraphContext:
         edges = []
 
         if am.alliance_rel:
-            edges.append({
-                "target": am.alliance_rel.name,
-                "target_type": "alliance",
-                "relationship": "member_of",
-            })
-            siblings = self.session.query(AirlineMetadata).filter(
-                AirlineMetadata.alliance_id == am.alliance_id,
-                AirlineMetadata.id != am.id,
-            ).limit(10).all()
+            edges.append(
+                {
+                    "target": am.alliance_rel.name,
+                    "target_type": "alliance",
+                    "relationship": "member_of",
+                }
+            )
+            siblings = (
+                self.session.query(AirlineMetadata)
+                .filter(
+                    AirlineMetadata.alliance_id == am.alliance_id,
+                    AirlineMetadata.id != am.id,
+                )
+                .limit(10)
+                .all()
+            )
             for sib in siblings:
-                edges.append({
-                    "target": sib.airline_name,
-                    "target_slug": sib.slug,
-                    "target_type": "airline",
-                    "relationship": "alliance_peer",
-                })
+                edges.append(
+                    {
+                        "target": sib.airline_name,
+                        "target_slug": sib.slug,
+                        "target_type": "airline",
+                        "relationship": "alliance_peer",
+                    }
+                )
 
         hub_links = self.session.query(AirlineAirport).filter_by(airline_metadata_id=am.id).all()
         for link in hub_links:
             ap = self.session.query(AirportMetadata).get(link.airport_metadata_id)
             if ap:
-                edges.append({
-                    "target": ap.airport_name,
-                    "target_iata": ap.iata,
-                    "target_type": "airport",
-                    "relationship": link.relationship_type or "hub",
-                })
+                edges.append(
+                    {
+                        "target": ap.airport_name,
+                        "target_iata": ap.iata,
+                        "target_type": "airport",
+                        "relationship": link.relationship_type or "hub",
+                    }
+                )
 
         if am.country:
-            edges.append({
-                "target": am.country,
-                "target_type": "country",
-                "relationship": "headquartered_in",
-            })
+            edges.append(
+                {
+                    "target": am.country,
+                    "target_type": "country",
+                    "relationship": "headquartered_in",
+                }
+            )
 
         for label in am.operational_labels:
-            edges.append({
-                "target": label,
-                "target_type": "label",
-                "relationship": "tagged_as",
-            })
+            edges.append(
+                {
+                    "target": label,
+                    "target_type": "label",
+                    "relationship": "tagged_as",
+                }
+            )
 
         return {
             "entity": am.airline_name,
@@ -89,12 +105,14 @@ class AviationGraphContext:
         for link in links:
             am = self.session.query(AirlineMetadata).get(link.airline_metadata_id)
             if am:
-                edges.append({
-                    "target": am.airline_name,
-                    "target_slug": am.slug,
-                    "target_type": "airline",
-                    "relationship": link.relationship_type or "hub",
-                })
+                edges.append(
+                    {
+                        "target": am.airline_name,
+                        "target_slug": am.slug,
+                        "target_type": "airline",
+                        "relationship": link.relationship_type or "hub",
+                    }
+                )
 
         if ap.country:
             edges.append({"target": ap.country, "target_type": "country", "relationship": "located_in"})

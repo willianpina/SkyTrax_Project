@@ -3,6 +3,7 @@
 Usage unchanged:
     from database.models import Airline, Review, ...
 """
+
 from database.session import Base
 from database.models.base import TimestampMixin
 from database.models.core import Airline, Review, NLPResult, SpiderRun

@@ -8,7 +8,9 @@ from analytics.semantic_ops import SemanticClusterService
 
 def test_semantic_cluster_assignment() -> None:
     service = SemanticClusterService.__new__(SemanticClusterService)
-    label = service._assign_cluster("My baggage was lost and refund was denied after a long delay at the airport.")
+    label = service._assign_cluster(
+        "My baggage was lost and refund was denied after a long delay at the airport."
+    )
     assert label in SEMANTIC_CLUSTER_LABELS or label == "general feedback"
 
 

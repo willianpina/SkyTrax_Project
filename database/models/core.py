@@ -4,7 +4,18 @@ from datetime import date, datetime, timezone
 from typing import Any
 from uuid import uuid4
 
-from sqlalchemy import CheckConstraint, Date, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy import text as sql_text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -84,7 +95,9 @@ class Review(TimestampMixin, Base):
     )
 
     airline: Mapped[Airline] = relationship(back_populates="reviews")
-    nlp_result: Mapped["NLPResult"] = relationship(back_populates="review", uselist=False, cascade="all, delete-orphan")
+    nlp_result: Mapped["NLPResult"] = relationship(
+        back_populates="review", uselist=False, cascade="all, delete-orphan"
+    )
 
 
 class NLPResult(TimestampMixin, Base):
@@ -143,11 +156,17 @@ class SpiderRun(TimestampMixin, Base):
     spider_name: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
     source: Mapped[str] = mapped_column(String(80), nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False)
-    items_scraped: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"), nullable=False)
-    pages_crawled: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"), nullable=False)
+    items_scraped: Mapped[int] = mapped_column(
+        Integer, default=0, server_default=sql_text("0"), nullable=False
+    )
+    pages_crawled: Mapped[int] = mapped_column(
+        Integer, default=0, server_default=sql_text("0"), nullable=False
+    )
     crawl_duration_ms: Mapped[int | None] = mapped_column(Integer)
     retry_count: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"), nullable=False)
-    anti_ban_triggers: Mapped[int] = mapped_column(Integer, default=0, server_default=sql_text("0"), nullable=False)
+    anti_ban_triggers: Mapped[int] = mapped_column(
+        Integer, default=0, server_default=sql_text("0"), nullable=False
+    )
     quality_score: Mapped[float | None] = mapped_column(Float)
     airline_slug: Mapped[str | None] = mapped_column(String(180))
     run_metadata: Mapped[dict[str, Any]] = mapped_column(

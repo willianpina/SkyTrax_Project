@@ -16,7 +16,6 @@ from app.response_contract import (
     CANCELLED_STATUS,
     CLIENT_DISCONNECT_STATUS,
     defensive_call_next,
-    ensure_response,
     safe_json_response,
 )
 

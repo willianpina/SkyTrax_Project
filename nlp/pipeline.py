@@ -29,12 +29,35 @@ class ReviewNLPPipeline:
     embeddings are loaded only when NLP_ENABLE_EMBEDDINGS=true.
     """
 
-    positive_terms = {"excellent", "great", "comfortable", "friendly", "clean", "efficient", "smooth", "helpful"}
-    negative_terms = {"delayed", "rude", "poor", "dirty", "cancelled", "lost", "bad", "uncomfortable", "refund"}
+    positive_terms = {
+        "excellent",
+        "great",
+        "comfortable",
+        "friendly",
+        "clean",
+        "efficient",
+        "smooth",
+        "helpful",
+    }
+    negative_terms = {
+        "delayed",
+        "rude",
+        "poor",
+        "dirty",
+        "cancelled",
+        "lost",
+        "bad",
+        "uncomfortable",
+        "refund",
+    }
 
-    def __init__(self, embedding_model_name: str | None = None, enable_embeddings: bool | None = None) -> None:
+    def __init__(
+        self, embedding_model_name: str | None = None, enable_embeddings: bool | None = None
+    ) -> None:
         settings = get_settings()
-        self.enable_embeddings = settings.nlp_enable_embeddings if enable_embeddings is None else enable_embeddings
+        self.enable_embeddings = (
+            settings.nlp_enable_embeddings if enable_embeddings is None else enable_embeddings
+        )
         self.embedding_model_name = embedding_model_name or settings.nlp_embedding_model
 
         try:

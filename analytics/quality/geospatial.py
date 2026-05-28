@@ -52,12 +52,18 @@ class GeospatialIntelligenceService:
         }
 
     def refresh_routes(self, airline_slug: str | None = None) -> dict:
-        query = self.session.query(Review).options(selectinload(Review.airline), selectinload(Review.nlp_result)).join(Airline)
+        query = (
+            self.session.query(Review)
+            .options(selectinload(Review.airline), selectinload(Review.nlp_result))
+            .join(Airline)
+        )
         if airline_slug:
             query = query.filter(Airline.slug == airline_slug)
         reviews = query.filter(Review.route.isnot(None)).limit(5000).all()
         airport_map = {row.iata_code: row for row in self.session.query(Airport).all()}
-        aggregates: dict[tuple[str, str], dict] = defaultdict(lambda: {"count": 0, "complaints": 0, "sentiment": 0.0})
+        aggregates: dict[tuple[str, str], dict] = defaultdict(
+            lambda: {"count": 0, "complaints": 0, "sentiment": 0.0}
+        )
 
         for review in reviews:
             label = self._normalize_route(review.route)
@@ -65,7 +71,9 @@ class GeospatialIntelligenceService:
                 continue
             key = (review.airline_id, label)
             aggregates[key]["count"] += 1
-            if review.recommended is False or (review.nlp_result and review.nlp_result.sentiment_label == "negative"):
+            if review.recommended is False or (
+                review.nlp_result and review.nlp_result.sentiment_label == "negative"
+            ):
                 aggregates[key]["complaints"] += 1
             if review.nlp_result:
                 aggregates[key]["sentiment"] += review.nlp_result.sentiment_score
@@ -115,7 +123,10 @@ class GeospatialIntelligenceService:
                 or 0
             )
             total = (
-                self.session.query(func.count(Review.id)).filter(Review.route.ilike(f"%{airport.iata_code}%")).scalar() or 0
+                self.session.query(func.count(Review.id))
+                .filter(Review.route.ilike(f"%{airport.iata_code}%"))
+                .scalar()
+                or 0
             )
             results.append(
                 {
@@ -125,7 +136,11 @@ class GeospatialIntelligenceService:
                     "longitude": airport.longitude,
                     "complaint_density": round(negative / max(total, 1), 4),
                     "review_count": int(total),
-                    "risk_level": "high" if total and negative / total > 0.4 else "medium" if total else "low",
+                    "risk_level": "high"
+                    if total and negative / total > 0.4
+                    else "medium"
+                    if total
+                    else "low",
                 }
             )
         return sorted(results, key=lambda row: row["complaint_density"], reverse=True)[:limit]
@@ -134,7 +149,12 @@ class GeospatialIntelligenceService:
         airports = self.session.query(Airport).filter(Airport.latitude.isnot(None)).all()
         points = []
         for airport in airports:
-            total = self.session.query(func.count(Review.id)).filter(Review.route.ilike(f"%{airport.iata_code}%")).scalar() or 0
+            total = (
+                self.session.query(func.count(Review.id))
+                .filter(Review.route.ilike(f"%{airport.iata_code}%"))
+                .scalar()
+                or 0
+            )
             negative = (
                 self.session.query(func.count(Review.id))
                 .join(NLPResult)

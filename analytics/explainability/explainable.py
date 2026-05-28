@@ -28,8 +28,7 @@ class ExplainableIntelligenceService:
         topic_phrase = ", ".join(d["topic"] for d in drivers[:2]) or "mixed operational themes"
         delta_complaint = self._complaint_delta(airline.id if airline else None, lookback_days)
         narrative = (
-            f"Airline Reputation Score is {score['score']} ({direction}). "
-            f"Primary drivers: {topic_phrase}. "
+            f"Airline Reputation Score is {score['score']} ({direction}). Primary drivers: {topic_phrase}. "
         )
         if delta_complaint >= 10:
             narrative += (
@@ -104,7 +103,11 @@ class ExplainableIntelligenceService:
         rows = (
             self.session.query(NLPResult.topics, Review.text)
             .join(Review)
-            .filter(Review.airline_id == airline_id, Review.review_date >= since, NLPResult.sentiment_label == "negative")
+            .filter(
+                Review.airline_id == airline_id,
+                Review.review_date >= since,
+                NLPResult.sentiment_label == "negative",
+            )
             .limit(200)
             .all()
         )
@@ -112,7 +115,10 @@ class ExplainableIntelligenceService:
         for topics, _ in rows:
             for topic in topics or []:
                 counts[topic] = counts.get(topic, 0) + 1
-        return [{"topic": topic, "count": count} for topic, count in sorted(counts.items(), key=lambda x: -x[1])[:5]]
+        return [
+            {"topic": topic, "count": count}
+            for topic, count in sorted(counts.items(), key=lambda x: -x[1])[:5]
+        ]
 
     def _complaint_delta(self, airline_id: str | None, lookback_days: int) -> float:
         if not airline_id:
@@ -127,7 +133,9 @@ class ExplainableIntelligenceService:
             if end:
                 q = q.filter(Review.review_date < end)
             complaints = q.scalar() or 0
-            total_q = self.session.query(func.count(Review.id)).filter(Review.airline_id == airline_id, Review.review_date >= start)
+            total_q = self.session.query(func.count(Review.id)).filter(
+                Review.airline_id == airline_id, Review.review_date >= start
+            )
             if end:
                 total_q = total_q.filter(Review.review_date < end)
             total = total_q.scalar() or 1

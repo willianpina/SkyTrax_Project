@@ -24,10 +24,12 @@ def main() -> None:
             log_startup_summary(report)
         except StartupBlockedError as exc:
             import logging
+
             logging.getLogger(__name__).critical("[SCHEMA] Worker startup blocked: %s", exc)
             raise SystemExit(1) from exc
         except Exception as exc:
             import logging
+
             logging.getLogger(__name__).error("[SCHEMA] Worker startup validation failed: %s", exc)
 
     connection = Redis.from_url(settings.redis_url)

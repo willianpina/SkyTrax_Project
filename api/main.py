@@ -118,7 +118,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=[host.strip() for host in settings.api_trusted_hosts.split(",")])
+app.add_middleware(
+    TrustedHostMiddleware, allowed_hosts=[host.strip() for host in settings.api_trusted_hosts.split(",")]
+)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestSizeLimitMiddleware, max_bytes=settings.api_max_request_bytes)

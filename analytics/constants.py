@@ -13,6 +13,7 @@ def get_all_reviewed_slugs() -> list[str]:
         from database.session import SessionLocal
         from database.models.core import Airline, Review
         from sqlalchemy import func
+
         session = SessionLocal()
         try:
             rows = (
@@ -27,6 +28,7 @@ def get_all_reviewed_slugs() -> list[str]:
             session.close()
     except Exception:
         return BENCHMARK_AIRLINES
+
 
 PREMIUM_AIRLINES = [r["slug"] for r in SEED_AIRLINES if r.get("tier") == "premium"]
 LOW_COST_AIRLINES = [r["slug"] for r in SEED_AIRLINES if r.get("tier") == "low_cost"]

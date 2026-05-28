@@ -58,23 +58,53 @@ def enqueue(job_fn, *args, **kwargs) -> None:
             retry=Retry(max=settings.job_retry_attempts),
         )
         elapsed_ms = round((time.monotonic() - t0) * 1000, 1)
-        _safe_log("info", "scheduler_enqueued", job_name=job_name, job_args=str(args), queue_name=queue.name, enqueue_ms=elapsed_ms)
+        _safe_log(
+            "info",
+            "scheduler_enqueued",
+            job_name=job_name,
+            job_args=str(args),
+            queue_name=queue.name,
+            enqueue_ms=elapsed_ms,
+        )
     except Exception as exc:
         elapsed_ms = round((time.monotonic() - t0) * 1000, 1)
-        _safe_log("error", "scheduler_enqueue_failed", job_name=job_name, job_args=str(args), error_type=type(exc).__name__, error_detail=str(exc)[:300], enqueue_ms=elapsed_ms)
+        _safe_log(
+            "error",
+            "scheduler_enqueue_failed",
+            job_name=job_name,
+            job_args=str(args),
+            error_type=type(exc).__name__,
+            error_detail=str(exc)[:300],
+            enqueue_ms=elapsed_ms,
+        )
         raise
 
 
 def _on_job_missed(event) -> None:
-    _safe_log("warning", "scheduler_job_missed", job_id=event.job_id, scheduled_run_time=str(getattr(event, "scheduled_run_time", "")))
+    _safe_log(
+        "warning",
+        "scheduler_job_missed",
+        job_id=event.job_id,
+        scheduled_run_time=str(getattr(event, "scheduled_run_time", "")),
+    )
 
 
 def _on_job_error(event) -> None:
-    _safe_log("error", "scheduler_job_error", job_id=event.job_id, error_detail=str(getattr(event, "exception", ""))[:300])
+    _safe_log(
+        "error",
+        "scheduler_job_error",
+        job_id=event.job_id,
+        error_detail=str(getattr(event, "exception", ""))[:300],
+    )
 
 
 def _on_job_executed(event) -> None:
-    _safe_log("info", "scheduler_job_executed", job_id=event.job_id, scheduled_run_time=str(getattr(event, "scheduled_run_time", "")))
+    _safe_log(
+        "info",
+        "scheduler_job_executed",
+        job_id=event.job_id,
+        scheduled_run_time=str(getattr(event, "scheduled_run_time", "")),
+    )
 
 
 def build_scheduler() -> BlockingScheduler:
@@ -89,6 +119,7 @@ def build_scheduler() -> BlockingScheduler:
     )
 
     from apscheduler.events import EVENT_JOB_MISSED, EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
+
     scheduler.add_listener(_on_job_missed, EVENT_JOB_MISSED)
     scheduler.add_listener(_on_job_error, EVENT_JOB_ERROR)
     scheduler.add_listener(_on_job_executed, EVENT_JOB_EXECUTED)
@@ -224,7 +255,13 @@ def main() -> None:
         return
     scheduler = build_scheduler()
     job_ids = [j.id for j in scheduler.get_jobs()]
-    _safe_log("info", "scheduler_started", timezone=settings.scheduler_timezone, jobs_registered=len(job_ids), job_ids=str(job_ids))
+    _safe_log(
+        "info",
+        "scheduler_started",
+        timezone=settings.scheduler_timezone,
+        jobs_registered=len(job_ids),
+        job_ids=str(job_ids),
+    )
     scheduler.start()
 
 

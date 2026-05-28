@@ -36,7 +36,7 @@ logs: ## Tail logs for all services
 # ── Backend ───────────────────────────────────────────────────────────
 
 test: ## Run pytest with coverage
-	$(COMPOSE) run --rm api pytest --cov=api --cov=analytics --cov=worker -v
+	$(COMPOSE) run --rm app pytest --cov=api --cov=analytics --cov=worker -v
 
 lint: ## Run ruff linter and format check
 	ruff check .

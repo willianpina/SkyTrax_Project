@@ -2,6 +2,7 @@
 
 Supports full pagination, incremental crawl, deduplication, and retry.
 """
+
 from __future__ import annotations
 
 import scrapy
@@ -38,7 +39,9 @@ class AirlineMetadataSpider(scrapy.Spider):
                 self._seen_urls.add(url)
                 yield scrapy.Request(url, callback=self.parse_airline, errback=self._errback)
 
-        next_page = response.css("a.next::attr(href), a[rel='next']::attr(href), .pagination a::attr(href)").getall()
+        next_page = response.css(
+            "a.next::attr(href), a[rel='next']::attr(href), .pagination a::attr(href)"
+        ).getall()
         for href in next_page:
             url = response.urljoin(href)
             if url not in self._seen_urls:
@@ -106,5 +109,8 @@ class AirlineMetadataSpider(scrapy.Spider):
     def closed(self, reason):
         self.logger.info(
             "airline_metadata_spider_closed: pages=%d items=%d urls_seen=%d reason=%s",
-            self._pages_crawled, self._items_yielded, len(self._seen_urls), reason,
+            self._pages_crawled,
+            self._items_yielded,
+            len(self._seen_urls),
+            reason,
         )

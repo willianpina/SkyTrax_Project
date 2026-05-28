@@ -9,4 +9,6 @@ def test_review_fingerprint_is_stable() -> None:
 
 
 def test_review_fingerprint_changes_with_content() -> None:
-    assert review_fingerprint("British Airways", "Great flight") != review_fingerprint("British Airways", "Bad flight")
+    assert review_fingerprint("British Airways", "Great flight") != review_fingerprint(
+        "British Airways", "Bad flight"
+    )

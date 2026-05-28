@@ -39,10 +39,12 @@ class AnomalyDetectionService:
 
         for i, airline in enumerate(airlines):
             if time.monotonic() - t0 > ANOMALY_TIMEOUT_S:
-                logger.warning("[ANOMALY] Timeout after %ds, processed %d/%d", ANOMALY_TIMEOUT_S, i, len(airlines))
+                logger.warning(
+                    "[ANOMALY] Timeout after %ds, processed %d/%d", ANOMALY_TIMEOUT_S, i, len(airlines)
+                )
                 break
             if heartbeat_fn and i % 5 == 0:
-                heartbeat_fn(f"anomaly {i+1}/{len(airlines)} {airline.slug}")
+                heartbeat_fn(f"anomaly {i + 1}/{len(airlines)} {airline.slug}")
             try:
                 created += self._detect_airline_anomalies(airline, since)
             except Exception as exc:
@@ -247,7 +249,9 @@ class AnomalyDetectionService:
     def _daily_complaint_counts(self, airline_id: str, since: date) -> list[float]:
         rows = (
             self.session.query(Review.review_date, func.count(Review.id))
-            .filter(Review.airline_id == airline_id, Review.review_date >= since, Review.recommended.is_(False))
+            .filter(
+                Review.airline_id == airline_id, Review.review_date >= since, Review.recommended.is_(False)
+            )
             .group_by(Review.review_date)
             .order_by(Review.review_date)
             .all()

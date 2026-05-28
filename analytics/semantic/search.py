@@ -37,7 +37,9 @@ class SemanticClusterService:
 
         if airline_slug:
             airline = self.session.query(Airline).filter(Airline.slug == airline_slug).first()
-            self.session.query(SemanticCluster).filter(SemanticCluster.airline_id == (airline.id if airline else None)).delete()
+            self.session.query(SemanticCluster).filter(
+                SemanticCluster.airline_id == (airline.id if airline else None)
+            ).delete()
         else:
             self.session.query(SemanticCluster).delete()
 
@@ -63,7 +65,9 @@ class SemanticClusterService:
         return {"clusters_created": created}
 
     def list_clusters(self, airline_slug: str | None = None) -> list[dict]:
-        query = self.session.query(SemanticCluster, Airline).outerjoin(Airline, SemanticCluster.airline_id == Airline.id)
+        query = self.session.query(SemanticCluster, Airline).outerjoin(
+            Airline, SemanticCluster.airline_id == Airline.id
+        )
         if airline_slug:
             query = query.filter(Airline.slug == airline_slug)
         return [

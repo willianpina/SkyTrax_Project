@@ -1,4 +1,5 @@
 """Aviation Metadata Intelligence API endpoints."""
+
 from __future__ import annotations
 
 
@@ -43,9 +44,12 @@ def list_airlines(
     limit: int = Query(50, ge=1, le=200),
     session: Session = Depends(get_session),
 ):
-    rows = session.query(AirlineMetadata).order_by(
-        AirlineMetadata.star_rating.desc().nullslast()
-    ).limit(limit).all()
+    rows = (
+        session.query(AirlineMetadata)
+        .order_by(AirlineMetadata.star_rating.desc().nullslast())
+        .limit(limit)
+        .all()
+    )
     return [
         {
             "slug": r.slug,
@@ -68,9 +72,12 @@ def list_airports(
     limit: int = Query(50, ge=1, le=200),
     session: Session = Depends(get_session),
 ):
-    rows = session.query(AirportMetadata).order_by(
-        AirportMetadata.airport_rating.desc().nullslast()
-    ).limit(limit).all()
+    rows = (
+        session.query(AirportMetadata)
+        .order_by(AirportMetadata.airport_rating.desc().nullslast())
+        .limit(limit)
+        .all()
+    )
     return [
         {
             "iata": r.iata,
@@ -151,9 +158,12 @@ def coverage_report_history(
     limit: int = Query(10, ge=1, le=50),
     session: Session = Depends(get_session),
 ):
-    rows = session.query(AviationCoverageReport).order_by(
-        AviationCoverageReport.created_at.desc()
-    ).limit(limit).all()
+    rows = (
+        session.query(AviationCoverageReport)
+        .order_by(AviationCoverageReport.created_at.desc())
+        .limit(limit)
+        .all()
+    )
     return [
         {
             "id": r.id,
@@ -212,11 +222,14 @@ def bootstrap_run(background_tasks: BackgroundTasks):
         _bootstrap_status["running"] = True
         try:
             from scripts.bootstrap_aviation import run_spiders, run_enrichment_pass, run_coverage_validation
+
             spiders = run_spiders()
             enrichment = run_enrichment_pass()
             coverage = run_coverage_validation()
             _bootstrap_status["last_result"] = {
-                "spiders": spiders, "enrichment": enrichment, "coverage": coverage,
+                "spiders": spiders,
+                "enrichment": enrichment,
+                "coverage": coverage,
             }
         except Exception as e:
             _bootstrap_status["last_result"] = {"error": str(e)}
@@ -238,6 +251,7 @@ def normalization_report(validator: AviationValidator = Depends(_validator)):
 
 
 # ═══ Hub Intelligence ═══
+
 
 @router.get("/hub-intelligence/dashboard")
 def hub_intel_dashboard(svc: HubIntelligenceService = Depends(_hub_intel)):

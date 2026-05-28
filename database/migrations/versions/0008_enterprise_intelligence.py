@@ -58,9 +58,14 @@ def upgrade() -> None:
     if "crawl_duration_ms" not in sr_cols:
         op.add_column("spider_runs", sa.Column("crawl_duration_ms", sa.Integer(), nullable=True))
     if "retry_count" not in sr_cols:
-        op.add_column("spider_runs", sa.Column("retry_count", sa.Integer(), server_default=sa.text("0"), nullable=False))
+        op.add_column(
+            "spider_runs", sa.Column("retry_count", sa.Integer(), server_default=sa.text("0"), nullable=False)
+        )
     if "anti_ban_triggers" not in sr_cols:
-        op.add_column("spider_runs", sa.Column("anti_ban_triggers", sa.Integer(), server_default=sa.text("0"), nullable=False))
+        op.add_column(
+            "spider_runs",
+            sa.Column("anti_ban_triggers", sa.Integer(), server_default=sa.text("0"), nullable=False),
+        )
     if "quality_score" not in sr_cols:
         op.add_column("spider_runs", sa.Column("quality_score", sa.Float(), nullable=True))
     if "airline_slug" not in sr_cols:
@@ -73,9 +78,24 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    for col in ("run_metadata", "airline_slug", "quality_score", "anti_ban_triggers", "retry_count", "crawl_duration_ms"):
+    for col in (
+        "run_metadata",
+        "airline_slug",
+        "quality_score",
+        "anti_ban_triggers",
+        "retry_count",
+        "crawl_duration_ms",
+    ):
         op.drop_column("spider_runs", col)
     for col in ("explanation", "anomaly_score", "anomaly_confidence"):
         op.drop_column("anomaly_events", col)
-    for col in ("forecast_method", "explanation", "generated_from_reviews", "insufficient_data", "window_size", "sample_size", "confidence_score"):
+    for col in (
+        "forecast_method",
+        "explanation",
+        "generated_from_reviews",
+        "insufficient_data",
+        "window_size",
+        "sample_size",
+        "confidence_score",
+    ):
         op.drop_column("forecast_snapshots", col)

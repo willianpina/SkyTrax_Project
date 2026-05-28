@@ -67,7 +67,9 @@ class PostgresPersistencePipeline:
         self.session.close()
         logger.info(
             "[OPS][PERSIST] pipeline_closed spider=%s inserted=%d skipped=%d",
-            spider.name, self.inserted_reviews, self.skipped_reviews,
+            spider.name,
+            self.inserted_reviews,
+            self.skipped_reviews,
         )
 
     def process_item(self, item, spider):
@@ -105,7 +107,8 @@ class PostgresPersistencePipeline:
             self._sync_stats(spider)
             logger.debug(
                 "[OPS][DEDUPE] airline=%s fingerprint=%s",
-                item.get("airline_slug"), item["fingerprint"][:12],
+                item.get("airline_slug"),
+                item["fingerprint"][:12],
             )
             return
         airline = self._get_or_create_airline(item)
@@ -135,7 +138,9 @@ class PostgresPersistencePipeline:
             self._sync_stats(spider)
             logger.debug(
                 "[OPS][PERSIST] airline=%s review_date=%s inserted=%d",
-                item.get("airline_slug"), item.get("review_date"), self.inserted_reviews,
+                item.get("airline_slug"),
+                item.get("review_date"),
+                self.inserted_reviews,
             )
         except IntegrityError:
             self.session.rollback()

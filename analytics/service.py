@@ -14,7 +14,9 @@ class AnalyticsService:
 
     def executive_summary(self, airline_slug: str | None = None) -> dict:
         review_query = self.session.query(Review).join(Airline)
-        sentiment_query = self.session.query(NLPResult.sentiment_label, func.count(NLPResult.id)).join(Review).join(Airline)
+        sentiment_query = (
+            self.session.query(NLPResult.sentiment_label, func.count(NLPResult.id)).join(Review).join(Airline)
+        )
 
         if airline_slug:
             review_query = review_query.filter(Airline.slug == airline_slug)
@@ -27,8 +29,7 @@ class AnalyticsService:
         ).scalar()
 
         sentiment = {
-            label: count
-            for label, count in sentiment_query.group_by(NLPResult.sentiment_label).all()
+            label: count for label, count in sentiment_query.group_by(NLPResult.sentiment_label).all()
         }
 
         return {
@@ -42,7 +43,9 @@ class AnalyticsService:
         }
 
     def sentiment_summary(self, airline_slug: str | None = None) -> dict:
-        query = self.session.query(NLPResult.sentiment_label, func.count(NLPResult.id)).join(Review).join(Airline)
+        query = (
+            self.session.query(NLPResult.sentiment_label, func.count(NLPResult.id)).join(Review).join(Airline)
+        )
         if airline_slug:
             query = query.filter(Airline.slug == airline_slug)
         distribution = {label: count for label, count in query.group_by(NLPResult.sentiment_label).all()}
@@ -98,7 +101,9 @@ class AnalyticsService:
     def top_topics(self, polarity: str, airline_slug: str | None = None) -> list[dict]:
         query = self.session.query(TopicSnapshot).filter(TopicSnapshot.polarity == polarity)
         if airline_slug:
-            query = query.join(Airline, TopicSnapshot.airline_id == Airline.id).filter(Airline.slug == airline_slug)
+            query = query.join(Airline, TopicSnapshot.airline_id == Airline.id).filter(
+                Airline.slug == airline_slug
+            )
         return [
             {"label": row.label, "weight": row.weight, "sample_size": row.sample_size}
             for row in query.order_by(TopicSnapshot.weight.desc()).limit(8).all()

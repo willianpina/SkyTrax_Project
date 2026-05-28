@@ -32,5 +32,7 @@ class TopicTrendService:
             new = current.get(label, 0)
             growth = (new - old) / max(old, 1)
             if new or old:
-                rows.append({"topic": label, "current": new, "previous": old, "growth_rate": round(growth, 4)})
+                rows.append(
+                    {"topic": label, "current": new, "previous": old, "growth_rate": round(growth, 4)}
+                )
         return sorted(rows, key=lambda row: row["growth_rate"], reverse=True)[:25]

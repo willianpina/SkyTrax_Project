@@ -64,9 +64,7 @@ class DataQualityMonitor:
             )
 
         since = datetime.now(timezone.utc) - timedelta(hours=24)
-        recent = (
-            self.session.query(func.count(Review.id)).filter(Review.created_at >= since).scalar() or 0
-        )
+        recent = self.session.query(func.count(Review.id)).filter(Review.created_at >= since).scalar() or 0
         baseline = max((sample_size - recent) / 30, 1)
         if recent > baseline * 5:
             findings.append(
@@ -78,10 +76,7 @@ class DataQualityMonitor:
             )
 
         invalid_text = (
-            self.session.query(func.count(Review.id))
-            .filter(func.length(Review.text) < 20)
-            .scalar()
-            or 0
+            self.session.query(func.count(Review.id)).filter(func.length(Review.text) < 20).scalar() or 0
         )
         if invalid_text:
             findings.append(
@@ -93,7 +88,10 @@ class DataQualityMonitor:
             )
 
         severity = "low"
-        if any(item["check"] in {"duplicate_fingerprints", "suspicious_ratings", "ingestion_spike"} for item in findings):
+        if any(
+            item["check"] in {"duplicate_fingerprints", "suspicious_ratings", "ingestion_spike"}
+            for item in findings
+        ):
             severity = "high"
         elif findings:
             severity = "medium"
@@ -109,7 +107,12 @@ class DataQualityMonitor:
         return {"severity": severity, "findings_count": len(findings), "sample_size": sample_size}
 
     def list_reports(self, limit: int = 20) -> list[dict]:
-        rows = self.session.query(DataQualityReport).order_by(DataQualityReport.generated_at.desc()).limit(limit).all()
+        rows = (
+            self.session.query(DataQualityReport)
+            .order_by(DataQualityReport.generated_at.desc())
+            .limit(limit)
+            .all()
+        )
         return [
             {
                 "id": row.id,

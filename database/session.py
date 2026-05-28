@@ -49,7 +49,9 @@ def _build_engine(url: str | None = None):
 
 
 engine = _build_engine()
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False, future=True)
+SessionLocal = sessionmaker(
+    bind=engine, autoflush=False, autocommit=False, expire_on_commit=False, future=True
+)
 
 
 def engine_generation() -> int:

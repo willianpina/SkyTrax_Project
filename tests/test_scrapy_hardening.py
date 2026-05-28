@@ -24,7 +24,9 @@ def test_review_parser_requires_complete_quality_fields() -> None:
     </article>
     """
 
-    item = spider._parse_card(html, {"slug": "british-airways", "name": "British Airways"}, "https://example.test")
+    item = spider._parse_card(
+        html, {"slug": "british-airways", "name": "British Airways"}, "https://example.test"
+    )
 
     assert item is not None
     assert item["title"] == "Great cabin crew"

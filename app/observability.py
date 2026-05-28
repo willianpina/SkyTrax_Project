@@ -13,7 +13,16 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from database.models import Airline, AnomalyEvent, ExecutiveInsight, ForecastSnapshot, MetricSnapshot, NLPResult, Review, SpiderRun
+from database.models import (
+    Airline,
+    AnomalyEvent,
+    ExecutiveInsight,
+    ForecastSnapshot,
+    MetricSnapshot,
+    NLPResult,
+    Review,
+    SpiderRun,
+)
 from database.models.aviation import AirlineMetadata, AirportMetadata, Alliance
 from database.models.operations import OperationalRefreshRun
 
@@ -103,16 +112,24 @@ def collect_runtime_metrics(session: Session) -> None:
     metrics.set("skytrax_insights_total", float(session.query(func.count(ExecutiveInsight.id)).scalar() or 0))
     metrics.set("skytrax_snapshots_total", float(session.query(func.count(MetricSnapshot.id)).scalar() or 0))
     metrics.set("skytrax_anomalies_total", float(session.query(func.count(AnomalyEvent.id)).scalar() or 0))
-    metrics.set("skytrax_forecast_snapshots_total", float(session.query(func.count(ForecastSnapshot.id)).scalar() or 0))
+    metrics.set(
+        "skytrax_forecast_snapshots_total",
+        float(session.query(func.count(ForecastSnapshot.id)).scalar() or 0),
+    )
 
     one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
-    recent_reviews = session.query(func.count(Review.id)).filter(Review.created_at >= one_hour_ago).scalar() or 0
+    recent_reviews = (
+        session.query(func.count(Review.id)).filter(Review.created_at >= one_hour_ago).scalar() or 0
+    )
     metrics.set("skytrax_reviews_per_hour", float(recent_reviews))
 
     airlines_total = float(session.query(func.count(AirlineMetadata.id)).scalar() or 0)
     airports_total = float(session.query(func.count(AirportMetadata.id)).scalar() or 0)
     alliances_total = float(session.query(func.count(Alliance.id)).scalar() or 0)
-    hubs_total = float(session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.hub_level.isnot(None)).scalar() or 0)
+    hubs_total = float(
+        session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.hub_level.isnot(None)).scalar()
+        or 0
+    )
 
     metrics.set("skytrax_aviation_airlines_total", airlines_total)
     metrics.set("skytrax_aviation_airports_total", airports_total)
@@ -120,11 +137,20 @@ def collect_runtime_metrics(session: Session) -> None:
     metrics.set("skytrax_aviation_hubs_total", hubs_total)
     metrics.set(
         "skytrax_aviation_premium_airlines",
-        float(session.query(func.count(AirlineMetadata.id)).filter(AirlineMetadata.is_premium.is_(True)).scalar() or 0),
+        float(
+            session.query(func.count(AirlineMetadata.id))
+            .filter(AirlineMetadata.is_premium.is_(True))
+            .scalar()
+            or 0
+        ),
     )
 
-    missing_iata = float(session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.iata.is_(None)).scalar() or 0)
-    missing_icao = float(session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.icao.is_(None)).scalar() or 0)
+    missing_iata = float(
+        session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.iata.is_(None)).scalar() or 0
+    )
+    missing_icao = float(
+        session.query(func.count(AirportMetadata.id)).filter(AirportMetadata.icao.is_(None)).scalar() or 0
+    )
     metrics.set("skytrax_aviation_missing_iata", missing_iata)
     metrics.set("skytrax_aviation_missing_icao", missing_icao)
 
@@ -150,8 +176,16 @@ def collect_runtime_metrics(session: Session) -> None:
 
     latest_run = session.query(SpiderRun).order_by(SpiderRun.started_at.desc()).first()
     if latest_run:
-        metrics.set("skytrax_scrapy_last_items_scraped", float(latest_run.items_scraped), spider=latest_run.spider_name)
-        metrics.set("skytrax_scrapy_last_pages_crawled", float(latest_run.pages_crawled), spider=latest_run.spider_name)
+        metrics.set(
+            "skytrax_scrapy_last_items_scraped",
+            float(latest_run.items_scraped),
+            spider=latest_run.spider_name,
+        )
+        metrics.set(
+            "skytrax_scrapy_last_pages_crawled",
+            float(latest_run.pages_crawled),
+            spider=latest_run.spider_name,
+        )
         metrics.set(
             "skytrax_scrapy_last_error_count",
             float(len(latest_run.errors or [])),
