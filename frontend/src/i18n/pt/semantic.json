@@ -1,17 +1,48 @@
 {
-  "clusters": {
-    "title": "Clusters Semânticos",
-    "groups": "{{count}} grupos",
-    "reviews": "{{count}} avaliações"
+  "pageTitle": "Análise Semântica",
+  "pageSubtitle": "Clusterização operacional de narrativas, entidades e tendências reputacionais",
+  "badgeRuntime": "Runtime Semântico",
+  "badgeNlp": "NLP Ativo",
+  "badgeNlpStandby": "NLP em espera",
+  "statClusters": "Clusters Ativos",
+  "statClustersHint": "Agrupamentos narrativos monitorados",
+  "statCorpus": "Corpus Semântico",
+  "statCorpusHint": "Volume operacional indexado",
+  "statPositive": "Narrativas Positivas",
+  "statPositiveHint": "Tendências favoráveis detectadas",
+  "statNegative": "Fricções Negativas",
+  "statNegativeHint": "Narrativas críticas identificadas",
+  "narrativeTitle": "Painel Narrativo Operacional",
+  "narrativeSubtitle": "Tendências semânticas dominantes identificadas pelo runtime analítico",
+  "positivePane": "Sinais Positivos",
+  "negativePane": "Fricções Operacionais",
+  "incidence": "{{count}} incidências",
+  "frictionTitle": "Matriz de Fricção Semântica",
+  "frictionSubtitle": "Correlação entre clusters narrativos, sentimento e impacto operacional",
+  "exploreTitle": "Investigação Semântica",
+  "exploreSubtitle": "Recuperação contextual para análise operacional e RAG corporativo",
+  "clustersPane": "Temas recorrentes",
+  "searchPane": "Busca contextual",
+  "searchPlaceholder": "Ex.: bagagem atrasada, reembolso, conforto do assento",
+  "searchHint": "Digite um termo e pressione Enter para recuperar avaliações correlacionadas",
+  "threshold": "Precisão",
+  "allAirlines": "Todas as companhias",
+  "reviews": "{{count}} avaliações",
+  "noResults": "Nenhuma avaliação correlacionada para esta consulta.",
+  "emptyTitle": "Sincronização semântica pendente",
+  "emptyDetail": "O runtime aguarda vetores enriquecidos. Execute o pipeline de sincronização para ativar clusters e embeddings operacionais.",
+  "friction": {
+    "title": "Matriz de Fricção Semântica",
+    "subtitle": "Correlação entre clusters narrativos, sentimento e impacto operacional",
+    "empty": "Matriz indisponível. Execute a sincronização do pipeline para gerar correlações de fricção."
   },
   "lookup": {
-    "title": "Busca Semântica",
-    "subtitle": "Recuperação pronta para RAG",
-    "placeholder": "Buscar avaliações (ex.: reembolso bagagem atrasada)"
+    "title": "Busca contextual",
+    "subtitle": "Recuperação vetorial para análise operacional",
+    "placeholder": "Ex.: bagagem atrasada, reembolso"
   },
-  "friction": {
-    "title": "Matriz de Fricção Semântica Operacional",
-    "subtitle": "Scores de fricção ponderados companhia x cluster operacional com decaimento temporal e sentimento",
-    "empty": "Sem dados de fricção disponíveis. Execute uma sincronização de pipeline para gerar analytics."
+  "clusters": {
+    "title": "Temas recorrentes",
+    "reviews": "{{count}} avaliações"
   }
 }

@@ -81,22 +81,28 @@ function SidebarInner() {
                 </span>
               )}
               {collapsed && <div className="sidebar-group-dot" />}
-              {group.items.map(({ path, icon: Icon, titleKey }) => (
-                <NavLink
-                  key={path}
-                  to={path}
-                  className={({ isActive }) =>
-                    `sidebar-item ${isActive ? "sidebar-item--active" : ""}`
-                  }
-                  onClick={closeMobile}
-                  {...(collapsed ? { "data-tooltip": t(titleKey) } : {})}
-                >
-                  <Icon size={18} strokeWidth={1.75} className="sidebar-item-icon" />
-                  {!collapsed && (
-                    <span className="sidebar-item-label">{t(titleKey)}</span>
-                  )}
-                </NavLink>
-              ))}
+              {group.items.map((item) => {
+                const { path, icon: Icon, titleKey, id } = item;
+                const navLabelKey = item.navLabelKey || `modules.${id}.navLabel`;
+                const navLabel = t(navLabelKey, { defaultValue: t(titleKey) });
+                return (
+                  <NavLink
+                    key={path}
+                    to={path}
+                    className={({ isActive }) =>
+                      `sidebar-item ${isActive ? "sidebar-item--active" : ""}`
+                    }
+                    onClick={closeMobile}
+                    title={navLabel}
+                    {...(collapsed ? { "data-tooltip": navLabel } : {})}
+                  >
+                    <Icon size={18} strokeWidth={1.75} className="sidebar-item-icon" />
+                    {!collapsed && (
+                      <span className="sidebar-item-label sidebar-label">{navLabel}</span>
+                    )}
+                  </NavLink>
+                );
+              })}
             </div>
           ))}
         </nav>

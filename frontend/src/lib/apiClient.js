@@ -13,14 +13,14 @@ export const FALLBACK_ANALYTICS = {
     { month: "2026-05-01", average_rating: 8.2, count: 256 }
   ],
   top_positive_topics: [
-    { label: "cabin crew", weight: 42 },
-    { label: "seat comfort", weight: 36 },
-    { label: "smooth boarding", weight: 25 }
+    { label: "cabin crew", weight: 42, sample_size: 775 },
+    { label: "seat comfort", weight: 36, sample_size: 664 },
+    { label: "smooth boarding", weight: 25, sample_size: 462 }
   ],
   top_negative_topics: [
-    { label: "delayed baggage", weight: 39 },
-    { label: "refund handling", weight: 31 },
-    { label: "legroom", weight: 24 }
+    { label: "delayed baggage", weight: 39, sample_size: 721 },
+    { label: "refund handling", weight: 31, sample_size: 573 },
+    { label: "legroom", weight: 24, sample_size: 444 }
   ]
 };
 

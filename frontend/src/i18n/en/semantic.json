@@ -1,17 +1,48 @@
 {
-  "clusters": {
-    "title": "Semantic Clusters",
-    "groups": "{{count}} groups",
-    "reviews": "{{count}} reviews"
+  "pageTitle": "Semantic Intelligence Runtime",
+  "pageSubtitle": "Operational clustering of narratives, entities and reputational trends",
+  "badgeRuntime": "Semantic Runtime",
+  "badgeNlp": "NLP Active",
+  "badgeNlpStandby": "NLP Standby",
+  "statClusters": "Active Clusters",
+  "statClustersHint": "Monitored narrative groupings",
+  "statCorpus": "Semantic Corpus",
+  "statCorpusHint": "Indexed operational volume",
+  "statPositive": "Positive Narratives",
+  "statPositiveHint": "Favorable trends detected",
+  "statNegative": "Negative Frictions",
+  "statNegativeHint": "Critical narratives identified",
+  "narrativeTitle": "Operational Narrative Panel",
+  "narrativeSubtitle": "Dominant semantic trends identified by the analytics runtime",
+  "positivePane": "Positive Signals",
+  "negativePane": "Operational Frictions",
+  "incidence": "{{count}} incidences",
+  "frictionTitle": "Semantic Friction Matrix",
+  "frictionSubtitle": "Correlation across narrative clusters, sentiment and operational impact",
+  "exploreTitle": "Semantic Investigation",
+  "exploreSubtitle": "Contextual retrieval for operational analysis and enterprise RAG",
+  "clustersPane": "Recurring themes",
+  "searchPane": "Contextual search",
+  "searchPlaceholder": "e.g. delayed baggage, refund, seat comfort",
+  "searchHint": "Enter a term and press Enter to retrieve correlated reviews",
+  "threshold": "Precision",
+  "allAirlines": "All airlines",
+  "reviews": "{{count}} reviews",
+  "noResults": "No correlated reviews for this query.",
+  "emptyTitle": "Semantic sync pending",
+  "emptyDetail": "The runtime awaits enriched vectors. Run the synchronization pipeline to activate clusters and operational embeddings.",
+  "friction": {
+    "title": "Semantic Friction Matrix",
+    "subtitle": "Correlation across narrative clusters, sentiment and operational impact",
+    "empty": "Matrix unavailable. Run pipeline sync to generate friction correlations."
   },
   "lookup": {
-    "title": "Semantic Lookup",
-    "subtitle": "RAG-ready retrieval",
-    "placeholder": "Search reviews (e.g. delayed baggage refund)"
+    "title": "Contextual search",
+    "subtitle": "Vector retrieval for operational analysis",
+    "placeholder": "e.g. delayed baggage, refund"
   },
-  "friction": {
-    "title": "Operational Semantic Friction Matrix",
-    "subtitle": "Weighted airline x operational-cluster friction scores with temporal decay and sentiment",
-    "empty": "No friction data available. Run a pipeline sync to generate analytics."
+  "clusters": {
+    "title": "Recurring themes",
+    "reviews": "{{count}} reviews"
   }
 }

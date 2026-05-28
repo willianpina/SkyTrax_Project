@@ -33,12 +33,15 @@ export default function AnomaliesWorkspace() {
           <AnomalyFilterBar counts={counts} sevFilter={sevFilter} onFilterChange={setSevFilter} />
         </section>
 
-        <section className="fg-cell fg-span-12 anomaly-runtime-pair">
+        <section className="fg-cell fg-span-12">
           <article className="op-module-card anomaly-timeline-slot">
             <div className="op-module-body anomaly-timeline-module__body">
               <AnomalyTimeline anomalies={anomalies} embedded />
             </div>
           </article>
+        </section>
+
+        <section className="fg-cell fg-span-12">
           <AnomalySignalStream anomalies={anomalies} alerts={alerts} />
         </section>
 

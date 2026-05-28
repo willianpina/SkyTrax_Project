@@ -71,7 +71,7 @@ export const AnomalyTimeline = memo(function AnomalyTimeline({ anomalies, embedd
         <p className="muted-copy ops-empty-state">{t("charts:anomalyTimeline.empty")}</p>
       ) : (
         <div className="ops-chart-stage ops-chart-stage--flat anomaly-timeline-chart">
-          <LazyEChart option={timelineOption} height={180} className="ops-chart-canvas" />
+          <LazyEChart option={timelineOption} height={320} className="ops-chart-canvas" />
         </div>
       )}
       {recentRows.length > 0 ? (

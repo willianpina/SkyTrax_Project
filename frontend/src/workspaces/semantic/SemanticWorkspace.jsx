@@ -2,24 +2,43 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
-import { SemanticInvestigationPanel } from "../../components/command/SemanticInvestigationPanel";
-import { TopicPanel } from "../../components/TopicPanel";
-import { FrictionMatrix } from "../../components/FrictionMatrix";
+import { SemanticOverviewStrip } from "./SemanticOverviewStrip";
+import { SemanticTopicsPanel } from "./SemanticTopicsPanel";
+import { SemanticFrictionModule } from "./SemanticFrictionModule";
+import { SemanticEntityRuntime } from "./SemanticEntityRuntime";
 
 export default function SemanticWorkspace() {
-  const { t } = useTranslation(["semantic", "charts", "dashboard", "nav"]);
+  const { t } = useTranslation("semantic");
   const { data, clusters, reputation, apiBase } = useSharedAnalytics();
 
+  const positive = data?.top_positive_topics || [];
+  const negative = data?.top_negative_topics || [];
+
   return (
-    <WorkspaceShell id="semantic" accent="signal">
-      <SemanticInvestigationPanel clusters={clusters} apiBase={apiBase} reputation={reputation} />
+    <WorkspaceShell
+      id="semantic"
+      accent="signal"
+      className="workspace-semantic"
+      title={t("pageTitle")}
+      subtitle={t("pageSubtitle")}
+    >
+      <div className="forecasting-grid semantic-grid semantic-grid--calm">
+        <section className="fg-cell fg-span-12">
+          <SemanticOverviewStrip clusters={clusters} positive={positive} negative={negative} />
+        </section>
 
-      <section className="tactical-grid">
-        <TopicPanel title={t("dashboard:topics.positiveDrivers")} rows={data.top_positive_topics || []} tone="positive" />
-        <TopicPanel title={t("dashboard:topics.negativeFriction")} rows={data.top_negative_topics || []} tone="negative" />
-      </section>
+        <section className="fg-cell fg-span-12">
+          <SemanticTopicsPanel positive={positive} negative={negative} />
+        </section>
 
-      <FrictionMatrix />
+        <section className="fg-cell fg-span-12">
+          <SemanticFrictionModule />
+        </section>
+
+        <section className="fg-cell fg-span-12">
+          <SemanticEntityRuntime clusters={clusters} apiBase={apiBase} reputation={reputation} />
+        </section>
+      </div>
     </WorkspaceShell>
   );
 }

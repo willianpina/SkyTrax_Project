@@ -12,50 +12,62 @@
   },
   "modules": {
     "executive": {
+      "navLabel": "Executive",
       "title": "Executive",
       "subtitle": "Strategic overview and operational posture"
     },
     "reputation": {
+      "navLabel": "Reputation",
       "title": "Reputation",
       "subtitle": "Airline reputation monitoring and risk analysis"
     },
     "forecasting": {
+      "navLabel": "Forecasting",
       "title": "Forecasting",
       "subtitle": "Predictive aviation trend analysis"
     },
     "benchmarking": {
+      "navLabel": "Benchmarking",
       "title": "Benchmarking",
       "subtitle": "Peer comparison and competitive analysis"
     },
     "anomalies": {
+      "navLabel": "Anomalies",
       "title": "Anomalies",
       "subtitle": "Anomaly detection and incident monitoring"
     },
     "semantic": {
+      "navLabel": "Semantic Analysis",
       "title": "Semantic Analysis",
-      "subtitle": "Topic clustering and entity extraction"
+      "subtitle": "Narratives, entities and reputation trends"
     },
     "aviation": {
+      "navLabel": "Aviation",
       "title": "Aviation",
       "subtitle": "Global airline operational registry"
     },
     "hubs": {
+      "navLabel": "Hubs",
       "title": "Hubs",
       "subtitle": "Hub connectivity and traffic analysis"
     },
     "alliances": {
+      "navLabel": "Alliances",
       "title": "Alliances",
       "subtitle": "Alliance membership and network analysis"
     },
     "coverage": {
+      "navLabel": "Coverage",
       "title": "Coverage",
       "subtitle": "Metadata completeness and graph readiness"
     },
     "geospatial": {
+      "navLabel": "Geospatial",
       "title": "Geospatial",
       "subtitle": "Spatial analytics and route mapping"
     },
     "investigations": {
+      "navLabel": "Investigations",
       "title": "Investigations",
       "subtitle": "Deep-dive analysis and investigative workflows"
     }
