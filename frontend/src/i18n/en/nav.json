@@ -65,10 +65,16 @@
     "collapseSidebar": "Collapse navigation"
   },
   "geo": {
-    "hubsTitle": "Hub analytics",
-    "hubsDesc": "Connect PostGIS for live hub and route analytics overlays.",
+    "hubsTitle": "Geospatial intelligence",
+    "hubsDesc": "Live hubs, route risk, disruption clusters and active geo-signals.",
     "layersTitle": "Map layers",
-    "layersDesc": "Prepared for Deck.gl / Mapbox integration. Currently in lightweight mode."
+    "layersDesc": "Deck.gl operational overlays on aviation basemap.",
+    "airports": "Airports",
+    "routes": "Routes",
+    "events": "Events",
+    "hubs": "Strategic hubs",
+    "zones": "Coverage",
+    "trips": "Flow"
   },
   "investigations": {
     "subtitle": "Investigative workflow",

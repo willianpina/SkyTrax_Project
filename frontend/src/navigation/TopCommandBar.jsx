@@ -12,27 +12,37 @@ import { exportReputationCsv } from "../lib/chartConfigs";
 function TopCommandBarInner() {
   const { t } = useTranslation(["nav", "common", "command"]);
   const { isLive, isLoading, error, partialErrors, reload, reputation, benchmarking } = useSharedAnalytics();
-  const { status, history, loading, triggerRefresh, resetPipeline } = useOperations();
-  const { badges: platformBadges } = usePlatformHealth();
   const [modalOpen, setModalOpen] = useState(false);
+  const { status, history, loading, triggerRefresh, resetPipeline } = useOperations();
+  const { badges: platformBadges } = usePlatformHealth(45000, {
+    enabled: !modalOpen,
+    pipelineOnly: true,
+  });
 
-  const isRefreshing = status.running === true;
+  const isStalled = status.stage === "stalled" || status.pipeline_status === "stalled" || !!status.stale;
+  const isRefreshing = status.running === true && !isStalled;
 
   const handleSyncClick = useCallback(async () => {
+    if (isStalled) {
+      await resetPipeline();
+      await triggerRefresh();
+      setModalOpen(true);
+      return;
+    }
     if (isRefreshing) {
       setModalOpen(true);
       return;
     }
     await triggerRefresh();
     setModalOpen(true);
-  }, [isRefreshing, triggerRefresh]);
+  }, [isRefreshing, isStalled, triggerRefresh, resetPipeline]);
 
   const statusLabel = isLive ? "LIVE" : error || t("common:status.demoData");
   const partialSuffix = partialErrors.length ? ` · ${t("common:status.partial", { count: partialErrors.length })}` : "";
 
   return (
     <>
-      <header className="command-header glass-panel">
+      <header className="command-header">
         <div className="topbar-brand">
           <span className="topbar-brand-name">{t("command:title")}</span>
           {platformBadges.length > 0 && (
@@ -86,6 +96,7 @@ function TopCommandBarInner() {
         status={status}
         history={history}
         onReset={resetPipeline}
+        onRetrySync={handleSyncClick}
       />
     </>
   );

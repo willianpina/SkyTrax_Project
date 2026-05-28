@@ -33,15 +33,21 @@ export const EMPTY_BENCHMARKING = {
   complaint_density: {}
 };
 
-export async function fetchJson(path, fallback) {
+/**
+ * JSON fetch with optional AbortSignal (polling governance).
+ */
+export async function fetchJson(path, fallback, { signal } = {}) {
   try {
-    const response = await fetch(`${API_BASE}${path}`);
+    const response = await fetch(`${API_BASE}${path}`, { signal });
     if (!response.ok) {
       console.warn("api_request_failed", path, response.status);
       return fallback;
     }
     return await response.json();
   } catch (error) {
+    if (error?.name === "AbortError") {
+      return fallback;
+    }
     console.warn("api_request_error", path, error);
     return fallback;
   }

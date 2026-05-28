@@ -14,30 +14,33 @@ function ExecutiveInsightsPanelInner({ insights, defaultInsight }) {
       accent="warning"
       expandable
       defaultExpanded={insights?.length > 0}
+      quiet
       className="insights-panel span-wide"
     >
-      <div className="insight-grid">
+      <ul className="insight-feed" role="list">
         {rows.map((insight) => (
-          <div className={`insight-card hover-intel severity-${insight.severity}`} key={`${insight.airline}-${insight.summary}`}>
-            <div className="insight-card-head">
-              <strong style={{ fontSize: "12px" }}>{insight.airline}</strong>
-              <SeverityBadge severity={insight.severity} />
-              {insight.confidence != null && (
-                <ConfidenceBadge score={Math.round(Number(insight.confidence) * 100)} />
-              )}
+          <li className={`insight-feed-row severity-${insight.severity}`} key={`${insight.airline}-${insight.summary}`}>
+            <div className="insight-feed-head">
+              <strong className="insight-feed-airline">{insight.airline}</strong>
+              <div className="insight-feed-meta">
+                <SeverityBadge severity={insight.severity} />
+                {insight.confidence != null && (
+                  <ConfidenceBadge score={Math.round(Number(insight.confidence) * 100)} />
+                )}
+              </div>
             </div>
-            <p>{insight.summary || insight.insight_text}</p>
-            {insight.category && <span className="op-tag">{insight.category}</span>}
-            {(insight.drivers || insight.supporting_topics || []).length > 0 && (
-              <div className="insight-drivers">
+            <p className="insight-feed-copy">{insight.summary || insight.insight_text}</p>
+            {(insight.category || (insight.drivers || insight.supporting_topics || []).length > 0) && (
+              <div className="insight-feed-tags">
+                {insight.category && <span className="insight-feed-tag">{insight.category}</span>}
                 {(insight.drivers || insight.supporting_topics || []).slice(0, 4).map((d) => (
-                  <span className="op-tag" key={d}>{d}</span>
+                  <span className="insight-feed-tag" key={d}>{d}</span>
                 ))}
               </div>
             )}
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </PanelShell>
   );
 }

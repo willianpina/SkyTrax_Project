@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import time
 from logging import getLogger
 
@@ -23,6 +24,7 @@ from worker.jobs import (
     run_aviation_coverage_audit,
     run_data_quality_scan,
     run_forecasting_job,
+    run_pipeline_watchdog,
     schedule_priority_crawls,
 )
 
@@ -199,6 +201,14 @@ def build_scheduler() -> BlockingScheduler:
         lambda: enqueue(run_aviation_coverage_audit),
         IntervalTrigger(hours=12),
         id="aviation_coverage_audit",
+        max_instances=1,
+        coalesce=True,
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        lambda: enqueue(run_pipeline_watchdog),
+        IntervalTrigger(seconds=int(os.getenv("PIPELINE_WATCHDOG_INTERVAL_S", "60"))),
+        id="pipeline_watchdog",
         max_instances=1,
         coalesce=True,
         replace_existing=True,

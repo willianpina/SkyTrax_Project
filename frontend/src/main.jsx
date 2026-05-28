@@ -7,6 +7,7 @@ import { AnalyticsProvider } from "./hooks/AnalyticsProvider";
 import { ThemeProvider } from "./hooks/ThemeProvider";
 import { router } from "./router";
 import i18n, { initI18n } from "./i18n";
+import "./design-system/styles.css";
 import "./styles.css";
 
 function AppBootstrap() {

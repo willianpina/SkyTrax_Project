@@ -23,5 +23,6 @@ router.include_router(intelligence_router)
 router.include_router(search_router)
 router.include_router(admin_router)
 router.include_router(aviation_router)
-router.include_router(operations_router)
+# Enterprise health routes must register before operations_router (also defines /health/pipeline).
 router.include_router(ops_health_router, prefix="/operations")
+router.include_router(operations_router)

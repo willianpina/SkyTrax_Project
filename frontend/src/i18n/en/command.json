@@ -92,7 +92,9 @@
     "idle": "Idle",
     "stalled": "Stalled",
     "timeout": "Timeout",
-    "stalledMessage": "Pipeline lost heartbeat for an extended period. Use Reset if the worker is not running.",
+    "stalledMessage": "Pipeline lost heartbeat for an extended period. The worker is not active.",
+    "stallMeta": "Last heartbeat {{age}}s ago — worker considered offline",
+    "retrySyncBtn": "Run again",
     "stalledFusion": "Fusion stage lost heartbeat for an extended period. The worker may still be correlating signals.",
     "finalizing": "Finalizing pipeline",
     "persisting": "Persisting graph intelligence",
@@ -105,6 +107,12 @@
     "timeoutMessage": "Pipeline exceeded maximum duration. Partial data may be available.",
     "resetBtn": "Reset",
     "history": "Recent operations",
+    "historyCol": {
+      "status": "Status",
+      "duration": "Duration",
+      "processing": "Processing",
+      "origin": "Origin"
+    },
     "events": "Operational events",
     "discovery": "Discovering airlines",
     "crawl": "Incremental crawl",
@@ -199,18 +207,29 @@
       "title": "Pipeline Integrity",
       "metadataCoverage": "Metadata coverage",
       "graphDensity": "Graph nodes",
+      "graphNodes": "Nodes",
+      "graphEdges": "Edges",
+      "graphNodesHint": "Canonical graph_nodes (accumulated)",
+      "graphEdgesHint": "Canonical graph_edges (accumulated)",
       "signals": "Signals",
       "anomalies": "Anomalies",
       "snapshots": "Snapshots",
       "live": "LIVE",
       "reconciled": "RECONCILED",
       "liveBadge": "Authoritative runtime KPIs from pipeline status",
-      "reconciledBadge": "Merged with Postgres counts — stale zeros removed"
+      "reconciledBadge": "Merged with Postgres counts — stale zeros removed",
+      "partial": "PARTIAL",
+      "partialBadge": "Some stage metrics missing — safe fallbacks applied",
+      "fallback": "Integrity metrics temporarily unavailable — live KPIs below remain authoritative"
     },
     "linkage": {
       "metadata": "Metadata persistence blocked by schema drift (review_intelligence)",
       "knowledge_graph": "Knowledge graph skipped — airline_metadata incomplete",
-      "fusion": "Signals unavailable — upstream graph or metadata empty",
+      "fusion": "Semantic correlation unavailable — upstream contract not satisfied",
+      "fusion_completed": "Semantic correlation complete",
+      "fusion_enrichment_warning": "Partial aviation enrichment",
+      "fusion_aviation_partial": "Semantic correlation complete — aviation enrichment partial (timeout)",
+      "fusion_timeout": "Aviation enrichment timed out — correlation signals preserved",
       "anomalies": "Anomaly detection skipped — insufficient forecast baseline",
       "insights": "Executive insights failed — check NLP enrichment or schema",
       "snapshots": "Snapshot persistence degraded",
@@ -221,6 +240,10 @@
       "aviation_identity_conflict": "Canonical identity conflict reconciled — record merged via MDM (slug/IATA)"
     },
     "reconciledBanner": "Operational status reconciled with live KPIs — stale degraded messages removed",
+    "kpi": {
+      "graphNodes": "Nodes",
+      "graphEdges": "Edges"
+    },
     "alembic": {
       "repaired": "Alembic schema repaired automatically",
       "chainValid": "Migration chain validated",

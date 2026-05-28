@@ -332,6 +332,17 @@ def _metadata_backfill(batch_size: int, max_batches: int) -> dict:
         session.close()
 
 
+def run_pipeline_watchdog() -> dict:
+    """RQ job: reconcile orphan/zombie pipeline state (heartbeat + stall cleanup)."""
+    from worker.orchestration.pipeline_watchdog import reconcile_pipeline_state
+
+    logger.info("[PIPELINE][RECOVERY] watchdog job started")
+    result = reconcile_pipeline_state(persist=True)
+    logger.info("[PIPELINE][RECOVERY] watchdog job finished action=%s", result.get("action"))
+    record_worker_metric("skytrax_pipeline_watchdog_runs", 1.0)
+    return result
+
+
 def run_operational_refresh(
     operation_id: str | None = None,
     airline_slug: str | None = None,
@@ -342,8 +353,12 @@ def run_operational_refresh(
     This function MUST live in worker.jobs so that RQ can serialize/find it
     by import path (worker.jobs.run_operational_refresh).
     """
+    from worker.orchestration.operation_lifecycle import OperationLifecycleManager
     from worker.orchestration.refresh_pipeline import OperationalRefreshPipeline
-    logger.info("[OPS] run_operational_refresh started op=%s trigger=%s", operation_id, triggered_by)
+
+    logger.info("[PIPELINE_WORKER] run_operational_refresh op=%s trigger=%s", operation_id, triggered_by)
+    if operation_id:
+        OperationLifecycleManager().transition(operation_id, "running")
     return OperationalRefreshPipeline(
         operation_id=operation_id,
         airline_slug=airline_slug,
@@ -359,8 +374,12 @@ def run_aviation_sync(
 
     Reuses the same operational ecosystem as run_operational_refresh.
     """
+    from worker.orchestration.operation_lifecycle import OperationLifecycleManager
     from worker.orchestration.refresh_pipeline import AviationSyncPipeline
-    logger.info("[OPS] run_aviation_sync started op=%s trigger=%s", operation_id, triggered_by)
+
+    logger.info("[PIPELINE_WORKER] run_aviation_sync op=%s trigger=%s", operation_id, triggered_by)
+    if operation_id:
+        OperationLifecycleManager().transition(operation_id, "running")
     return AviationSyncPipeline(
         operation_id=operation_id,
         triggered_by=triggered_by,

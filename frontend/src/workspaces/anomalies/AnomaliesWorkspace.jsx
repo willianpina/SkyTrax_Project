@@ -35,7 +35,7 @@ function SeverityStrip({ counts, total }) {
   return (
     <section className="anm-kpi-strip">
       {kpis.map(({ icon: Icon, label, value, sub, accent }) => (
-        <div className={`anm-kpi glass-panel ${accent === "risk" && value > 0 ? "anm-kpi--alert" : ""}`} key={label}>
+        <div className={`anm-kpi ${accent === "risk" && value > 0 ? "anm-kpi--alert" : ""}`} key={label}>
           <div className="anm-kpi-top">
             <span className="anm-kpi-icon"><Icon size={13} /></span>
             <span className="anm-kpi-label">{label}</span>
@@ -167,7 +167,7 @@ function SignalStream({ anomalies, alerts }) {
 
   if (combined.length === 0) {
     return (
-      <PanelShell title={t("anomalies:stream.emptyTitle")} subtitle={t("anomalies:stream.emptySub")} accent="signal">
+      <PanelShell title={t("anomalies:stream.emptyTitle")} subtitle={t("anomalies:stream.emptySub")} accent="signal" quiet>
         <div className="anm-empty-sm">
           <Radio size={18} strokeWidth={1.2} />
           <span>{t("anomalies:stream.emptyMsg")}</span>
@@ -177,7 +177,7 @@ function SignalStream({ anomalies, alerts }) {
   }
 
   return (
-    <PanelShell title={t("anomalies:stream.title")} subtitle={t("anomalies:stream.subtitle", { count: combined.length })} accent="risk" expandable>
+    <PanelShell title={t("anomalies:stream.title")} subtitle={t("anomalies:stream.subtitle", { count: combined.length })} accent="risk" expandable quiet>
       <div className="anm-stream">
         {combined.map((s, i) => {
           const sev = s.severity || "low";
@@ -234,7 +234,7 @@ function ExecutiveAssessment({ anomalies }) {
   }, [anomalies, t]);
 
   return (
-    <PanelShell title={t("anomalies:assessment.title")} subtitle={t("anomalies:assessment.subtitle")} accent="signal" expandable>
+    <PanelShell title={t("anomalies:assessment.title")} subtitle={t("anomalies:assessment.subtitle")} accent="signal" expandable quiet>
       <div className="anm-assessment">
         {insights.map((ins, i) => (
           <div className={`anm-assess-row anm-assess--${ins.sev}`} key={i}>
@@ -310,6 +310,7 @@ export default function AnomaliesWorkspace() {
             subtitle={t("anomalies:registry.subtitle", { anomalies: filtered.length, carriers: groups.length })}
             accent="risk"
             expandable
+            quiet
           >
             {groups.length === 0 ? (
               <div className="anm-empty-sm">

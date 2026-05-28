@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
@@ -53,17 +55,60 @@ async def lifespan(_app: FastAPI):
 
             report = run_startup_governance(engine, service="api")
             log_startup_summary(report)
+            try:
+                from app.health_snapshot import refresh_integrity_from_redis, seed_from_startup_report
+
+                seed_from_startup_report(report)
+                refresh_integrity_from_redis()
+            except Exception as snap_exc:
+                logger.warning("[HEALTH_SNAPSHOT] seed skipped: %s", snap_exc)
         except StartupBlockedError:
             raise
         except Exception as exc:
             logger.error("[SCHEMA] Startup validation failed: %s", exc)
 
+    logger.info("[FASTAPI_STARTUP] application lifespan begin")
+    try:
+        from api.startup_health import (
+            audit_import_graph,
+            boot_pipeline_health_contract,
+            boot_router_governance,
+        )
+
+        audit_import_graph()
+        boot_pipeline_health_contract()
+        boot_router_governance(_app)
+    except Exception as exc:
+        logger.warning("[FASTAPI_STARTUP] health boot checks skipped: %s", exc)
+
     log_registered_health_routes(_app)
     route_check = validate_health_routes(_app)
     if not route_check.get("valid"):
         logger.error("[BOOTSTRAP] Health route validation failed: %s", route_check.get("missing"))
+    logger.info("[FASTAPI_STARTUP] application lifespan ready")
+
+    async def _pipeline_watchdog_loop() -> None:
+        from worker.orchestration.pipeline_watchdog import reconcile_pipeline_state
+
+        interval = float(os.getenv("PIPELINE_WATCHDOG_INTERVAL_S", "60"))
+        while True:
+            try:
+                await asyncio.sleep(interval)
+                await asyncio.to_thread(reconcile_pipeline_state, persist=True)
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:
+                logger.warning("[RECOVERY] api watchdog loop error: %s", exc)
+
+    watchdog_task = asyncio.create_task(_pipeline_watchdog_loop())
 
     yield
+
+    watchdog_task.cancel()
+    try:
+        await watchdog_task
+    except asyncio.CancelledError:
+        pass
 
 
 app = FastAPI(
@@ -141,5 +186,10 @@ async def validation_exception_handler(request, exc: ValidationError) -> JSONRes
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request, exc: Exception) -> JSONResponse:
+    from fastapi import HTTPException as FastAPIHTTPException
+    from starlette.exceptions import HTTPException as StarletteHTTPException
+
+    if isinstance(exc, (FastAPIHTTPException, StarletteHTTPException)):
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
     logger.exception("unhandled_api_error", extra={"service": "api", "path": str(request.url.path)})
     return JSONResponse(status_code=500, content={"detail": "Internal server error."})

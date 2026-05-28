@@ -11,12 +11,15 @@ function PanelShellInner({
   expandable = false,
   defaultExpanded = true,
   footer,
-  accent = "signal"
+  accent = "signal",
+  quiet = false,
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const quietClass = quiet ? "intel-panel--quiet panel-quiet glass-panel--quiet" : "glass-panel";
+  const accentClass = quiet ? "" : `accent-${accent}`;
 
   return (
-    <article className={`intel-panel glass-panel accent-${accent} ${className} ${expanded ? "" : "collapsed"}`}>
+    <article className={`intel-panel ${quietClass} ${accentClass} ${className} ${expanded ? "" : "collapsed"}`}>
       <header className="intel-panel-header">
         <div className="intel-panel-titles">
           <h2>{title}</h2>

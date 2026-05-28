@@ -1,16 +1,59 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 from collections import defaultdict, deque
 from uuid import uuid4
 
-from fastapi import HTTPException, Request
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 
 from app.observability import metrics
 from app.request_context import request_id_var, trace_id_var
+from app.response_contract import (
+    CANCELLED_STATUS,
+    CLIENT_DISCONNECT_STATUS,
+    defensive_call_next,
+    ensure_response,
+    safe_json_response,
+)
+
+logger = logging.getLogger(__name__)
+
+# Hot polling paths — exempt from global HTTP timeout (handlers must stay fast).
+_HOT_POLL_PREFIXES = (
+    "/api/operations/status",
+    "/api/operations/live",
+    "/api/operations/health/",
+    "/health",
+    "/metrics",
+)
+
+# Async pipeline dispatch — never subject to HTTP timeout.
+_ASYNC_DISPATCH_PREFIX = "/api/operations/refresh"
+
+
+def _path_matches(path: str, prefixes: tuple[str, ...]) -> bool:
+    normalized = path.rstrip("/")
+    for prefix in prefixes:
+        p = prefix.rstrip("/")
+        if normalized == p or normalized.startswith(f"{p}/"):
+            return True
+    return False
+
+
+def _is_hot_poll_path(path: str) -> bool:
+    return _path_matches(path, _HOT_POLL_PREFIXES)
+
+
+def _is_async_dispatch(request: Request) -> bool:
+    if request.method != "POST":
+        return False
+    path = request.url.path.rstrip("/")
+    base = _ASYNC_DISPATCH_PREFIX.rstrip("/")
+    return path == base or path.startswith(f"{base}/")
 
 
 class RequestContextMiddleware(BaseHTTPMiddleware):
@@ -23,8 +66,9 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         trace_token = trace_id_var.set(trace_id)
         started_at = time.perf_counter()
         status_code = 500
+        response: Response | None = None
         try:
-            response = await call_next(request)
+            response = await defensive_call_next(request, call_next)
             status_code = response.status_code
             return response
         finally:
@@ -44,16 +88,19 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             )
             request_id_var.reset(request_token)
             trace_id_var.reset(trace_token)
-            if "response" in locals():
-                response.headers["x-request-id"] = request_id
-                response.headers["x-trace-id"] = trace_id
+            if response is not None:
+                try:
+                    response.headers["x-request-id"] = request_id
+                    response.headers["x-trace-id"] = trace_id
+                except Exception:
+                    pass
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Set baseline API security headers."""
 
     async def dispatch(self, request: Request, call_next) -> Response:
-        response = await call_next(request)
+        response = await defensive_call_next(request, call_next)
         response.headers.setdefault("x-content-type-options", "nosniff")
         response.headers.setdefault("x-frame-options", "DENY")
         response.headers.setdefault("referrer-policy", "strict-origin-when-cross-origin")
@@ -73,7 +120,7 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
         content_length = request.headers.get("content-length")
         if content_length and int(content_length) > self.max_bytes:
             return JSONResponse(status_code=413, content={"detail": "Request payload too large."})
-        return await call_next(request)
+        return await defensive_call_next(request, call_next)
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -96,19 +143,46 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             metrics.inc("skytrax_api_rate_limited", client=client)
             return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded."})
         bucket.append(now)
-        return await call_next(request)
+        return await defensive_call_next(request, call_next)
 
 
 class TimeoutMiddleware(BaseHTTPMiddleware):
-    """Apply a coarse request timeout at the ASGI middleware layer."""
+    """Coarse request timeout — skipped for hot polling and async dispatch paths."""
 
     def __init__(self, app, timeout_seconds: float) -> None:
         super().__init__(app)
         self.timeout_seconds = timeout_seconds
+        self._hot_poll_timeout = min(timeout_seconds, 8.0)
+
+    def _effective_timeout(self, request: Request) -> float | None:
+        path = request.url.path
+        if _is_async_dispatch(request) or _is_hot_poll_path(path):
+            return None
+        if _path_matches(path, _HOT_POLL_PREFIXES):
+            return self._hot_poll_timeout
+        return self.timeout_seconds
 
     async def dispatch(self, request: Request, call_next) -> Response:
+        timeout = self._effective_timeout(request)
+        path = request.url.path
         try:
-            return await asyncio.wait_for(call_next(request), timeout=self.timeout_seconds)
+            if timeout is None:
+                return await defensive_call_next(request, call_next)
+            return await asyncio.wait_for(
+                defensive_call_next(request, call_next),
+                timeout=timeout,
+            )
         except asyncio.TimeoutError:
-            metrics.inc("skytrax_api_timeouts", path=request.url.path)
-            raise HTTPException(status_code=504, detail="Request timed out.")
+            metrics.inc("skytrax_api_timeouts", path=path)
+            logger.warning("[ENDPOINT_TIMEOUT] path=%s timeout=%.1fs", path, timeout or 0)
+            return safe_json_response(
+                {"detail": "Request timed out.", "path": path},
+                status_code=504,
+                path=path,
+            )
+        except asyncio.CancelledError:
+            if await request.is_disconnected():
+                metrics.inc("skytrax_client_disconnects", path=path)
+                logger.info("[CLIENT_DISCONNECT] timeout middleware path=%s", path)
+                return Response(status_code=CLIENT_DISCONNECT_STATUS)
+            return Response(status_code=CANCELLED_STATUS)

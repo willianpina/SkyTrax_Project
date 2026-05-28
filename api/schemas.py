@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ServiceStatusResponse(BaseModel):
@@ -254,3 +254,81 @@ class OperationalAlertResponse(BaseModel):
     anomaly_type: str
     detected_at: str
     detail: str
+
+
+class PipelineHealthPipeline(BaseModel):
+    """Pipeline subsection for GET /api/operations/health/pipeline."""
+
+    model_config = ConfigDict(extra="allow")
+
+    running: bool = False
+    stage: str | None = None
+    progress: int | float | None = None
+    pipeline_status: str | None = None
+    operation_id: str | None = None
+    degraded: bool = False
+    false_degraded_detected: bool = False
+
+
+class PipelineHealthSchema(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    healthy: bool = True
+    migration_drift: bool | None = None
+    missing_tables: list[str] = Field(default_factory=list)
+    pending_migrations: list[str] = Field(default_factory=list)
+    current_revision: str | None = None
+    head_revision: str | None = None
+    canonical_aviation_valid: bool | None = None
+    aviation_missing_columns: list[str] = Field(default_factory=list)
+    aviation_aliases_detected: dict = Field(default_factory=dict)
+    aviation_backfill_status: str | None = None
+    aviation_semantic_drift: bool | None = None
+    runtime_schema_consistent: bool | None = None
+    stale_reflection_detected: bool = False
+    engine_generation: int = 0
+    runtime_refresh_count: int = 0
+    aviation_identity_health: dict = Field(default_factory=dict)
+    canonical_identity_consistent: bool | None = None
+    semantic_duplicates_detected: int | None = None
+    slug_collision_rate: float | None = None
+    identity_merge_count: int | None = None
+    summary_source: str | None = None
+
+
+class PipelineHealthResponse(BaseModel):
+    """Enterprise pipeline health — JSON-safe governance fields."""
+
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
+
+    status: str = "ready"
+    readiness: str = "ready"
+    environment: str = "development"
+    degraded: bool = False
+    pipeline: PipelineHealthPipeline = Field(default_factory=PipelineHealthPipeline)
+    # Avoid field name `schema` — shadows BaseModel.schema() and breaks OpenAPI/serialization.
+    schema_health: PipelineHealthSchema = Field(
+        default_factory=PipelineHealthSchema,
+        alias="schema",
+    )
+    native: dict = Field(default_factory=dict)
+    runtime: dict = Field(default_factory=dict)
+    runtime_health: dict = Field(default_factory=dict)
+    startup: dict | None = None
+    blocked_stages: list[str] = Field(default_factory=list)
+    degraded_history: list[dict] = Field(default_factory=list)
+    auto_migrate_policy: str = "validate_only"
+    integrity_reconciled: bool = False
+    authoritative_kpis: dict = Field(default_factory=dict)
+    canonical_kpis: dict = Field(default_factory=dict)
+    accumulated_kpis: dict = Field(default_factory=dict)
+    delta_kpis: dict = Field(default_factory=dict)
+    kpi_governance: dict = Field(default_factory=dict)
+    kpi_lineage: dict = Field(default_factory=dict)
+    metric_lineage: dict = Field(default_factory=dict)
+    metric_semantics: dict = Field(default_factory=dict)
+    integrity_consistent: bool = True
+    runtime_authoritative: bool = False
+    stale_kpis_removed: int = 0
+    payload_safe: bool = True
+    governance_source: str | None = None

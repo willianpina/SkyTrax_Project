@@ -10,6 +10,7 @@ from analytics.intelligence import (
     ReputationService,
 )
 from analytics.operational_intelligence import OperationalIntelligenceService
+from analytics.geospatial_intelligence import GeospatialIntelligenceService
 from analytics.snapshots import SnapshotService
 from api.schemas import (
     BenchmarkingResponse,
@@ -130,6 +131,11 @@ def airline_rankings(
     session: Session = Depends(get_session),
 ):
     return OperationalIntelligenceService(session)._airline_rankings(limit=limit)
+
+
+@router.get("/geospatial/overview")
+def geospatial_overview(session: Session = Depends(get_session)):
+    return GeospatialIntelligenceService(session).overview()
 
 
 @router.get("/graph/stats")
