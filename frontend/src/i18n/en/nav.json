@@ -69,7 +69,7 @@
     "investigations": {
       "navLabel": "Investigations",
       "title": "Investigations",
-      "subtitle": "Deep-dive analysis and investigative workflows"
+      "subtitle": "In-depth incident analysis and reputation signals"
     }
   },
   "nav": {
