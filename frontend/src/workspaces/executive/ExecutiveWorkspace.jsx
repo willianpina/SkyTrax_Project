@@ -64,19 +64,31 @@ export default function ExecutiveWorkspace() {
         <MetricCard icon={AlertTriangle} label={t("dashboard:kpi.operationalAlerts")} value={alerts.length || "—"} detail={t("dashboard:kpi.operationalAlertsDetail")} tone="risk" trend={alerts.length > 3 ? "down" : "stable"} />
       </section>
 
-      <div className="command-body">
+      <div className="command-body command-body--executive">
         <div className="command-central">
-          <section className="tactical-grid">
-            <ForecastPanel forecasts={forecasts} />
-            <ChartPanel title={t("charts:ratingEvolution.title")} subtitle={t("charts:ratingEvolution.subtitle")} option={ratingOption} accent="positive" />
+          <section className="tactical-grid executive-analytics-row">
+            <ForecastPanel forecasts={forecasts} className="forecast-panel--executive" />
+            <ChartPanel
+              title={t("charts:ratingEvolution.title")}
+              subtitle={t("charts:ratingEvolution.subtitle")}
+              option={ratingOption}
+              accent="positive"
+              height={360}
+              className="rating-evolution-panel"
+            />
           </section>
-          <OperationalAlertsPanel alerts={alerts} />
+
+          <section className="tactical-grid executive-runtime-row">
+            <IntelligenceTimeline items={feedItems} />
+            <AnomalyFeed anomalies={anomalies} alerts={alerts} />
+          </section>
+
+          <section className="executive-alerts-row">
+            <OperationalAlertsPanel alerts={alerts} />
+          </section>
+
           <ExecutiveInsightsPanel insights={insights} defaultInsight={defaultInsight} />
         </div>
-        <aside className="command-rail-right">
-          <IntelligenceTimeline items={feedItems} />
-          <AnomalyFeed anomalies={anomalies} alerts={alerts} />
-        </aside>
       </div>
     </WorkspaceShell>
   );

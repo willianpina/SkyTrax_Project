@@ -4,9 +4,9 @@ import { baseChartTheme, axisStyle, PALANTIR_COLORS } from "../lib/chartTheme";
 import { forecastConfidence } from "../lib/executiveMetrics";
 import { formatScore, formatDeltaNumeric } from "../utils/formatMetric";
 import { LazyEChart } from "./ui/LazyEChart";
-import { ConfidenceBadge, OperationalTag, PanelShell, TrendArrow } from "./ui/PanelShell";
+import { ConfidenceBadge, PanelShell, TrendArrow } from "./ui/PanelShell";
 
-function ForecastPanelInner({ forecasts }) {
+function ForecastPanelInner({ forecasts, className = "" }) {
   const { t, i18n } = useTranslation(["charts", "common", "command"]);
   const arsRows = (forecasts?.metrics?.reputation_score || []).filter((r) => r.horizon === "weekly");
   const primary = arsRows[0];
@@ -78,15 +78,11 @@ function ForecastPanelInner({ forecasts }) {
   }, [primary, t, i18n.language, conf.insufficient]);
 
   const badges = (
-    <>
-      <ConfidenceBadge
-        score={conf.score}
-        insufficient={conf.insufficient}
-        label={conf.insufficient ? "Confidence warming up" : t("command:forecast.confidence", { score: conf.score })}
-      />
-      <OperationalTag>{conf.method}</OperationalTag>
-      {primary?.trend_direction ? <TrendArrow direction={primary.trend_direction} /> : null}
-    </>
+    <ConfidenceBadge
+      score={conf.score}
+      insufficient={conf.insufficient}
+      label={conf.insufficient ? "Confidence warming up" : t("command:forecast.confidence", { score: conf.score })}
+    />
   );
 
   return (
@@ -95,7 +91,7 @@ function ForecastPanelInner({ forecasts }) {
       subtitle={t("charts:reputationForecast.subtitle")}
       badges={badges}
       accent="warning"
-      className="forecast-panel"
+      className={`forecast-panel ${className}`.trim()}
     >
       {arsRows.length === 0 || conf.insufficient ? (
         <div className="muted-copy forecast-empty-copy">
@@ -106,10 +102,9 @@ function ForecastPanelInner({ forecasts }) {
         <LazyEChart option={option} height={240} />
       )}
       <div className="forecast-metrics tactical">
-        {["sentiment", "complaint_density"].map((metric) => {
+        {["sentiment"].map((metric) => {
           const row = (forecasts?.metrics?.[metric] || []).find((r) => r.horizon === "weekly");
           if (!row) return null;
-          const fc = forecastConfidence(row);
           const current = formatScore(row.current_value);
           const forecast = formatScore(row.forecast_value);
           const delta = formatDeltaNumeric(
@@ -123,7 +118,6 @@ function ForecastPanelInner({ forecasts }) {
             <div className="forecast-chip hover-intel" key={metric}>
               <div className="chip-head">
                 <strong>{t(`charts:metrics.${metric}`, { defaultValue: metric.replace("_", " ") })}</strong>
-                <ConfidenceBadge score={fc.score} insufficient={fc.insufficient} />
               </div>
               <span className="metric-num">
                 {current} → {forecast}

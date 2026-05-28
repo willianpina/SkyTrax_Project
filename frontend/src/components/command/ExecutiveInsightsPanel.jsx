@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { formatScore } from "../../utils/formatMetric";
 import { PanelShell, ConfidenceBadge, SeverityBadge } from "../ui/PanelShell";
+import { formatOperationalDateTime } from "../../utils/datetime";
 
 function ExecutiveInsightsPanelInner({ insights, defaultInsight }) {
   const { t } = useTranslation(["dashboard", "common"]);
@@ -38,11 +38,14 @@ function ExecutiveInsightsPanelInner({ insights, defaultInsight }) {
             </div>
             <p className="insight-feed-copy">{insight.summary || insight.insight_text}</p>
             {(insight.category || (insight.drivers || insight.supporting_topics || []).length > 0) && (
-              <div className="insight-feed-tags">
+              <div className="insight-feed-footer">
                 {insight.category && <span className="insight-feed-tag">{insight.category}</span>}
                 {(insight.drivers || insight.supporting_topics || []).slice(0, 4).map((d) => (
                   <span className="insight-feed-tag" key={d}>{d}</span>
                 ))}
+                <span className="insight-feed-time">
+                  {formatOperationalDateTime(insight.timestamp || insight.created_at || insight.detected_at)}
+                </span>
               </div>
             )}
           </li>
