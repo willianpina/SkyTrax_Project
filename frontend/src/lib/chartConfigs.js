@@ -4,14 +4,38 @@ export function buildRatingOption(timeline) {
   const categories = timeline.map((row) => (row.month || "").slice(0, 7));
   const values = timeline.map((row) => row.average_rating ?? row.score / 10);
   return {
-    ...baseChartTheme(),
-    xAxis: { type: "category", data: categories, ...axisStyle() },
-    yAxis: { type: "value", min: 0, max: 10, ...axisStyle() },
+    ...baseChartTheme({ grid: { left: 46, right: 14, top: 26, bottom: 34 } }),
+    xAxis: {
+      type: "category",
+      data: categories,
+      ...axisStyle(),
+      axisLabel: {
+        ...axisStyle().axisLabel,
+        interval: (index) => index % 2 === 0,
+      },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: "value",
+      min: 0,
+      max: 10,
+      splitNumber: 4,
+      ...axisStyle(),
+      axisTick: { show: false },
+      splitLine: {
+        lineStyle: {
+          color: "rgba(148, 163, 184, 0.08)",
+        },
+      },
+    },
     series: [
       {
-        data: values, type: "line", smooth: true,
-        areaStyle: { color: "rgba(45, 212, 168, 0.1)" },
-        lineStyle: { color: PALANTIR_COLORS.positive, width: 2 },
+        data: values,
+        type: "line",
+        smooth: 0.35,
+        showSymbol: false,
+        areaStyle: { color: "rgba(45, 212, 168, 0.08)" },
+        lineStyle: { color: PALANTIR_COLORS.positive, width: 2.4 },
         itemStyle: { color: PALANTIR_COLORS.positive }
       }
     ]

@@ -10,7 +10,9 @@ function ChartPanelInner({ title, subtitle, option, height = 240, accent = "sign
       {!hasData && emptyMessage ? (
         <p className="muted-copy">{emptyMessage}</p>
       ) : (
-        <LazyEChart option={option} height={height} />
+        <div className="chart-container">
+          <LazyEChart option={option} height={height} className="chart-container-canvas" />
+        </div>
       )}
     </PanelShell>
   );

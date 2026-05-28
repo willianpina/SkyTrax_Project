@@ -15,7 +15,6 @@ function ExecutiveInsightsPanelInner({ insights, defaultInsight }) {
       accent="warning"
       expandable
       defaultExpanded={hasInsights}
-      quiet
       className={`insights-panel span-wide ${hasInsights ? "" : "insights-panel--compact"}`.trim()}
     >
       {!hasInsights && (
@@ -37,17 +36,15 @@ function ExecutiveInsightsPanelInner({ insights, defaultInsight }) {
               </div>
             </div>
             <p className="insight-feed-copy">{insight.summary || insight.insight_text}</p>
-            {(insight.category || (insight.drivers || insight.supporting_topics || []).length > 0) && (
-              <div className="insight-feed-footer">
-                {insight.category && <span className="insight-feed-tag">{insight.category}</span>}
-                {(insight.drivers || insight.supporting_topics || []).slice(0, 4).map((d) => (
-                  <span className="insight-feed-tag" key={d}>{d}</span>
-                ))}
-                <span className="insight-feed-time">
-                  {formatOperationalDateTime(insight.timestamp || insight.created_at || insight.detected_at)}
-                </span>
-              </div>
-            )}
+            <div className="insight-feed-footer">
+              {insight.category && <span className="insight-feed-tag">{insight.category}</span>}
+              {(insight.drivers || insight.supporting_topics || []).slice(0, 3).map((d) => (
+                <span className="insight-feed-tag" key={d}>{d}</span>
+              ))}
+              <span className="insight-feed-time">
+                {formatOperationalDateTime(insight.timestamp || insight.created_at || insight.detected_at)}
+              </span>
+            </div>
           </li>
         ))}
       </ul>
