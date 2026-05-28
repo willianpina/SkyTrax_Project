@@ -1,65 +1,42 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
-import { buildComplaintDensityOption } from "../../lib/chartConfigs";
-import { formatScore } from "../../utils/formatMetric";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
-import { ChartPanel } from "../../components/charts/ChartPanel";
-import { BenchmarkingRadar } from "../../components/charts/BenchmarkingRadar";
-import { AirlineComparisonMatrix } from "../../components/command/AirlineComparisonMatrix";
-import { PanelShell, TrendArrow } from "../../components/ui/PanelShell";
 import { FrictionMatrix } from "../../components/FrictionMatrix";
+import { OperationalModuleCard } from "../../components/forecasting/OperationalModuleCard";
+import { BenchmarkKpiStrip } from "./BenchmarkKpiStrip";
+import { BenchmarkAnalyticsRow } from "./BenchmarkAnalyticsRow";
+import { BenchmarkRuntimeTable } from "./BenchmarkRuntimeTable";
 
 export default function BenchmarkingWorkspace() {
-  const { t } = useTranslation(["benchmarking", "charts", "command", "nav"]);
+  const { t } = useTranslation(["benchmarking", "semantic"]);
   const { reputation, benchmarking } = useSharedAnalytics();
 
-  const complaintOption = useMemo(
-    () => buildComplaintDensityOption(reputation, benchmarking.complaint_density),
-    [reputation, benchmarking.complaint_density]
-  );
-
-  const ranked = [...reputation].sort((a, b) => (b.score || 0) - (a.score || 0));
-  const leaders = ranked.slice(0, 3);
-
   return (
-    <WorkspaceShell id="benchmarking" accent="signal">
-      <section className="workspace-kpi-strip">
-        {leaders.map((r, i) => (
-          <div className={`peer-card glass-panel rank-${i + 1}`} key={r.slug}>
-            <span className="peer-rank">#{i + 1}</span>
-            <strong>{r.airline}</strong>
-            <span className="peer-score metric-num">{formatScore(r.score, { allowZero: true })}</span>
-            <TrendArrow direction={r.score > 60 ? "up" : "down"} />
-          </div>
-        ))}
-      </section>
+    <WorkspaceShell id="benchmarking" accent="signal" className="workspace-benchmarking">
+      <div className="forecasting-grid benchmarking-grid">
+        <section className="fg-cell fg-span-12" aria-label={t("kpi.title", { defaultValue: "Benchmark KPIs" })}>
+          <BenchmarkKpiStrip reputation={reputation} />
+        </section>
 
-      <AirlineComparisonMatrix reputation={reputation} benchmarking={benchmarking} />
+        <section className="fg-cell fg-span-12" aria-label={t("analytics.title", { defaultValue: "Comparative analytics" })}>
+          <BenchmarkAnalyticsRow reputation={reputation} benchmarking={benchmarking} />
+        </section>
 
-      <section className="tactical-grid">
-        <BenchmarkingRadar radarRows={benchmarking?.radar_analytics} />
-        <ChartPanel title={t("charts:complaintDensity.title")} subtitle={t("charts:complaintDensity.subtitle")} option={complaintOption} accent="risk" />
-      </section>
+        <section className="fg-cell fg-span-12" aria-label={t("runtime.title", { defaultValue: "Benchmark runtime" })}>
+          <BenchmarkRuntimeTable reputation={reputation} benchmarking={benchmarking} />
+        </section>
 
-      <FrictionMatrix />
-
-      <section className="tactical-grid">
-        <PanelShell title={t("benchmarking:ranking.title", { defaultValue: "Airline ranking" })} subtitle={t("benchmarking:ranking.subtitle", { defaultValue: "Sorted by ARS" })} accent="signal">
-          <div className="ranking-list tactical">
-            {ranked.map((r, i) => (
-              <div className="ranking-row hover-intel" key={r.slug}>
-                <span className="ranking-pos">#{i + 1}</span>
-                <span className="ranking-airline">{r.airline}</span>
-                <div className="ranking-bar-track">
-                  <div className="ranking-bar positive" style={{ width: `${Math.round(r.score)}%` }} />
-                </div>
-                <span className="ranking-score metric-num">{formatScore(r.score, { allowZero: true })}</span>
-              </div>
-            ))}
-          </div>
-        </PanelShell>
-      </section>
+        <section className="fg-cell fg-span-12 benchmark-deep-section" aria-label={t("deep.title", { defaultValue: "Deep analytics" })}>
+          <OperationalModuleCard
+            className="benchmark-friction-module"
+            title={t("semantic:friction.title", { defaultValue: "Friction intelligence" })}
+            subtitle={t("deep.subtitle", { defaultValue: "Topic-level operational friction heatmap" })}
+          >
+            <FrictionMatrix bare chartMaxHeight={360} />
+          </OperationalModuleCard>
+        </section>
+      </div>
     </WorkspaceShell>
   );
 }

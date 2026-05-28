@@ -91,12 +91,6 @@ export default function ExecutiveDashboard() {
 
   const statusLabel = isLive ? t("common:status.apiLive") : error || t("common:status.demoData");
   const partialSuffix = partialErrors.length ? ` · ${t("common:status.partial", { count: partialErrors.length })}` : "";
-  const defaultInsight = {
-    severity: "neutral",
-    summary: t("dashboard:sections.noInsights"),
-    airline: t("dashboard:sections.portfolio"),
-    drivers: []
-  };
   const signalCount = (alerts?.length || 0) + (anomalies?.filter((a) => a.severity === "high" || a.severity === "critical")?.length || 0);
 
   return (
@@ -154,7 +148,7 @@ export default function ExecutiveDashboard() {
               <ChartPanel title={t("charts:sentimentMix.title")} subtitle={t("charts:sentimentMix.subtitle")} option={sentimentOption} accent="signal" />
               <BenchmarkingRadar radarRows={benchmarking?.radar_analytics} />
             </section>
-            <ExecutiveInsightsPanel insights={insights} defaultInsight={defaultInsight} />
+            <ExecutiveInsightsPanel insights={insights} />
             <AirlineComparisonMatrix reputation={reputation} benchmarking={benchmarking} />
             <section className="tactical-grid">
               <TopicPanel title={t("dashboard:topics.positiveDrivers")} rows={data.top_positive_topics || []} tone="positive" />

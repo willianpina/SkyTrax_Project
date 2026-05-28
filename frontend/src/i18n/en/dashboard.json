@@ -22,6 +22,12 @@
   },
   "sections": {
     "executiveInsights": "Executive Insights",
+    "insightsSubtitle": "Strategic intelligence signals from operational correlation",
+    "insightsSubtitleEmpty": "Executive recommendations appear when confidence threshold is met",
+    "insightsStandby": "Insight stream standby",
+    "insightsRuntime": "Correlation runtime active",
+    "insightsEmptyTitle": "No executive signals above confidence threshold.",
+    "insightsEmptyDetail": "Signal cards expand automatically once runtime correlation confidence stabilizes.",
     "signals": "{{count}} signals",
     "noInsights": "No executive alerts for the current sample.",
     "portfolio": "Portfolio",

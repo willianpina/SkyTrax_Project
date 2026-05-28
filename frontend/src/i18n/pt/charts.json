@@ -1,7 +1,13 @@
 {
   "ratingEvolution": {
     "title": "Evolução da Avaliação",
-    "subtitle": "Tendência temporal"
+    "subtitle": "Tendência temporal do portfólio",
+    "empty": "O histórico de avaliação será exibido após o primeiro snapshot operacional.",
+    "series": "Média de avaliação",
+    "kpiLatest": "Última avaliação",
+    "kpiDelta": "Δ período",
+    "kpiWindow": "Janela",
+    "periods": "{{count}} períodos"
   },
   "sentimentMix": {
     "title": "Mix de Sentimento",
@@ -15,12 +21,24 @@
     "title": "Mapa de Calor de Tópicos",
     "subtitle": "Fricção por companhia"
   },
+  "operationalForecast": {
+    "title": "Previsão Operacional",
+    "subtitle": "Projeção de reputação do portfólio e trajetória de avaliação",
+    "statusPipeline": "Pipeline ativo",
+    "horizon": "Horizonte semanal"
+  },
   "reputationForecast": {
     "title": "Previsão de Reputação",
-    "subtitle": "EWMA + média móvel",
-    "empty": "Execute o job de previsão para popular as predições.",
+    "subtitle": "Projeção semanal ARS",
+    "empty": "Os sinais de previsão aparecem após o limiar mínimo de confiança operacional.",
     "actual": "Real",
-    "forecast": "Previsão"
+    "forecast": "Previsão",
+    "warmingUp": "Aquecendo",
+    "pipelineActive": "Ativo",
+    "kpiCurrent": "ARS atual",
+    "kpiForecast": "Previsão",
+    "kpiPipeline": "Pipeline",
+    "kpiConfidence": "Confiança"
   },
   "competitiveRadar": {
     "title": "Radar Competitivo",
@@ -47,6 +65,8 @@
     "subtitle": "Todas as métricas rastreadas"
   },
   "executive": {
+    "stripLabel": "Inteligência de previsão",
+    "stripSubtitle": "Resumo operacional do portfólio",
     "monitored": "Monitoradas",
     "deteriorating": "Em deterioração",
     "recovering": "Em recuperação",
@@ -55,10 +75,12 @@
     "modelConfidence": "Confiança do Modelo"
   },
   "topMovers": {
-    "title": "Maiores Mudanças"
+    "title": "Maiores Mudanças",
+    "subtitle": "Maiores variações projetadas de score"
   },
   "table": {
     "title": "Previsões Operacionais",
+    "subtitle": "Sinais de previsão por companhia",
     "airline": "Companhia",
     "current": "Atual",
     "forecast": "Previsto",

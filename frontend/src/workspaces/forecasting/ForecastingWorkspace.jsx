@@ -1,20 +1,18 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
-import { buildRatingOption } from "../../lib/chartConfigs";
 import {
   buildAirlineForecasts,
   extractTopMovers,
   computeExecutiveSummary,
-  buildTemporalHeatmap
+  buildTemporalHeatmap,
 } from "../../lib/forecastIntelligence";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
-import { ForecastPanel } from "../../components/ForecastPanel";
-import { ChartPanel } from "../../components/charts/ChartPanel";
 import { ExecutiveSummary } from "./ExecutiveSummary";
 import { TopMovers } from "./TopMovers";
 import { PredictionsTable } from "./PredictionsTable";
 import { TemporalHeatmap } from "./TemporalHeatmap";
+import { OperationalForecastCharts } from "./OperationalForecastCharts";
 
 export default function ForecastingWorkspace() {
   const { t } = useTranslation(["charts", "command", "common", "nav"]);
@@ -26,7 +24,6 @@ export default function ForecastingWorkspace() {
     .slice(0, 12)
     .map((s) => ({ month: String(s.period_end).slice(0, 10), score: s.metrics?.reputation_score || 0 }));
   const ratingTimeline = timeline.length ? timeline : data.timeline || [];
-  const ratingOption = useMemo(() => buildRatingOption(ratingTimeline), [ratingTimeline]);
 
   const airlineForecasts = useMemo(
     () => buildAirlineForecasts(forecasts, reputation),
@@ -38,26 +35,28 @@ export default function ForecastingWorkspace() {
   const heatmapData = useMemo(() => buildTemporalHeatmap(airlineForecasts), [airlineForecasts]);
 
   return (
-    <WorkspaceShell
-      id="forecasting"
-      accent="warning"
-    >
-      <ExecutiveSummary summary={executiveSummary} />
+    <WorkspaceShell id="forecasting" accent="warning" className="workspace-forecasting">
+      <div className="forecasting-grid">
+        <section className="fg-cell fg-span-12" aria-label={t("charts:executive.stripLabel", { defaultValue: "Executive KPIs" })}>
+          <ExecutiveSummary summary={executiveSummary} />
+        </section>
 
-      <TopMovers movers={topMovers} />
+        <section className="fg-cell fg-span-12" aria-label={t("charts:topMovers.title", { defaultValue: "Top movers" })}>
+          <TopMovers movers={topMovers} />
+        </section>
 
-      <ForecastPanel forecasts={forecasts} />
+        <section className="fg-cell fg-span-12" aria-label={t("charts:operationalForecast.title", { defaultValue: "Operational forecast" })}>
+          <OperationalForecastCharts forecasts={forecasts} ratingTimeline={ratingTimeline} />
+        </section>
 
-      <ChartPanel
-        title={t("charts:ratingEvolution.title")}
-        subtitle={t("charts:ratingEvolution.subtitle")}
-        option={ratingOption}
-        accent="positive"
-      />
+        <section className="fg-cell fg-span-12" aria-label={t("charts:table.title", { defaultValue: "Operational predictions" })}>
+          <PredictionsTable airlines={airlineForecasts} />
+        </section>
 
-      <PredictionsTable airlines={airlineForecasts} />
-
-      <TemporalHeatmap heatmapData={heatmapData} />
+        <section className="fg-cell fg-span-12" aria-label={t("charts:heatmap.title", { defaultValue: "Risk trend matrix" })}>
+          <TemporalHeatmap heatmapData={heatmapData} />
+        </section>
+      </div>
     </WorkspaceShell>
   );
 }

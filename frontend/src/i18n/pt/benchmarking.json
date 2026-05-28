@@ -1,5 +1,29 @@
 {
   "subtitle": "Comparação entre pares e análise competitiva",
+  "kpi": {
+    "title": "Inteligência de benchmark",
+    "subtitle": "Snapshot de performance do portfólio",
+    "airlines": "companhias",
+    "monitored": "Monitoradas",
+    "avgScore": "ARS médio",
+    "atRisk": "Em risco",
+    "leader": "Líder"
+  },
+  "analytics": {
+    "title": "Analytics comparativo",
+    "subtitle": "Benchmark multidimensional e densidade de reclamações",
+    "complaintEmpty": "A densidade de reclamações é exibida com avaliações indexadas."
+  },
+  "runtime": {
+    "title": "Tabela runtime de benchmark",
+    "subtitle": "Comparação de reputação entre pares — visão operacional com scroll",
+    "hint": "Cabeçalho fixo · scroll interno",
+    "empty": "Sem dados de benchmark na janela atual."
+  },
+  "deep": {
+    "title": "Analytics operacional avançado",
+    "subtitle": "Mapa de calor de fricção operacional por tópico"
+  },
   "heatmap": {
     "airlineAxis": "Companhias",
     "topicAxis": "Tópicos"

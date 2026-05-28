@@ -4,13 +4,11 @@ import { Activity, AlertTriangle, BarChart3, Gauge } from "lucide-react";
 import { useSharedAnalytics } from "../../hooks/AnalyticsProvider";
 import { computeExecutiveMetrics } from "../../lib/executiveMetrics";
 import { buildIntelligenceFeed } from "../../lib/intelligenceFeed";
-import { buildRatingOption } from "../../lib/chartConfigs";
 import { formatScore, formatPercent } from "../../utils/formatMetric";
 import { WorkspaceShell } from "../../layouts/WorkspaceShell";
 import { ExecutiveMetricsStrip } from "../../components/command/ExecutiveMetricsStrip";
 import { MetricCard } from "../../components/MetricCard";
-import { ForecastPanel } from "../../components/ForecastPanel";
-import { ChartPanel } from "../../components/charts/ChartPanel";
+import { OperationalForecastCharts } from "../forecasting/OperationalForecastCharts";
 import { OperationalAlertsPanel } from "../../components/AnomalyPanel";
 import { ExecutiveInsightsPanel } from "../../components/command/ExecutiveInsightsPanel";
 import { IntelligenceTimeline } from "../../components/command/IntelligenceTimeline";
@@ -40,14 +38,6 @@ export default function ExecutiveWorkspace() {
     .slice(0, 12)
     .map((s) => ({ month: String(s.period_end).slice(0, 10), score: s.metrics?.reputation_score || 0 }));
   const ratingTimeline = timelineFromSnapshots.length ? timelineFromSnapshots : data.timeline || [];
-  const ratingOption = useMemo(() => buildRatingOption(ratingTimeline), [ratingTimeline]);
-
-  const defaultInsight = {
-    severity: "neutral",
-    summary: t("dashboard:sections.noInsights"),
-    airline: t("dashboard:sections.portfolio"),
-    drivers: []
-  };
 
   return (
     <WorkspaceShell id="executive" accent="signal">
@@ -65,29 +55,23 @@ export default function ExecutiveWorkspace() {
       </section>
 
       <div className="command-body command-body--executive">
-        <div className="command-central">
-          <section className="tactical-grid executive-analytics-row">
-            <ForecastPanel forecasts={forecasts} className="forecast-panel--executive" />
-            <ChartPanel
-              title={t("charts:ratingEvolution.title")}
-              subtitle={t("charts:ratingEvolution.subtitle")}
-              option={ratingOption}
-              accent="positive"
-              height={360}
-              className="rating-evolution-panel"
-            />
+        <div className="command-central forecasting-grid">
+          <section className="fg-cell fg-span-12 executive-forecast-module">
+            <OperationalForecastCharts forecasts={forecasts} ratingTimeline={ratingTimeline} />
           </section>
 
-          <section className="tactical-grid executive-runtime-row">
+          <section className="fg-cell fg-span-12 tactical-grid executive-runtime-row">
             <IntelligenceTimeline items={feedItems} />
             <AnomalyFeed anomalies={anomalies} alerts={alerts} />
           </section>
 
-          <section className="executive-alerts-row">
+          <section className="fg-cell fg-span-12 executive-alerts-row">
             <OperationalAlertsPanel alerts={alerts} />
           </section>
 
-          <ExecutiveInsightsPanel insights={insights} defaultInsight={defaultInsight} />
+          <section className="fg-cell fg-span-12 executive-insights-row">
+            <ExecutiveInsightsPanel insights={insights} />
+          </section>
         </div>
       </div>
     </WorkspaceShell>

@@ -43,15 +43,15 @@ function TopCommandBarInner() {
     if (isLive) return "Live";
     return "Standby";
   })();
-  const streamDetail = streamStatus === "Live"
-    ? "Live ingestion active"
+  const streamLabel = streamStatus === "Live"
+    ? t("command:ops.stream.live", { defaultValue: "Live ingestion active" })
     : streamStatus === "Syncing"
-      ? "Streaming synchronization in progress"
+      ? t("command:ops.stream.syncing", { defaultValue: "Sync active" })
       : streamStatus === "Delayed"
-        ? "Streaming heartbeat delayed"
-        : "Streaming standby";
+        ? t("command:ops.stream.delayed", { defaultValue: "Sync delayed" })
+        : t("command:ops.stream.standby", { defaultValue: "Ingestion standby" });
   const partialSuffix = partialErrors.length ? ` · ${t("common:status.partial", { count: partialErrors.length })}` : "";
-  const analyticsDetail = !isLive && error ? `${error}${partialSuffix}` : partialSuffix;
+  const streamTitle = [streamLabel, !isLive && error ? error : "", partialSuffix].filter(Boolean).join(" · ");
 
   return (
     <>
@@ -91,20 +91,26 @@ function TopCommandBarInner() {
           >
             <RefreshCw size={14} className={isLoading ? "spin" : ""} />
           </button>
-          <button
-            type="button"
-            className={`ops-sync-btn ${isRefreshing ? "syncing" : ""}`}
-            onClick={handleSyncClick}
-            disabled={loading}
-            title={t("command:ops.syncTitle")}
-          >
-            <Radio size={14} className={isRefreshing ? "pulse-icon" : ""} />
-            <span>{isRefreshing ? t("command:ops.synchronizing") : t("command:ops.sync")}</span>
-          </button>
-          <span className={`ops-status ${streamStatus.toLowerCase() === "live" ? "live" : ""}`}>
-            <span className="pulse-dot" aria-hidden />
-            <span>{streamDetail}{analyticsDetail}</span>
-          </span>
+          <div className="topbar-stream-group">
+            <button
+              type="button"
+              className={`ops-sync-btn ${isRefreshing ? "syncing" : ""}`}
+              onClick={handleSyncClick}
+              disabled={loading}
+              title={t("command:ops.syncTitle")}
+            >
+              <Radio size={14} className={isRefreshing ? "pulse-icon" : ""} />
+              <span>{isRefreshing ? t("command:ops.synchronizing") : t("command:ops.sync")}</span>
+            </button>
+            <span
+              className={`ops-stream-status ops-stream-status--${streamStatus.toLowerCase()}`}
+              title={streamTitle}
+              aria-label={streamTitle}
+            >
+              <span className="pulse-dot" aria-hidden />
+              <span className="ops-stream-label">{streamLabel}</span>
+            </span>
+          </div>
         </div>
       </header>
       <OperationalSyncModal

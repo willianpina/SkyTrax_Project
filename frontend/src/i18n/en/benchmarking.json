@@ -1,5 +1,29 @@
 {
   "subtitle": "Peer comparison and competitive analysis",
+  "kpi": {
+    "title": "Benchmark intelligence",
+    "subtitle": "Portfolio peer performance snapshot",
+    "airlines": "airlines",
+    "monitored": "Monitored",
+    "avgScore": "Avg ARS",
+    "atRisk": "At risk",
+    "leader": "Leader"
+  },
+  "analytics": {
+    "title": "Comparative analytics",
+    "subtitle": "Multi-dimensional peer benchmarking and complaint density",
+    "complaintEmpty": "Complaint density populates with indexed reviews."
+  },
+  "runtime": {
+    "title": "Benchmark runtime table",
+    "subtitle": "Peer reputation comparison — scrollable operational view",
+    "hint": "Sticky header · internal scroll",
+    "empty": "No benchmark data in current window."
+  },
+  "deep": {
+    "title": "Deep operational analytics",
+    "subtitle": "Topic-level operational friction heatmap"
+  },
   "heatmap": {
     "airlineAxis": "Airlines",
     "topicAxis": "Topics"

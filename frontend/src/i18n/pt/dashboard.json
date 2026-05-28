@@ -22,6 +22,12 @@
   },
   "sections": {
     "executiveInsights": "Insights Executivos",
+    "insightsSubtitle": "Sinais de inteligência estratégica da correlação operacional",
+    "insightsSubtitleEmpty": "Recomendações executivas aparecem ao atingir o limiar de confiança",
+    "insightsStandby": "Stream de insights em espera",
+    "insightsRuntime": "Runtime de correlação ativo",
+    "insightsEmptyTitle": "Nenhum sinal executivo acima do limiar de confiança.",
+    "insightsEmptyDetail": "Os cards de sinal expandem automaticamente quando a confiança de correlação estabilizar.",
     "signals": "{{count}} sinais",
     "noInsights": "Nenhum alerta executivo para a amostra atual.",
     "portfolio": "Portfólio",

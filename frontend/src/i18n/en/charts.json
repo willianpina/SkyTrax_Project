@@ -1,7 +1,13 @@
 {
   "ratingEvolution": {
     "title": "Rating Evolution",
-    "subtitle": "Temporal trend"
+    "subtitle": "Portfolio temporal trend",
+    "empty": "Rating history will populate after the first operational snapshot.",
+    "series": "Avg. rating",
+    "kpiLatest": "Latest rating",
+    "kpiDelta": "Period Δ",
+    "kpiWindow": "Window",
+    "periods": "{{count}} periods"
   },
   "sentimentMix": {
     "title": "Sentiment Mix",
@@ -15,12 +21,24 @@
     "title": "Topic Heatmap",
     "subtitle": "Airline friction"
   },
+  "operationalForecast": {
+    "title": "Operational Forecast",
+    "subtitle": "Portfolio reputation projection and rating trajectory",
+    "statusPipeline": "Pipeline active",
+    "horizon": "Weekly horizon"
+  },
   "reputationForecast": {
     "title": "Reputation Forecast",
-    "subtitle": "EWMA + rolling avg",
-    "empty": "Run forecasting job to populate predictions.",
+    "subtitle": "Weekly ARS projection",
+    "empty": "Forecast signals appear once minimum operational confidence is reached.",
     "actual": "Actual",
-    "forecast": "Forecast"
+    "forecast": "Forecast",
+    "warmingUp": "Warming up",
+    "pipelineActive": "Active",
+    "kpiCurrent": "Current ARS",
+    "kpiForecast": "Forecast",
+    "kpiPipeline": "Pipeline",
+    "kpiConfidence": "Confidence"
   },
   "competitiveRadar": {
     "title": "Competitive Radar",
@@ -47,6 +65,8 @@
     "subtitle": "All tracked metrics"
   },
   "executive": {
+    "stripLabel": "Forecast intelligence",
+    "stripSubtitle": "Portfolio runtime summary",
     "monitored": "Monitored",
     "deteriorating": "Deteriorating",
     "recovering": "Recovering",
@@ -55,10 +75,12 @@
     "modelConfidence": "Model Confidence"
   },
   "topMovers": {
-    "title": "Top Movers"
+    "title": "Top Movers",
+    "subtitle": "Largest projected score shifts"
   },
   "table": {
     "title": "Operational Predictions",
+    "subtitle": "Airline-level forecast signals",
     "airline": "Airline",
     "current": "Current",
     "forecast": "Forecast",

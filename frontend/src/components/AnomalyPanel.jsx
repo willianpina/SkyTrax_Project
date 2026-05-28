@@ -11,16 +11,26 @@ function translateAnomalyType(t, type) {
   return t(`alerts:types.${type}`, { defaultValue: type.replace(/_/g, " ") });
 }
 
-export const AnomalyTimeline = memo(function AnomalyTimeline({ anomalies }) {
+export const AnomalyTimeline = memo(function AnomalyTimeline({ anomalies, embedded = false }) {
   const { t, i18n } = useTranslation(["charts", "alerts", "command", "common"]);
   const sorted = [...(anomalies || [])].slice(0, 12).reverse();
 
   const timelineOption = useMemo(() => {
     const categories = sorted.map((a) => formatShortDate(a.detected_at));
     return {
-      ...baseChartTheme({ grid: { left: 48, right: 16, top: 32, bottom: 52 } }),
-      xAxis: { type: "category", data: categories, axisLabel: { ...axisStyle().axisLabel, rotate: 28 } },
-      yAxis: { type: "value", ...axisStyle() },
+      ...baseChartTheme({ grid: { left: 40, right: 12, top: 16, bottom: 36 } }),
+      legend: { show: false },
+      xAxis: {
+        type: "category",
+        data: categories,
+        axisLabel: { ...axisStyle().axisLabel, fontSize: 9, rotate: 24 },
+        axisTick: { show: false },
+      },
+      yAxis: {
+        type: "value",
+        ...axisStyle(),
+        splitLine: { lineStyle: { color: "rgba(148, 163, 184, 0.06)" } },
+      },
       series: [
         {
           type: "bar",
@@ -32,24 +42,82 @@ export const AnomalyTimeline = memo(function AnomalyTimeline({ anomalies }) {
                   ? PALANTIR_COLORS.critical
                   : a.severity === "medium"
                     ? PALANTIR_COLORS.warning
-                    : PALANTIR_COLORS.signal
-            }
+                    : PALANTIR_COLORS.signal,
+            },
           })),
-          barWidth: "55%"
+          barWidth: "50%",
         },
         {
           type: "scatter",
           symbol: "pin",
-          symbolSize: 22,
-          itemStyle: { color: PALANTIR_COLORS.critical, shadowBlur: 8 },
+          symbolSize: 16,
+          itemStyle: { color: PALANTIR_COLORS.critical },
           data: sorted
-            .map((a, i) => (a.severity === "high" || a.severity === "critical" ? [i, a.observed_value] : null))
+            .map((a, i) =>
+              a.severity === "high" || a.severity === "critical" ? [i, a.observed_value] : null
+            )
             .filter(Boolean),
-          z: 5
-        }
-      ]
+          z: 5,
+        },
+      ],
     };
   }, [sorted, i18n.language]);
+
+  const recentRows = sorted.slice(-5).reverse();
+
+  const body = (
+    <>
+      {sorted.length === 0 ? (
+        <p className="muted-copy ops-empty-state">{t("charts:anomalyTimeline.empty")}</p>
+      ) : (
+        <div className="ops-chart-stage ops-chart-stage--flat anomaly-timeline-chart">
+          <LazyEChart option={timelineOption} height={180} className="ops-chart-canvas" />
+        </div>
+      )}
+      {recentRows.length > 0 ? (
+        <div className="atp-recent anomaly-timeline-recent">
+          {recentRows.map((row) => {
+            const sev = row.severity || "low";
+            const typeName = translateAnomalyType(t, row.anomaly_type);
+            return (
+              <div className={`atp-row atp-row--${sev}`} key={row.id}>
+                <span className={`anm-sev-dot anm-sev-dot--${sev}`} aria-hidden />
+                <div className="atp-row-body">
+                  <strong className="atp-row-airline">{row.airline}</strong>
+                  <span className="atp-row-type">{typeName}</span>
+                </div>
+                <div className="atp-row-score">
+                  <span className="atp-row-obs metric-num">
+                    {formatScore(row.observed_value, { allowZero: true })}
+                  </span>
+                  <span className="atp-row-sep">→</span>
+                  <span className="atp-row-exp metric-num">
+                    {formatScore(row.expected_value, { allowZero: true })}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="op-chart-pane anomaly-timeline-embed">
+        <header className="op-chart-pane-header">
+          <div className="op-chart-pane-titles">
+            <h3 className="op-module-pane-title">{t("charts:anomalyTimeline.title")}</h3>
+            <p className="op-module-pane-sub">
+              {t("charts:anomalyTimeline.events", { count: (anomalies || []).length })}
+            </p>
+          </div>
+        </header>
+        {body}
+      </div>
+    );
+  }
 
   return (
     <PanelShell
@@ -59,34 +127,7 @@ export const AnomalyTimeline = memo(function AnomalyTimeline({ anomalies }) {
       expandable
       className="anomaly-timeline-panel"
     >
-      {sorted.length === 0 ? (
-        <p className="muted-copy">{t("charts:anomalyTimeline.empty")}</p>
-      ) : (
-        <LazyEChart option={timelineOption} height={200} />
-      )}
-      <div className="atp-recent">
-        {sorted
-          .slice(-6)
-          .reverse()
-          .map((row) => {
-            const sev = row.severity || "low";
-            const typeName = translateAnomalyType(t, row.anomaly_type);
-            return (
-              <div className={`atp-row atp-row--${sev}`} key={row.id}>
-                <span className={`anm-sev-dot anm-sev-dot--${sev}`} />
-                <div className="atp-row-body">
-                  <strong className="atp-row-airline">{row.airline}</strong>
-                  <span className="atp-row-type">{typeName}</span>
-                </div>
-                <div className="atp-row-score">
-                  <span className="atp-row-obs metric-num">{formatScore(row.observed_value, { allowZero: true })}</span>
-                  <span className="atp-row-sep">→</span>
-                  <span className="atp-row-exp metric-num">{formatScore(row.expected_value, { allowZero: true })}</span>
-                </div>
-              </div>
-            );
-          })}
-      </div>
+      {body}
     </PanelShell>
   );
 });

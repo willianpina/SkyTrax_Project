@@ -80,6 +80,12 @@
     "sync": "Sincronizar",
     "syncing": "Sincronizando...",
     "synchronizing": "Sincronizando",
+    "stream": {
+      "live": "Ingestão ativa",
+      "syncing": "Sync ativo",
+      "delayed": "Sync atrasado",
+      "standby": "Ingestão em espera"
+    },
     "syncTitle": "Pipeline de processamento de dados",
     "pipelineTitle": "Plataforma Analítica Operacional",
     "pipelineSubtitle": "Orquestração de inteligência, corpus e correlação semântica",

@@ -80,6 +80,12 @@
     "sync": "Sync",
     "syncing": "Syncing...",
     "synchronizing": "Synchronizing",
+    "stream": {
+      "live": "Live ingestion active",
+      "syncing": "Sync active",
+      "delayed": "Sync delayed",
+      "standby": "Ingestion standby"
+    },
     "syncTitle": "Data processing pipeline",
     "pipelineTitle": "Analytics Pipeline",
     "pipelineSubtitle": "Full-cycle data processing and enrichment",
