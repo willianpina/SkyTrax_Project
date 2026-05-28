@@ -32,3 +32,15 @@ exports/
 secrets/
 data/
 notebooks/
+pipeline_lineage_report.json
+pipeline_lineage_report*.json
+
+# Build / IDE extras
+frontend/.vite/
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+
+# Local env overrides
+.env.local
+.env.*.local

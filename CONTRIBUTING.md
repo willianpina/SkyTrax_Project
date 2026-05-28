@@ -1,6 +1,15 @@
-# Contributing to SkyTrax Airline Intelligence Platform
+# Contributing to SkyTrax Analytics
 
 Thank you for your interest in contributing. This document outlines the process for contributing to this project.
+
+## Documentation
+
+Before opening a PR, review:
+
+- [Architecture](docs/architecture/architecture.md)
+- [Project inventory](docs/architecture/project_inventory.md)
+- [Technical debt](docs/architecture/technical_debt.md)
+- [Modules map](docs/modules/modules.md)
 
 ## Reporting Bugs
 

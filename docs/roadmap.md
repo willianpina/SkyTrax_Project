@@ -1,4 +1,10 @@
-# Roadmap
+# Roadmap (legacy)
+
+> Documentação atualizada em [docs/roadmap/roadmap.md](roadmap/roadmap.md).
+
+---
+
+# Roadmap (legacy)
 
 ## Phase 1: Scrapy Foundation
 

@@ -1,4 +1,14 @@
-# Architecture
+# Architecture (legacy)
+
+> **Este arquivo está desatualizado.** Use a documentação canônica:
+>
+> - [docs/architecture/architecture.md](architecture/architecture.md)
+> - [docs/architecture/project_inventory.md](architecture/project_inventory.md)
+> - [docs/architecture/technical_debt.md](architecture/technical_debt.md)
+
+---
+
+# Architecture (legacy)
 
 ## System Overview
 
