@@ -5,18 +5,25 @@ import { PanelShell, ConfidenceBadge, SeverityBadge } from "../ui/PanelShell";
 
 function ExecutiveInsightsPanelInner({ insights, defaultInsight }) {
   const { t } = useTranslation(["dashboard", "common"]);
-  const rows = insights?.length ? insights : [defaultInsight];
+  const hasInsights = (insights?.length || 0) > 0;
+  const rows = hasInsights ? insights : [];
 
   return (
     <PanelShell
       title={t("sections.executiveInsights")}
-      subtitle={t("sections.signals", { count: insights?.length || 0 })}
+      subtitle={hasInsights ? t("sections.signals", { count: insights.length }) : "Operational insight stream standby"}
       accent="warning"
       expandable
-      defaultExpanded={insights?.length > 0}
+      defaultExpanded={hasInsights}
       quiet
-      className="insights-panel span-wide"
+      className={`insights-panel span-wide ${hasInsights ? "" : "insights-panel--compact"}`.trim()}
     >
+      {!hasInsights && (
+        <div className="muted-copy insights-empty-copy">
+          <p>No executive signals above confidence threshold.</p>
+          <p>Signal cards expand automatically once runtime correlation confidence stabilizes.</p>
+        </div>
+      )}
       <ul className="insight-feed" role="list">
         {rows.map((insight) => (
           <li className={`insight-feed-row severity-${insight.severity}`} key={`${insight.airline}-${insight.summary}`}>

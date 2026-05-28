@@ -24,7 +24,10 @@ function IntelligenceTimelineInner({ items }) {
       className="timeline-panel"
     >
       {items.length === 0 ? (
-        <p className="muted-copy">{t("timeline.empty")}</p>
+        <div className="muted-copy timeline-empty-copy">
+          <p>Operational timeline standby.</p>
+          <p>Events will populate once anomaly correlation becomes active.</p>
+        </div>
       ) : (
         <ol className="intel-timeline">
           {items.map((item) => {

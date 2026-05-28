@@ -14,7 +14,7 @@ function TopCommandBarInner() {
   const { isLive, isLoading, error, partialErrors, reload, reputation, benchmarking } = useSharedAnalytics();
   const [modalOpen, setModalOpen] = useState(false);
   const { status, history, loading, triggerRefresh, resetPipeline } = useOperations();
-  const { badges: platformBadges } = usePlatformHealth(45000, {
+  const { badges: platformBadges, operationalHealth } = usePlatformHealth(45000, {
     enabled: !modalOpen,
     pipelineOnly: true,
   });
@@ -37,8 +37,21 @@ function TopCommandBarInner() {
     setModalOpen(true);
   }, [isRefreshing, isStalled, triggerRefresh, resetPipeline]);
 
-  const statusLabel = isLive ? "LIVE" : error || t("common:status.demoData");
+  const streamStatus = (() => {
+    if (isRefreshing) return "Syncing";
+    if (isStalled) return "Delayed";
+    if (isLive) return "Live";
+    return "Standby";
+  })();
+  const streamDetail = streamStatus === "Live"
+    ? "Live ingestion active"
+    : streamStatus === "Syncing"
+      ? "Streaming synchronization in progress"
+      : streamStatus === "Delayed"
+        ? "Streaming heartbeat delayed"
+        : "Streaming standby";
   const partialSuffix = partialErrors.length ? ` · ${t("common:status.partial", { count: partialErrors.length })}` : "";
+  const analyticsDetail = !isLive && error ? `${error}${partialSuffix}` : partialSuffix;
 
   return (
     <>
@@ -48,7 +61,11 @@ function TopCommandBarInner() {
           {platformBadges.length > 0 && (
             <div className="osm-platform-badges osm-platform-badges--compact">
               {platformBadges.map((b) => (
-                <span key={b.key} className={`osm-platform-badge osm-platform-badge--${b.severity}`}>
+                <span
+                  key={b.key}
+                  className={`osm-platform-badge osm-platform-badge--${b.variant || b.severity}`}
+                  title={b.tooltip || b.title || b.label}
+                >
                   {b.label}
                 </span>
               ))}
@@ -84,9 +101,9 @@ function TopCommandBarInner() {
             <Radio size={14} className={isRefreshing ? "pulse-icon" : ""} />
             <span>{isRefreshing ? t("command:ops.synchronizing") : t("command:ops.sync")}</span>
           </button>
-          <span className={`ops-status ${isLive ? "live" : ""}`}>
+          <span className={`ops-status ${streamStatus.toLowerCase() === "live" ? "live" : ""}`}>
             <span className="pulse-dot" aria-hidden />
-            {statusLabel}{partialSuffix}
+            <span>{streamDetail}{analyticsDetail}</span>
           </span>
         </div>
       </header>

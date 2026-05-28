@@ -79,7 +79,11 @@ function ForecastPanelInner({ forecasts }) {
 
   const badges = (
     <>
-      <ConfidenceBadge score={conf.score} insufficient={conf.insufficient} label={t("command:forecast.confidence", { score: conf.score })} />
+      <ConfidenceBadge
+        score={conf.score}
+        insufficient={conf.insufficient}
+        label={conf.insufficient ? "Confidence warming up" : t("command:forecast.confidence", { score: conf.score })}
+      />
       <OperationalTag>{conf.method}</OperationalTag>
       {primary?.trend_direction ? <TrendArrow direction={primary.trend_direction} /> : null}
     </>
@@ -94,7 +98,10 @@ function ForecastPanelInner({ forecasts }) {
       className="forecast-panel"
     >
       {arsRows.length === 0 || conf.insufficient ? (
-        <p className="muted-copy">{t("charts:reputationForecast.empty")}</p>
+        <div className="muted-copy forecast-empty-copy">
+          <p>Forecasting pipeline active.</p>
+          <p>Temporal prediction signals will appear after minimum operational confidence threshold.</p>
+        </div>
       ) : (
         <LazyEChart option={option} height={240} />
       )}
