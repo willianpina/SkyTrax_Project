@@ -1,13 +1,13 @@
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, Globe, Radio, Star, Users } from "lucide-react";
+import { AlertTriangle, Globe, MapPin, Radio, Star, Users } from "lucide-react";
 import { OperationalModuleCard } from "../../components/forecasting/OperationalModuleCard";
 import { formatScore } from "../../utils/formatMetric";
 import { allianceOverviewMetrics, riskLevel } from "./allianceShared";
 
-function AllianceOverviewStripInner({ alliances, loading }) {
+function AllianceOverviewStripInner({ alliances, hubAlliances, loading }) {
   const { t } = useTranslation("alliances");
-  const m = allianceOverviewMetrics(alliances);
+  const m = allianceOverviewMetrics(alliances, hubAlliances);
   const hasData = (alliances || []).length > 0;
   const riskTone = riskLevel(m.avgRisk);
 
@@ -36,6 +36,12 @@ function AllianceOverviewStripInner({ alliances, loading }) {
       label: t("statMembers"),
       hint: t("statMembersHint"),
       value: loading && !hasData ? "—" : m.totalMembers.toLocaleString(),
+    },
+    {
+      icon: MapPin,
+      label: t("statAllianceHubs"),
+      hint: t("statAllianceHubsHint"),
+      value: loading && m.allianceHubCount === 0 ? "—" : m.allianceHubCount.toLocaleString(),
     },
     {
       icon: Radio,

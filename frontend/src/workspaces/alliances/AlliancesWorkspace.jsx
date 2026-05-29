@@ -10,7 +10,7 @@ import { AllianceAnalyticsFeed } from "./AllianceAnalyticsFeed";
 
 export default function AlliancesWorkspace() {
   const { t } = useTranslation("alliances");
-  const { alliances, fusionSignals, loading } = useAllianceIntel();
+  const { alliances, fusionSignals, hubAlliances, loading } = useAllianceIntel();
 
   return (
     <WorkspaceShell
@@ -22,7 +22,7 @@ export default function AlliancesWorkspace() {
     >
       <div className="forecasting-grid alliances-grid">
         <section className="fg-cell fg-span-12">
-          <AllianceOverviewStrip alliances={alliances} loading={loading} />
+          <AllianceOverviewStrip alliances={alliances} hubAlliances={hubAlliances} loading={loading} />
         </section>
 
         <section className="fg-cell fg-span-12">

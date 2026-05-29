@@ -17,8 +17,10 @@ export function sortAlliances(alliances) {
   });
 }
 
-export function allianceOverviewMetrics(alliances) {
+export function allianceOverviewMetrics(alliances, hubAlliances) {
   const list = alliances || [];
+  const hubNetworks = hubAlliances || [];
+  const allianceHubCount = hubNetworks.reduce((s, a) => s + (a.hub_count || 0), 0);
   const totalMembers = list.reduce((s, a) => s + (a.member_count || 0), 0);
   const totalReviews = list.reduce((s, a) => s + (a.total_reviews || 0), 0);
   const avgRisk =
@@ -31,6 +33,7 @@ export function allianceOverviewMetrics(alliances) {
   );
   return {
     allianceCount: list.length,
+    allianceHubCount,
     totalMembers,
     totalReviews,
     avgRisk,
