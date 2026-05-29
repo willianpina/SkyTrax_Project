@@ -228,8 +228,7 @@ class HubIntelligenceService:
 
     def hub_dashboard(self) -> dict:
         """Top-level KPIs for the hub intelligence module."""
-        airports = self._load_airports()
-        total_airports = len(airports)
+        total_airports = self.session.query(func.count(AirportMetadata.id)).scalar() or 0
 
         if total_airports == 0:
             return {
@@ -242,40 +241,61 @@ class HubIntelligenceService:
                 "top_hubs": [],
             }
 
-        active_hubs = [ap for ap in airports if ap.hub_level is not None]
+        active_hubs = (
+            self.session.query(AirportMetadata).filter(AirportMetadata.hub_level.isnot(None)).all()
+        )
         if not active_hubs:
-            linked_ids = {
+            linked_ids = [
                 row[0]
                 for row in self.session.query(AirlineAirport.airport_metadata_id).distinct().all()
                 if row[0]
-            }
-            active_hubs = [ap for ap in airports if ap.id in linked_ids]
-        if not active_hubs and airports:
-            active_hubs = airports[: min(50, len(airports))]
-        mention_index = self._airport_mention_index()
+            ]
+            if linked_ids:
+                active_hubs = (
+                    self.session.query(AirportMetadata)
+                    .filter(AirportMetadata.id.in_(linked_ids))
+                    .limit(50)
+                    .all()
+                )
+        if not active_hubs:
+            active_hubs = (
+                self.session.query(AirportMetadata)
+                .order_by(AirportMetadata.airport_rating.desc().nullslast())
+                .limit(50)
+                .all()
+            )
 
-        # Critical hubs: top 10% by complaint mention count
-        complaint_counts: List[Tuple[str, int]] = []
-        for ap in active_hubs:
-            code = (ap.iata or "").upper()
-            mentions = mention_index.get(code, [])
-            neg = sum(1 for r in mentions if self._is_negative(r))
-            complaint_counts.append((code, neg))
+        review_count = self.session.query(func.count(Review.id)).scalar() or 0
+        use_mention_scan = review_count <= 8000 and len(active_hubs) <= 80
 
-        complaint_counts.sort(key=lambda x: x[1], reverse=True)
-        top_10_pct = max(1, len(complaint_counts) // 10)
-        critical_threshold = complaint_counts[top_10_pct - 1][1] if complaint_counts else 0
-        critical_hubs = sum(1 for _, c in complaint_counts if c >= critical_threshold and c > 0)
-
-        # High risk airports: avg rating < 5 when mentioned (scope: active hubs only)
+        critical_hubs = 0
         high_risk = 0
-        for ap in active_hubs:
-            code = (ap.iata or "").upper()
-            mentions = mention_index.get(code, [])
-            if mentions:
-                avg_r = sum(float(r.get("rating") or 5) for r in mentions) / len(mentions)
-                if avg_r < 5.0:
-                    high_risk += 1
+        if use_mention_scan:
+            mention_index = self._airport_mention_index()
+            complaint_counts: List[Tuple[str, int]] = []
+            for ap in active_hubs:
+                code = (ap.iata or "").upper()
+                mentions = mention_index.get(code, [])
+                neg = sum(1 for r in mentions if self._is_negative(r))
+                complaint_counts.append((code, neg))
+
+            complaint_counts.sort(key=lambda x: x[1], reverse=True)
+            top_10_pct = max(1, len(complaint_counts) // 10)
+            critical_threshold = complaint_counts[top_10_pct - 1][1] if complaint_counts else 0
+            critical_hubs = sum(1 for _, c in complaint_counts if c >= critical_threshold and c > 0)
+
+            for ap in active_hubs:
+                code = (ap.iata or "").upper()
+                mentions = mention_index.get(code, [])
+                if mentions:
+                    avg_r = sum(float(r.get("rating") or 5) for r in mentions) / len(mentions)
+                    if avg_r < 5.0:
+                        high_risk += 1
+        else:
+            critical_hubs = sum(
+                1 for ap in active_hubs if (ap.airport_rating or 10) < 4.0 or ap.hub_level == "critical"
+            )
+            high_risk = sum(1 for ap in active_hubs if (ap.airport_rating or 10) < 5.0)
 
         # Alliance coverage
         airports_with_alliance_airline = set()
