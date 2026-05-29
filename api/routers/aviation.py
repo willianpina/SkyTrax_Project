@@ -309,6 +309,38 @@ def normalization_report(validator: AviationValidator = Depends(_validator)):
 # ═══ Hub Intelligence ═══
 
 
+@router.get("/hubs/metrics")
+def hubs_metrics(
+    session: Session = Depends(get_session),
+    svc: HubIntelligenceService = Depends(_hub_intel),
+):
+    """Hub classification coverage for dashboards."""
+    from sqlalchemy import func
+
+    dash = svc.hub_dashboard()
+    by_class = dict(
+        session.query(AirportMetadata.hub_level, func.count(AirportMetadata.id))
+        .filter(AirportMetadata.hub_level.isnot(None))
+        .group_by(AirportMetadata.hub_level)
+        .all()
+    )
+    return {
+        "total_airports": dash.get("airports_monitored", 0),
+        "classified_hubs": dash.get("classified_hubs", 0),
+        "coverage_percent": dash.get("coverage_percent", 0.0),
+        "active_hubs": dash.get("active_hubs", 0),
+        "by_class": by_class,
+    }
+
+
+@router.post("/hubs/enrich")
+def hubs_enrich(session: Session = Depends(get_session)):
+    """Run automatic hub classification (reviews + airline links + alliances)."""
+    from aviation.hub_enrichment import enrich_hub_classifications
+
+    return enrich_hub_classifications(session, commit=True)
+
+
 @router.get("/hub-intelligence/dashboard")
 def hub_intel_dashboard(svc: HubIntelligenceService = Depends(_hub_intel)):
     payload = svc.hub_dashboard()

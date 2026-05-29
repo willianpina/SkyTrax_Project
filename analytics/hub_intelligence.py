@@ -37,6 +37,7 @@ _MENTION_CACHE_LOCK = Lock()
 _MENTION_CACHE: dict[str, Any] = {"built_at": 0.0, "review_count": -1, "index": {}}
 _MENTION_CACHE_TTL_S = int(os.getenv("HUB_MENTION_CACHE_TTL", "300"))
 _MENTION_REVIEW_LIMIT = int(os.getenv("HUB_MENTION_REVIEW_LIMIT", "12000"))
+_CLASSIFIED_HUB_LEVELS = ("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB", "major", "regional")
 
 COMPLAINT_CATEGORIES = {
     "baggage": {"baggage", "luggage", "lost bag", "suitcase", "missing bag", "damaged bag"},
@@ -230,10 +231,20 @@ class HubIntelligenceService:
         """Top-level KPIs for the hub intelligence module."""
         total_airports = self.session.query(func.count(AirportMetadata.id)).scalar() or 0
 
+        classified_hubs = (
+            self.session.query(func.count(AirportMetadata.id))
+            .filter(AirportMetadata.hub_level.in_(_CLASSIFIED_HUB_LEVELS))
+            .scalar()
+            or 0
+        )
+        coverage_percent = round((classified_hubs / total_airports * 100) if total_airports else 0.0, 2)
+
         if total_airports == 0:
             return {
                 "airports_monitored": 0,
                 "active_hubs": 0,
+                "classified_hubs": 0,
+                "coverage_percent": 0.0,
                 "critical_hubs": 0,
                 "high_risk_airports": 0,
                 "alliance_coverage": 0.0,
@@ -242,7 +253,9 @@ class HubIntelligenceService:
             }
 
         active_hubs = (
-            self.session.query(AirportMetadata).filter(AirportMetadata.hub_level.isnot(None)).all()
+            self.session.query(AirportMetadata)
+            .filter(AirportMetadata.hub_level.in_(_CLASSIFIED_HUB_LEVELS))
+            .all()
         )
         if not active_hubs:
             linked_ids = [
@@ -357,6 +370,8 @@ class HubIntelligenceService:
         return {
             "airports_monitored": total_airports,
             "active_hubs": len(active_hubs),
+            "classified_hubs": classified_hubs,
+            "coverage_percent": coverage_percent,
             "critical_hubs": critical_hubs,
             "high_risk_airports": high_risk,
             "alliance_coverage": alliance_coverage,

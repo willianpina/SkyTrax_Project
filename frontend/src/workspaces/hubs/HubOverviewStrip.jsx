@@ -16,6 +16,9 @@ function HubOverviewStripInner({ dashboard, loading }) {
   const { t } = useTranslation("hubs");
   const d = dashboard || {};
   const hasData = (d.airports_monitored ?? 0) > 0;
+  const classified = d.classified_hubs ?? 0;
+  const total = d.airports_monitored ?? 0;
+  const coveragePct = d.coverage_percent ?? 0;
 
   const status = (
     <>
@@ -82,6 +85,15 @@ function HubOverviewStripInner({ dashboard, loading }) {
       status={status}
       bodyClassName="hub-overview-module__body"
     >
+      {total > 0 && (
+        <p className="hub-classification-banner">
+          {t("classificationBanner", {
+            classified,
+            total,
+            percent: typeof coveragePct === "number" ? coveragePct.toFixed(1) : coveragePct,
+          })}
+        </p>
+      )}
       <div className="hub-summary-bar">
         {stats.map(({ icon: Icon, label, hint, value, trend, tone }) => (
           <div className={`hub-summary-stat${tone ? ` hub-summary-stat--${tone}` : ""}`} key={label}>

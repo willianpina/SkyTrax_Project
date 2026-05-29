@@ -1,6 +1,8 @@
 {
   "pageTitle": "Hubs",
   "pageSubtitle": "Airport infrastructure intelligence and global connectivity center",
+  "pageSubtitleClassified": "{{classified}} hubs classified of {{total}} monitored airports",
+  "classificationBanner": "{{classified}} hubs classified of {{total}} monitored airports ({{percent}}%)",
   "badgeRuntime": "Hub Runtime",
   "badgeInfrastructure": "Active Infrastructure",
   "statMonitored": "Airports Monitored",

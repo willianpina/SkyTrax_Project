@@ -145,7 +145,14 @@ class AirportMetadata(TimestampMixin, Base):
     longitude: Mapped[float | None] = mapped_column(Float)
     passenger_volume: Mapped[str | None] = mapped_column(String(40))
     airport_rating: Mapped[int | None] = mapped_column(Integer)
-    hub_level: Mapped[str | None] = mapped_column(String(40))
+    hub_level: Mapped[str | None] = mapped_column(String(40), index=True)
+    hub_score: Mapped[float | None] = mapped_column(Float)
+    alliance_hub: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=sql_text("false"), nullable=False
+    )
+    strategic_hub: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=sql_text("false"), nullable=False
+    )
     operational_labels: Mapped[list[str]] = mapped_column(
         JSONB,
         default=list,

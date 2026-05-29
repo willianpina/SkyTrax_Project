@@ -25,6 +25,12 @@ export default function HubsWorkspace() {
   const { triggerAviationSync, status: opsStatus, loading: opsLoading } = useOperations();
 
   const isSyncing = opsStatus.running && opsStatus.pipeline_type === "aviation";
+  const classified = hubDashboard?.classified_hubs ?? 0;
+  const total = hubDashboard?.airports_monitored ?? 0;
+  const subtitle =
+    total > 0
+      ? t("pageSubtitleClassified", { classified, total })
+      : t("pageSubtitle");
 
   return (
     <WorkspaceShell
@@ -32,7 +38,7 @@ export default function HubsWorkspace() {
       accent="signal"
       className="workspace-hubs"
       title={t("pageTitle")}
-      subtitle={t("pageSubtitle")}
+      subtitle={subtitle}
     >
       <div className="forecasting-grid hubs-grid">
         <section className="fg-cell fg-span-12">

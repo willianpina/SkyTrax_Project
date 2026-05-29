@@ -52,10 +52,21 @@ class CoverageAuditEngine:
             orphans["total"],
         )
 
+        classified_hubs = (
+            self.session.query(func.count(AirportMetadata.id))
+            .filter(AirportMetadata.hub_level.in_(("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB")))
+            .scalar()
+            or 0
+        )
+        hub_coverage_percent = round((classified_hubs / total_ap * 100) if total_ap else 0.0, 2)
+
         return {
             "total_airlines": total_a,
             "total_airports": total_ap,
             "total_alliances": alliances_count,
+            "classified_hubs": classified_hubs,
+            "hub_coverage_percent": hub_coverage_percent,
+            "total_hubs": classified_hubs,
             "missing_iata": missing_iata,
             "missing_icao": missing_icao,
             "missing_country": missing_country_airlines + missing_country_airports,

@@ -189,7 +189,15 @@ class AviationIntelligenceService:
         return result
 
     def hub_intelligence(self) -> list[dict[str, Any]]:
-        hubs = self.session.query(AirportMetadata).filter(AirportMetadata.hub_level.isnot(None)).all()
+        hubs = (
+            self.session.query(AirportMetadata)
+            .filter(
+                AirportMetadata.hub_level.in_(
+                    ("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB", "major", "regional")
+                )
+            )
+            .all()
+        )
         if not hubs:
             linked_ids = {
                 row[0]
@@ -218,6 +226,9 @@ class AviationIntelligenceService:
                     "country": hub.country,
                     "region": hub.region,
                     "hub_level": hub.hub_level or ("major" if connections >= 2 else "regional"),
+                    "hub_score": hub.hub_score,
+                    "alliance_hub": hub.alliance_hub,
+                    "strategic_hub": hub.strategic_hub,
                     "airport_rating": hub.airport_rating,
                     "airline_connections": connections,
                     "operational_labels": hub.operational_labels,
@@ -351,9 +362,35 @@ class AviationIntelligenceService:
             "airports_total": self.session.query(func.count(AirportMetadata.id)).scalar() or 0,
             "alliances_total": self.session.query(func.count(Alliance.id)).scalar() or 0,
             "hubs_total": self.session.query(func.count(AirportMetadata.id))
-            .filter(AirportMetadata.hub_level.isnot(None))
+            .filter(
+                AirportMetadata.hub_level.in_(
+                    ("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB", "major", "regional")
+                )
+            )
             .scalar()
             or 0,
+            "classified_hubs": self.session.query(func.count(AirportMetadata.id))
+            .filter(
+                AirportMetadata.hub_level.in_(("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB"))
+            )
+            .scalar()
+            or 0,
+            "total_airports": self.session.query(func.count(AirportMetadata.id)).scalar() or 0,
+            "coverage_percent": round(
+                (
+                    self.session.query(func.count(AirportMetadata.id))
+                    .filter(
+                        AirportMetadata.hub_level.in_(
+                            ("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB")
+                        )
+                    )
+                    .scalar()
+                    or 0
+                )
+                / max(self.session.query(func.count(AirportMetadata.id)).scalar() or 1, 1)
+                * 100,
+                2,
+            ),
             "premium_airlines": self.session.query(func.count(AirlineMetadata.id))
             .filter(AirlineMetadata.is_premium.is_(True))
             .scalar()
