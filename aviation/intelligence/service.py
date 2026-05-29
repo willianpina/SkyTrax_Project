@@ -370,20 +370,14 @@ class AviationIntelligenceService:
             .scalar()
             or 0,
             "classified_hubs": self.session.query(func.count(AirportMetadata.id))
-            .filter(
-                AirportMetadata.hub_level.in_(("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB"))
-            )
+            .filter(AirportMetadata.hub_level.in_(("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB")))
             .scalar()
             or 0,
             "total_airports": self.session.query(func.count(AirportMetadata.id)).scalar() or 0,
             "coverage_percent": round(
                 (
                     self.session.query(func.count(AirportMetadata.id))
-                    .filter(
-                        AirportMetadata.hub_level.in_(
-                            ("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB")
-                        )
-                    )
+                    .filter(AirportMetadata.hub_level.in_(("PRIMARY_HUB", "SECONDARY_HUB", "REGIONAL_HUB")))
                     .scalar()
                     or 0
                 )
