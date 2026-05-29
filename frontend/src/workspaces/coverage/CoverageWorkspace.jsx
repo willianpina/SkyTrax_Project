@@ -42,7 +42,14 @@ function CoverageMatrix({ summary, quality, graph, normalization }) {
       { entity: t("coverage:matrix.entities.airports"), count: summary.total_airports || 0, coverage: Math.min(cov * 0.6, 100), confidence: 45, freshness: 60, readiness: gr * 0.5 },
       { entity: t("coverage:matrix.entities.alliances"), count: summary.total_alliances || 0, coverage: 100, confidence: 95, freshness: 90, readiness: 90 },
       { entity: t("coverage:matrix.entities.routes"), count: graph.node_types?.route || 0, coverage: comp * 0.4, confidence: 40, freshness: 50, readiness: gr * 0.3 },
-      { entity: t("coverage:matrix.entities.hubs"), count: summary.total_hubs || 0, coverage: comp * 0.7, confidence: 60, freshness: 70, readiness: gr * 0.6 },
+      {
+        entity: t("coverage:matrix.entities.hubs"),
+        count: summary.classified_hubs ?? summary.total_hubs ?? 0,
+        coverage: summary.hub_coverage_percent ?? comp * 0.7,
+        confidence: 60,
+        freshness: 70,
+        readiness: gr * 0.6,
+      },
     ];
   }, [summary, quality, graph, normalization, t]);
 
@@ -259,6 +266,17 @@ export default function CoverageWorkspace() {
         <OpsKpi icon={Layers} label={t("coverage:strip.airports")} value={summary.total_airports || 0} sev="neutral" sub={t("coverage:strip.mapped")} />
         <OpsKpi icon={AlertTriangle} label={t("coverage:strip.gaps")} value={gapCount} sev={gapCount > 0 ? "warn" : "good"} />
         <OpsKpi icon={Search} label={t("coverage:strip.confidence")} value={normalization.avg_confidence || 0} unit="%" sev={severity(normalization.avg_confidence || 0)} />
+        <OpsKpi
+          icon={Layers}
+          label={t("coverage:strip.hubs")}
+          value={summary.hub_coverage_percent ?? 0}
+          unit="%"
+          sev={severity(summary.hub_coverage_percent || 0)}
+          sub={t("coverage:strip.hubsSub", {
+            classified: summary.classified_hubs ?? summary.total_hubs ?? 0,
+            total: summary.total_airports ?? 0,
+          })}
+        />
       </section>
 
       {/* ── Coverage matrix + graph readiness ─────────────────── */}
