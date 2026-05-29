@@ -13,8 +13,8 @@ concurrency:
 env:
   PYTHON_VERSION: "3.11"
   PYTHONPATH: ${{ github.workspace }}
-  DATABASE_URL: postgresql+psycopg://skytrax:skytrax@localhost:5432/skytrax
-  REDIS_URL: redis://localhost:6379/0
+  DATABASE_URL: "postgresql+psycopg://skytrax:skytrax@localhost:5432/skytrax"
+  REDIS_URL: "redis://localhost:6379/0"
   NLP_ENABLE_EMBEDDINGS: "false"
   SCHEMA_VALIDATE_ON_STARTUP: "false"
   API_TRUSTED_HOSTS: "testserver,localhost,127.0.0.1"
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      DATABASE_URL: sqlite:///:memory:
+      DATABASE_URL: "sqlite:///:memory:"
     steps:
       - uses: actions/checkout@v4
 
@@ -51,7 +51,7 @@ jobs:
       - name: Import smoke (FastAPI app)
         env:
           PYTHONPATH: ${{ github.workspace }}
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: "sqlite:///:memory:"
           NLP_ENABLE_EMBEDDINGS: "false"
           SCHEMA_VALIDATE_ON_STARTUP: "false"
         run: python -c "from main import app; assert app.title"
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      NODE_OPTIONS: --max-old-space-size=4096
+      NODE_OPTIONS: "--max-old-space-size=4096"
       CI: "true"
     steps:
       - uses: actions/checkout@v4
@@ -80,7 +80,7 @@ jobs:
       - name: Install and build
         working-directory: frontend
         env:
-          NODE_OPTIONS: --max-old-space-size=4096
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
           npm ci --no-audit --no-fund
           npm run build
@@ -92,7 +92,7 @@ jobs:
     needs: lint
     services:
       postgres:
-        image: pgvector/pgvector:pg16
+        image: "pgvector/pgvector:pg16"
         env:
           POSTGRES_DB: skytrax
           POSTGRES_USER: skytrax
@@ -158,7 +158,10 @@ jobs:
           docker compose -f docker-compose.prod.yml config
 
       - name: Build backend images
-        run: docker compose build --build-arg INSTALL_PLAYWRIGHT=false app worker scheduler
+        run: |
+          docker compose build \
+            --build-arg INSTALL_PLAYWRIGHT=false \
+            app worker scheduler
 
       - name: Build frontend production image
         run: docker compose -f docker-compose.prod.yml build frontend
