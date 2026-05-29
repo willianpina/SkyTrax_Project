@@ -1,0 +1,17 @@
+/* SkyTrax Operational Design System - Spacing Tokens */
+:root {
+  --ops-space-1: 4px;
+  --ops-space-2: 8px;
+  --ops-space-3: 12px;
+  --ops-space-4: 16px;
+  --ops-space-5: 20px;
+  --ops-space-6: 24px;
+  --ops-space-7: 28px;
+  --ops-space-8: 32px;
+  --ops-space-10: 40px;
+  --ops-space-12: 48px;
+
+  --ops-density-compact: var(--ops-space-2);
+  --ops-density-standard: var(--ops-space-3);
+  --ops-density-relaxed: var(--ops-space-4);
+}

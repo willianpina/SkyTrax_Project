@@ -1,0 +1,72 @@
+{
+  "title": "Coverage",
+  "subtitle": "Metadata completeness and graph readiness",
+  "strip": {
+    "coverage": "Coverage",
+    "completeness": "Completeness",
+    "enrichment": "Enrichment",
+    "graphReady": "Graph Ready",
+    "airlines": "Airlines",
+    "airports": "Airports",
+    "gaps": "Gaps",
+    "confidence": "Confidence",
+    "discovered": "discovered",
+    "mapped": "mapped"
+  },
+  "matrix": {
+    "title": "Metadata Coverage Matrix",
+    "entity": "Entity",
+    "count": "Count",
+    "coverage": "Coverage",
+    "confidence": "Confidence",
+    "freshness": "Freshness",
+    "readiness": "Readiness",
+    "entities": {
+      "airlines": "Airlines",
+      "airports": "Airports",
+      "alliances": "Alliances",
+      "routes": "Routes",
+      "hubs": "Hubs"
+    }
+  },
+  "graph": {
+    "title": "Knowledge Graph Readiness",
+    "edgeDensity": "{{value}}% edge density",
+    "totalNodes": "Total Nodes",
+    "totalEdges": "Total Edges",
+    "airlines": "Airlines",
+    "airports": "Airports",
+    "routes": "Routes",
+    "aircraft": "Aircraft",
+    "topics": "Topics",
+    "countries": "Countries"
+  },
+  "gaps": {
+    "title": "Critical Gaps",
+    "noGaps": "No critical gaps detected",
+    "orphan": "Orphan",
+    "duplicate": "Duplicate",
+    "missing": "Missing",
+    "airlinesWithout": "{{count}} airlines without metadata",
+    "airportsWithout": "{{count}} airports without metadata",
+    "duplicatesDetected": "{{count}} duplicate entities detected"
+  },
+  "normalization": {
+    "title": "Normalization Quality",
+    "avg": "{{value}}% avg",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "extraction": {
+    "title": "Data Extraction",
+    "analyzed": "{{count}} analyzed",
+    "empty": "No extraction data"
+  },
+  "severity": {
+    "critical": "CRITICAL",
+    "high": "HIGH",
+    "medium": "MEDIUM",
+    "low": "LOW"
+  }
+}

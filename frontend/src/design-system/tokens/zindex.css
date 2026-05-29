@@ -1,0 +1,9 @@
+/* SkyTrax Operational Design System - Z-Index Tokens */
+:root {
+  --ops-z-base: 1;
+  --ops-z-toolbar: 20;
+  --ops-z-sticky: 80;
+  --ops-z-overlay: 9000;
+  --ops-z-modal: 9050;
+  --ops-z-toast: 9200;
+}

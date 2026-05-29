@@ -1,0 +1,72 @@
+{
+  "title": "Cobertura",
+  "subtitle": "Completude de metadados e prontidão do grafo",
+  "strip": {
+    "coverage": "Cobertura",
+    "completeness": "Completude",
+    "enrichment": "Enriquecimento",
+    "graphReady": "Grafo Pronto",
+    "airlines": "Companhias",
+    "airports": "Aeroportos",
+    "gaps": "Lacunas",
+    "confidence": "Confiança",
+    "discovered": "descobertas",
+    "mapped": "mapeados"
+  },
+  "matrix": {
+    "title": "Matriz de Cobertura de Metadados",
+    "entity": "Entidade",
+    "count": "Total",
+    "coverage": "Cobertura",
+    "confidence": "Confiança",
+    "freshness": "Atualização",
+    "readiness": "Prontidão",
+    "entities": {
+      "airlines": "Companhias",
+      "airports": "Aeroportos",
+      "alliances": "Alianças",
+      "routes": "Rotas",
+      "hubs": "Hubs"
+    }
+  },
+  "graph": {
+    "title": "Prontidão do Grafo de Conhecimento",
+    "edgeDensity": "{{value}}% densidade de arestas",
+    "totalNodes": "Total de Nós",
+    "totalEdges": "Total de Arestas",
+    "airlines": "Companhias",
+    "airports": "Aeroportos",
+    "routes": "Rotas",
+    "aircraft": "Aeronaves",
+    "topics": "Tópicos",
+    "countries": "Países"
+  },
+  "gaps": {
+    "title": "Lacunas Críticas",
+    "noGaps": "Nenhuma lacuna crítica detectada",
+    "orphan": "Órfão",
+    "duplicate": "Duplicado",
+    "missing": "Ausente",
+    "airlinesWithout": "{{count}} companhias sem metadados",
+    "airportsWithout": "{{count}} aeroportos sem metadados",
+    "duplicatesDetected": "{{count}} entidades duplicadas detectadas"
+  },
+  "normalization": {
+    "title": "Qualidade da Normalização",
+    "avg": "{{value}}% média",
+    "high": "Alta",
+    "medium": "Média",
+    "low": "Baixa"
+  },
+  "extraction": {
+    "title": "Extração de Dados",
+    "analyzed": "{{count}} analisados",
+    "empty": "Sem dados de extração"
+  },
+  "severity": {
+    "critical": "CRÍTICO",
+    "high": "ALTO",
+    "medium": "MÉDIO",
+    "low": "BAIXO"
+  }
+}

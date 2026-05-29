@@ -1,0 +1,18 @@
+/* SkyTrax Operational Design System - Motion Tokens */
+:root {
+  --ops-motion-fast: 120ms;
+  --ops-motion-base: 180ms;
+  --ops-motion-slow: 260ms;
+
+  --ops-ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+  --ops-ease-emphasis: cubic-bezier(0.22, 1, 0.36, 1);
+  --ops-ease-linear: linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ops-motion-fast: 0ms;
+    --ops-motion-base: 0ms;
+    --ops-motion-slow: 0ms;
+  }
+}

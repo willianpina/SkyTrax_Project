@@ -1,0 +1,23 @@
+/* SkyTrax Operational Design System - Color Tokens */
+:root {
+  --ops-bg: #0b1220;
+  --ops-surface: rgba(15, 23, 42, 0.88);
+  --ops-panel: rgba(15, 23, 42, 0.94);
+  --ops-border: rgba(148, 163, 184, 0.18);
+  --ops-border-strong: rgba(148, 163, 184, 0.28);
+  --ops-text: #e8edf4;
+  --ops-muted: #8ea0b8;
+  --ops-success: #3ecf8e;
+  --ops-warning: #d4a054;
+  --ops-danger: #e88a8a;
+  --ops-active: #5eb8d4;
+  --ops-info: #7a9ec8;
+  --ops-shadow: rgba(2, 6, 23, 0.55);
+  --ops-glow: rgba(94, 184, 212, 0.18);
+
+  --ops-overlay: rgba(3, 8, 20, 0.78);
+  --ops-focus-ring: rgba(94, 184, 212, 0.45);
+  --ops-opacity-strong: 0.92;
+  --ops-opacity-medium: 0.72;
+  --ops-opacity-soft: 0.5;
+}

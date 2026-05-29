@@ -1,0 +1,20 @@
+/* SODS Pattern: Pipeline */
+.sods-pipeline-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ops-border);
+  border-radius: var(--ops-radius-md);
+  background: color-mix(in srgb, var(--ops-bg) 70%, transparent);
+}
+
+.sods-pipeline-stage {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  gap: var(--ops-space-2);
+  padding: var(--ops-space-2) var(--ops-space-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--ops-border) 60%, transparent);
+}
+
+.sods-pipeline-stage:last-child {
+  border-bottom: none;
+}

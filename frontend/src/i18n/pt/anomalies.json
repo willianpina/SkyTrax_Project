@@ -1,0 +1,71 @@
+{
+  "title": "Anomalias",
+  "subtitle": "{{count}} sinais ativos monitorados",
+  "strip": {
+    "activeSignals": "Sinais Ativos",
+    "activeSignalsSub": "Eventos de anomalia monitorados",
+    "critical": "Críticos",
+    "criticalSub": "Requerem ação imediata",
+    "medium": "Médios",
+    "mediumSub": "Sob observação",
+    "lowPriority": "Baixa Prioridade",
+    "lowPrioritySub": "Sinais informativos",
+    "carriers": "Companhias Afetadas",
+    "carriersSub": "Companhias sinalizadas",
+    "detection": "Cobertura de Detecção",
+    "detectionSub": "Confiança operacional"
+  },
+  "filter": {
+    "toolbar": "Filtros de severidade",
+    "all": "Todos",
+    "critical": "crítico",
+    "high": "alto",
+    "medium": "médio",
+    "low": "baixo"
+  },
+  "runtime": {
+    "pageTitle": "Inteligência de anomalias",
+    "pageSubtitle": "Runtime de monitoramento e detecção de ameaças operacionais"
+  },
+  "registry": {
+    "title": "Registro de Incidentes",
+    "runtimeTitle": "Runtime operacional de incidentes",
+    "subtitle": "{{anomalies}} anomalias · {{carriers}} companhias",
+    "virtualHint": "Carga progressiva · role para ver mais",
+    "loadingMore": "Role para carregar mais incidentes…",
+    "empty": "Nenhuma anomalia detectada. Linhas de base operacionais estáveis.",
+    "observed": "Observado",
+    "threshold": "Limiar",
+    "gap": "Desvio"
+  },
+  "severity": {
+    "critical": "CRÍTICO",
+    "high": "ALTO",
+    "medium": "ELEVADO",
+    "low": "MONITORANDO"
+  },
+  "assessment": {
+    "title": "Avaliação Executiva",
+    "subtitle": "Resumo de postura operacional",
+    "runtime": "Resumo estratégico de postura",
+    "criticalEscalation": "{{count}} companhia(s) com sinais de escalação crítica: {{airlines}}",
+    "mediumDetected": "{{count}} anomalias de prioridade média detectadas — padrões emergentes de deterioração sob observação",
+    "lowTracked": "{{count}} sinais informativos rastreados — monitoramento de linha de base ativo",
+    "allStable": "Todas as companhias dentro das linhas de base operacionais. Nenhuma escalação necessária."
+  },
+  "stream": {
+    "title": "Stream de Sinais em Tempo Real",
+    "subtitle": "{{count}} últimas detecções",
+    "emptyTitle": "Stream de Sinais",
+    "emptySub": "Sem sinais ativos",
+    "emptyMsg": "Nenhum sinal de anomalia detectado na janela atual"
+  },
+  "categories": {
+    "reputation": "Reputação",
+    "sentiment": "Sentimento",
+    "complaints": "Reclamações",
+    "service": "Serviço",
+    "operations": "Operações",
+    "signal": "Sinal"
+  }
+}

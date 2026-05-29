@@ -1,0 +1,29 @@
+/* SkyTrax Operational Design System - Typography Tokens */
+:root {
+  --ops-font-family: "Inter", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+  --ops-font-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+
+  --ops-text-xs: 0.58rem;
+  --ops-text-sm: 0.68rem;
+  --ops-text-md: 0.76rem;
+  --ops-text-lg: 0.92rem;
+  --ops-text-xl: 1.12rem;
+
+  --ops-weight-regular: 450;
+  --ops-weight-medium: 560;
+  --ops-weight-semibold: 640;
+  --ops-weight-bold: 700;
+
+  --ops-tracking-tight: -0.01em;
+  --ops-tracking-normal: 0;
+  --ops-tracking-wide: 0.08em;
+  --ops-tracking-caps: 0.12em;
+
+  --ops-lh-tight: 1.2;
+  --ops-lh-normal: 1.4;
+  --ops-lh-relaxed: 1.55;
+}
+
+.sods-tabular {
+  font-variant-numeric: tabular-nums;
+}

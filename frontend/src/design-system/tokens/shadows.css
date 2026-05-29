@@ -1,0 +1,8 @@
+/* SkyTrax Operational Design System - Shadow Tokens */
+:root {
+  --ops-shadow-1: 0 2px 8px rgba(2, 6, 23, 0.22);
+  --ops-shadow-2: 0 10px 28px rgba(2, 6, 23, 0.32);
+  --ops-shadow-3: 0 22px 60px rgba(2, 6, 23, 0.48);
+  --ops-shadow-glow-soft: 0 0 26px rgba(94, 184, 212, 0.08);
+  --ops-shadow-glow-status: 0 0 12px rgba(94, 184, 212, 0.2);
+}

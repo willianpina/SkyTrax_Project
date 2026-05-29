@@ -1,0 +1,17 @@
+/* SkyTrax Operational Design System - Light Theme */
+[data-theme="light"] {
+  --ops-bg: #f2f5fa;
+  --ops-surface: rgba(255, 255, 255, 0.92);
+  --ops-panel: rgba(255, 255, 255, 0.98);
+  --ops-border: rgba(15, 23, 42, 0.12);
+  --ops-border-strong: rgba(15, 23, 42, 0.18);
+  --ops-text: #0f172a;
+  --ops-muted: #64748b;
+  --ops-success: #047857;
+  --ops-warning: #b45309;
+  --ops-danger: #dc2626;
+  --ops-active: #0284c7;
+  --ops-info: #2563eb;
+  --ops-shadow: rgba(15, 23, 42, 0.12);
+  --ops-glow: rgba(2, 132, 199, 0.14);
+}

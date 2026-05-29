@@ -1,0 +1,9 @@
+/* SkyTrax Operational Design System - Radius Tokens */
+:root {
+  --ops-radius-xs: 4px;
+  --ops-radius-sm: 6px;
+  --ops-radius-md: 8px;
+  --ops-radius-lg: 12px;
+  --ops-radius-xl: 16px;
+  --ops-radius-pill: 999px;
+}

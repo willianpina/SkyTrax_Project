@@ -1,0 +1,21 @@
+/* SODS Pattern: Timeline */
+.sods-timeline {
+  border: 1px solid var(--ops-border);
+  border-radius: var(--ops-radius-md);
+  background: color-mix(in srgb, var(--ops-surface) 85%, transparent);
+  overflow: hidden;
+}
+
+.sods-timeline__row {
+  display: grid;
+  grid-template-columns: 14px 56px 1fr auto;
+  gap: var(--ops-space-2);
+  align-items: baseline;
+  padding: 6px var(--ops-space-3);
+  font-size: var(--ops-text-xs);
+  border-bottom: 1px solid color-mix(in srgb, var(--ops-border) 50%, transparent);
+}
+
+.sods-timeline__row:last-child {
+  border-bottom: none;
+}

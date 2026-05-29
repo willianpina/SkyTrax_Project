@@ -1,0 +1,245 @@
+/* Geospatial operational canvas — flat, stable, light-theme harmonized */
+
+.workspace-viewport:has(.geo-ops-canvas) {
+  padding: 0;
+  overflow: hidden;
+}
+
+.geo-ops-canvas {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 48px);
+  min-height: 480px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .geo-ops-canvas {
+  background: #111827;
+}
+
+.geo-ops-deck,
+.geo-ops-deck > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Compact HUD (blur 10px max) ─────────────────────────────── */
+.geo-hud {
+  position: absolute;
+  z-index: 10;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+}
+
+[data-theme="dark"] .geo-hud {
+  background: rgba(17, 24, 39, 0.82);
+  border-color: rgba(148, 163, 184, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.geo-hud--bar {
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
+.geo-hud-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.geo-hud-pill {
+  padding: 3px 8px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.geo-hud-pill:hover {
+  color: #334155;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.geo-hud-pill--on {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="dark"] .geo-hud-pill {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .geo-hud-pill--on {
+  color: #93c5fd;
+  background: rgba(96, 165, 250, 0.12);
+}
+
+.geo-hud-metrics {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.geo-hud-metric-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.geo-hud-metric-k {
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.geo-hud-metric-v {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+[data-theme="dark"] .geo-hud-metric-v {
+  color: #e2e8f0;
+}
+
+.geo-hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.geo-hud-live {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #059669;
+}
+
+.geo-hud-tag {
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  padding: 1px 4px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 2px;
+}
+
+.geo-hud-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.05);
+  color: #475569;
+  cursor: pointer;
+}
+
+.geo-hud-btn:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.geo-hud-btn--icon {
+  padding: 3px 5px;
+}
+
+.geo-hud--replay {
+  bottom: 10px;
+  right: 10px;
+  left: auto;
+  width: auto;
+  min-width: 140px;
+  max-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 6px;
+}
+
+.geo-hud-scrubber {
+  flex: 1;
+  width: 88px;
+  height: 2px;
+  appearance: none;
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+.geo-hud-scrubber::-webkit-slider-thumb {
+  appearance: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2563eb;
+  box-shadow: none;
+}
+
+.geo-tooltip {
+  color: #334155;
+  line-height: 1.4;
+  font-size: 11px;
+}
+
+.geo-tooltip strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.geo-ops-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(241, 245, 249, 0.6);
+  color: #64748b;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-theme="dark"] .geo-ops-loading {
+  background: rgba(17, 24, 39, 0.65);
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .geo-hud--bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .geo-hud-metrics {
+    flex-wrap: wrap;
+  }
+}

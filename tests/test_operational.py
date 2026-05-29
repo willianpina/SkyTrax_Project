@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+from unittest.mock import patch
 
 from analytics.constants import SEMANTIC_CLUSTER_LABELS
 from analytics.semantic_ops import SemanticClusterService
@@ -41,6 +42,9 @@ def test_enhanced_search_threshold_filters_low_scores() -> None:
             return self
 
         def limit(self, n):
+            return self
+
+        def all(self):
             return [_FakeReview("unrelated hotel stay with no aviation context")]
 
     class _FakeSession:
@@ -48,7 +52,8 @@ def test_enhanced_search_threshold_filters_low_scores() -> None:
             return _FakeQuery()
 
     service = EnhancedSemanticSearchService(_FakeSession())
-    results = service.search("refund baggage delay", threshold=0.5, limit=5)
+    with patch.object(service.pipeline, "embed", return_value=None):
+        results = service.search("refund baggage delay", threshold=0.5, limit=5)
     assert results == []
 
 

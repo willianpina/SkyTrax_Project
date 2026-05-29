@@ -1,0 +1,71 @@
+{
+  "title": "Anomalies",
+  "subtitle": "{{count}} active signals monitored",
+  "strip": {
+    "activeSignals": "Active Signals",
+    "activeSignalsSub": "Monitored anomaly events",
+    "critical": "Critical",
+    "criticalSub": "Requiring immediate action",
+    "medium": "Medium",
+    "mediumSub": "Under observation",
+    "lowPriority": "Low Priority",
+    "lowPrioritySub": "Informational signals",
+    "carriers": "Carriers Affected",
+    "carriersSub": "Distinct airlines flagged",
+    "detection": "Detection Coverage",
+    "detectionSub": "Operational confidence"
+  },
+  "filter": {
+    "toolbar": "Severity filters",
+    "all": "All",
+    "critical": "critical",
+    "high": "high",
+    "medium": "medium",
+    "low": "low"
+  },
+  "runtime": {
+    "pageTitle": "Anomaly intelligence",
+    "pageSubtitle": "Operational threat monitoring and detection runtime"
+  },
+  "registry": {
+    "title": "Incident Registry",
+    "runtimeTitle": "Operational incident runtime",
+    "subtitle": "{{anomalies}} anomalies · {{carriers}} carriers",
+    "virtualHint": "Progressive load · scroll for more",
+    "loadingMore": "Scroll to load more incidents…",
+    "empty": "No anomalies detected. Operational baselines stable.",
+    "observed": "Observed",
+    "threshold": "Threshold",
+    "gap": "Gap"
+  },
+  "severity": {
+    "critical": "CRITICAL",
+    "high": "HIGH",
+    "medium": "ELEVATED",
+    "low": "MONITORING"
+  },
+  "assessment": {
+    "title": "Executive Assessment",
+    "subtitle": "Operational posture summary",
+    "runtime": "Strategic posture summary",
+    "criticalEscalation": "{{count}} carrier(s) with critical escalation signals: {{airlines}}",
+    "mediumDetected": "{{count}} medium-priority anomalies detected — emerging deterioration patterns under observation",
+    "lowTracked": "{{count}} informational signals tracked — operational baseline monitoring active",
+    "allStable": "All carriers within operational baselines. No escalation required."
+  },
+  "stream": {
+    "title": "Live Signal Stream",
+    "subtitle": "{{count}} latest detections",
+    "emptyTitle": "Signal Stream",
+    "emptySub": "No active signals",
+    "emptyMsg": "No anomaly signals detected in the current window"
+  },
+  "categories": {
+    "reputation": "Reputation",
+    "sentiment": "Sentiment",
+    "complaints": "Complaints",
+    "service": "Service",
+    "operations": "Operations",
+    "signal": "Signal"
+  }
+}

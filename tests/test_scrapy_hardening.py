@@ -19,7 +19,7 @@ def test_review_parser_requires_complete_quality_fields() -> None:
       <h2 class="text_header">"Great cabin crew"</h2>
       <time datetime="2026-05-19"></time>
       <span itemprop="ratingValue">9</span>
-      <div itemprop="reviewBody">Trip Verified | Excellent cabin crew and efficient boarding experience.</div>
+      <div itemprop="reviewBody">Trip Verified | Excellent cabin crew and efficient boarding experience with attentive service throughout the long-haul flight.</div>
       <table><tr><td>Recommended</td><td>yes</td></tr></table>
     </article>
     """
