@@ -11,7 +11,9 @@
     "gaps": "Lacunas",
     "confidence": "Confiança",
     "discovered": "descobertas",
-    "mapped": "mapeados"
+    "mapped": "mapeados",
+    "hubs": "Hubs classificados",
+    "hubsSub": "{{classified}} de {{total}} aeroportos"
   },
   "matrix": {
     "title": "Matriz de Cobertura de Metadados",
