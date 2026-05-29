@@ -50,31 +50,42 @@ def metadata_session():
             )
         )
     session.flush()
-    yield session
+    yield session, airline
     session.close()
     transaction.rollback()
     connection.close()
     engine.dispose()
 
 
+def _intel_count_for_airline(session, airline_id: str) -> int:
+    return (
+        session.query(ReviewIntelligence)
+        .join(Review, Review.id == ReviewIntelligence.review_id)
+        .filter(Review.airline_id == airline_id)
+        .count()
+    )
+
+
 def test_metadata_extraction_persists_rows(metadata_session):
-    result = run_metadata_extraction(metadata_session, batch_size=10)
+    session, airline = metadata_session
+    result = run_metadata_extraction(session, batch_size=10)
     assert "error" not in result
     assert result["reviews_analyzed"] == 5
-    assert result["metadata_total"] == 5
     assert result["remaining"] == 0
-    count = metadata_session.query(ReviewIntelligence).count()
-    assert count == 5
+    assert _intel_count_for_airline(session, airline.id) == 5
 
 
 def test_metadata_extraction_idempotent(metadata_session):
-    run_metadata_extraction_until_done(metadata_session, batch_size=2, max_batches=20)
-    second = run_metadata_extraction(metadata_session, batch_size=10)
+    session, airline = metadata_session
+    run_metadata_extraction_until_done(session, batch_size=2, max_batches=20)
+    second = run_metadata_extraction(session, batch_size=10)
     assert second["reviews_analyzed"] == 0
-    assert second["metadata_total"] == 5
+    assert _intel_count_for_airline(session, airline.id) == 5
 
 
 def test_metadata_until_done_covers_corpus(metadata_session):
-    result = run_metadata_extraction_until_done(metadata_session, batch_size=2, max_batches=10)
+    session, airline = metadata_session
+    result = run_metadata_extraction_until_done(session, batch_size=2, max_batches=10)
     assert result["reviews_analyzed"] == 5
     assert result["remaining"] == 0
+    assert _intel_count_for_airline(session, airline.id) == 5

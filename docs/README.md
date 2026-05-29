@@ -5,8 +5,13 @@
 | Documento | Descrição |
 |-----------|-----------|
 | [architecture/architecture.md](architecture/architecture.md) | Visão arquitetural e fluxo de dados |
+| [architecture/diagram.md](architecture/diagram.md) | Diagrama Mermaid (Frontend → API → DB → Analytics) |
 | [architecture/project_inventory.md](architecture/project_inventory.md) | Inventário de pastas, módulos e APIs |
 | [architecture/technical_debt.md](architecture/technical_debt.md) | Dívida técnica classificada (ALTO/MÉDIO/BAIXO) |
+| [backend/README.md](backend/README.md) | API, workers, Scrapy, configuração |
+| [frontend/README.md](frontend/README.md) | React workspaces, Vite, stack UI |
+| [testing/README.md](testing/README.md) | Pytest, cobertura, smoke CI |
+| [MATURITY_REPORT.md](MATURITY_REPORT.md) | Relatório de maturidade do projeto |
 | [modules/modules.md](modules/modules.md) | Mapa dos workspaces e endpoints |
 | [deployment/deployment.md](deployment/deployment.md) | Deploy Docker e variáveis |
 | [roadmap/roadmap.md](roadmap/roadmap.md) | Roadmap por versão |

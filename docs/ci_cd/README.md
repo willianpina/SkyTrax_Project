@@ -15,7 +15,7 @@ pip install -r requirements-dev.txt
 ruff check .
 ruff format --check .
 python -c "from api.main import app"
-pytest --cov -q --ignore=tests/test_metadata_extractor.py
+pytest --cov --cov-fail-under=45 -q
 cd frontend && npm ci && npm run build
 ```
 

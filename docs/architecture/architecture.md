@@ -1,5 +1,7 @@
 # Arquitetura — SkyTrax Analytics
 
+> Diagrama interativo (Mermaid): [diagram.md](./diagram.md)
+
 ## Visão de alto nível
 
 ```text

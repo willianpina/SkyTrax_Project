@@ -18,23 +18,24 @@ Estabilizar GitHub Actions para que cada push em `main` execute lint, testes, bu
 | Hardening `tests/conftest.py` env defaults | ✅ |
 | Documentar auditoria | `docs/ci_cd/*` |
 
-## Fase 2 — Após merge (48h)
+## Fase 2 — Em progresso
 
-| # | Ação | Prioridade | Owner |
-|---|------|------------|-------|
-| 1 | Confirmar CI verde no GitHub (lint, test, frontend, docker) | CRÍTICO | — |
-| 2 | Instalar `gh` e arquivar link do run verde no README | BAIXO | — |
-| 3 | Adicionar badge CI no README | BAIXO | — |
+| # | Ação | Status |
+|---|------|--------|
+| 1 | Confirmar CI verde no GitHub (lint, test, frontend, docker) | Pendente push |
+| 2 | YAML `ci.yml` corrigido (URLs entre aspas) | ✅ |
+| 3 | Badge CI no README | Pendente run verde |
 
-## Fase 3 — Qualidade (1–2 semanas)
+## Fase 3 — Qualidade (parcialmente aplicada)
 
-| # | Ação | Prioridade |
-|---|------|------------|
-| 4 | Pre-commit: `ruff check` + `ruff format --check` | ALTO |
-| 5 | Remover `ExecutiveDashboard.jsx` órfão | MÉDIO |
-| 6 | Corrigir `Makefile` serviço `api` → `app` | MÉDIO |
-| 7 | Reabilitar `tests/test_metadata_extractor.py` no CI com fixture pgvector | MÉDIO |
-| 8 | Subir `fail_under` para 40 → 55 → 70 | MÉDIO |
+| # | Ação | Status |
+|---|------|--------|
+| 4 | Pre-commit: `ruff check` + `ruff format --check` | Pendente |
+| 5 | Remover `ExecutiveDashboard.jsx` órfão | Pendente |
+| 6 | Corrigir `Makefile` serviço `api` → `app` | Pendente |
+| 7 | Reabilitar `tests/test_metadata_extractor.py` no CI | ✅ |
+| 8 | `fail_under` 45% ativo; meta 55 → 70 | ✅ fase 1 |
+| 9 | `alembic check` no CI (advisory) | ✅ |
 
 ## Fase 4 — Hardening (1 mês)
 
