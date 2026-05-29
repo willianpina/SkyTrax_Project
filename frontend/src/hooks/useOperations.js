@@ -112,6 +112,14 @@ const IDLE_STATUS = {
   pipeline_type: "full",
 };
 
+const DOMAINS_REFRESH_EVENT = "skytrax:operational-refresh-complete";
+
+function notifyDomainsRefresh() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(DOMAINS_REFRESH_EVENT));
+  }
+}
+
 export function useOperations({ pollingEnabled = true } = {}) {
   const [status, setStatus] = useState(IDLE_STATUS);
   const [history, setHistory] = useState([]);
@@ -211,6 +219,9 @@ export function useOperations({ pollingEnabled = true } = {}) {
         setStatus(checked);
         stopPolling();
         fetchHistory();
+        if (TERMINAL_STAGES.has(checked.stage)) {
+          notifyDomainsRefresh();
+        }
         return;
       }
     }

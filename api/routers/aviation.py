@@ -12,7 +12,7 @@ from aviation.intelligence.service import AviationIntelligenceService
 from aviation.graph.context import AviationGraphContext
 from aviation.validation.engine import AviationValidator
 from analytics.hub_intelligence import HubIntelligenceService
-from database.models.aviation import AirlineMetadata, AirportMetadata, AviationCoverageReport
+from database.models.aviation import AirportMetadata, AviationCoverageReport
 
 router = APIRouter(prefix="/aviation", tags=["aviation"])
 
@@ -42,29 +42,9 @@ def _validator(session: Session = Depends(get_session)) -> AviationValidator:
 @router.get("/airlines")
 def list_airlines(
     limit: int = Query(50, ge=1, le=200),
-    session: Session = Depends(get_session),
+    intel: AviationIntelligenceService = Depends(_intel),
 ):
-    rows = (
-        session.query(AirlineMetadata)
-        .order_by(AirlineMetadata.star_rating.desc().nullslast())
-        .limit(limit)
-        .all()
-    )
-    return [
-        {
-            "slug": r.slug,
-            "name": r.airline_name,
-            "country": r.country,
-            "airline_type": r.airline_type,
-            "star_rating": r.star_rating,
-            "is_premium": r.is_premium,
-            "is_low_cost": r.is_low_cost,
-            "alliance": r.alliance_rel.name if r.alliance_rel else None,
-            "hub_airports": r.hub_airports,
-            "enrichment_confidence": r.enrichment_confidence,
-        }
-        for r in rows
-    ]
+    return intel._operational_airline_rows(limit=limit)
 
 
 @router.get("/airports")
@@ -211,6 +191,14 @@ def coverage_quality(cov: CoverageAuditEngine = Depends(_coverage)):
 @router.get("/bootstrap/status")
 def bootstrap_status():
     return _bootstrap_status
+
+
+@router.post("/propagate")
+def propagate_domains(session: Session = Depends(get_session)):
+    """Sync core airlines into aviation metadata, hubs, alliances (idempotent)."""
+    from aviation.operational_propagation import propagate_operational_domains
+
+    return propagate_operational_domains(session, commit=True)
 
 
 @router.post("/bootstrap/run")

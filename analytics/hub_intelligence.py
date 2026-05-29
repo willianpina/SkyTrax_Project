@@ -214,6 +214,15 @@ class HubIntelligenceService:
             }
 
         active_hubs = [ap for ap in airports if ap.hub_level is not None]
+        if not active_hubs:
+            linked_ids = {
+                row[0]
+                for row in self.session.query(AirlineAirport.airport_metadata_id).distinct().all()
+                if row[0]
+            }
+            active_hubs = [ap for ap in airports if ap.id in linked_ids]
+        if not active_hubs and airports:
+            active_hubs = airports[: min(50, len(airports))]
         mention_index = self._airport_mention_index()
 
         # Critical hubs: top 10% by complaint mention count

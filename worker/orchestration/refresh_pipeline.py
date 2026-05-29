@@ -582,6 +582,7 @@ class OperationalRefreshPipeline:
             self._finalization_started = fin_started
             self._emit_finalization_heartbeat(r, "finalizing", "Refreshing KPI totals from database", 92)
             self._refresh_kpis_from_db()
+            self._propagate_aviation_domains()
             self._reconcile_operational_state(r)
             self._emit_finalization_heartbeat(r, "finalizing", "Writing pipeline lineage report", 95)
             try:
@@ -1418,6 +1419,20 @@ class OperationalRefreshPipeline:
         try:
             sync = AviationMasterSync(session)
             result = sync.run()
+            if not result.get("error"):
+                try:
+                    from aviation.operational_propagation import propagate_operational_domains
+
+                    propagate = propagate_operational_domains(session, commit=True)
+                    result["operational_propagation"] = propagate
+                except Exception as prop_exc:
+                    session.rollback()
+                    logger.warning(
+                        "[OPS][AVIATION_MASTER] operational propagation failed: %s op=%s",
+                        prop_exc,
+                        self.operation_id,
+                    )
+                    result["operational_propagation_error"] = str(prop_exc)[:200]
             record_worker_metric(
                 "skytrax_aviation_master_airlines",
                 float(result.get("airlines_created", 0) + result.get("airlines_updated", 0)),
@@ -1667,6 +1682,25 @@ class OperationalRefreshPipeline:
             record_worker_metric("skytrax_snapshot_failures", 1.0)
             return {"error": str(exc), "created": 0}
 
+    def _propagate_aviation_domains(self) -> dict[str, Any]:
+        """Ensure aviation / hubs / alliances / coverage tables reflect core airline corpus."""
+        from aviation.operational_propagation import propagate_operational_domains
+
+        session = SessionLocal()
+        try:
+            stats = propagate_operational_domains(session, commit=True)
+            self._add_event(
+                f"Aviation domains propagated: {stats.get('airlines_metadata_total', 0)} airlines, "
+                f"{stats.get('hubs_with_level', 0)} hubs"
+            )
+            return stats
+        except Exception as exc:
+            session.rollback()
+            logger.warning("[OPS][AVIATION_PROPAGATE] failed: %s op=%s", exc, self.operation_id)
+            return {"error": str(exc)[:200]}
+        finally:
+            session.close()
+
     def _persist_run(self, elapsed_ms: int) -> None:
         from app.payload_serialization import safe_json_value
         from database.models.operations import OperationalRefreshRun
@@ -1777,6 +1811,7 @@ class AviationSyncPipeline:
             self._run_stage(r, "airport_discovery", 2, self._stage_airport_discovery, layers)
             self._run_stage(r, "aviation_metadata", 3, self._stage_aviation_metadata, layers)
             self._run_stage(r, "hub_intelligence", 4, self._stage_hub_intelligence, layers)
+            self._run_aviation_propagate_final()
             self._reconcile_operational_state(r)
 
             terminal = "completed_degraded" if self.errors else "completed"
@@ -1920,11 +1955,35 @@ class AviationSyncPipeline:
         try:
             sync = AviationMasterSync(session)
             result = sync.run()
+            if not result.get("error"):
+                try:
+                    from aviation.operational_propagation import propagate_operational_domains
+
+                    result["operational_propagation"] = propagate_operational_domains(session, commit=True)
+                except Exception as prop_exc:
+                    session.rollback()
+                    result["operational_propagation_error"] = str(prop_exc)[:200]
             return result
         except Exception as exc:
             session.rollback()
             logger.warning("[OPS][AVIATION_MASTER] Failed: %s op=%s", exc, self.operation_id)
             return {"error": str(exc)}
+        finally:
+            session.close()
+
+    def _run_aviation_propagate_final(self) -> None:
+        from aviation.operational_propagation import propagate_operational_domains
+
+        session = SessionLocal()
+        try:
+            stats = propagate_operational_domains(session, commit=True)
+            self.results["aviation_propagation"] = stats
+            self._add_event(
+                f"Operational domains refreshed: {stats.get('airlines_metadata_total', 0)} airlines"
+            )
+        except Exception as exc:
+            session.rollback()
+            logger.warning("[OPS][AVIATION_PROPAGATE] final pass failed: %s", exc)
         finally:
             session.close()
 
