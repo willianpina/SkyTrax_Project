@@ -19,9 +19,16 @@ export function useCoverage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const results = await Promise.allSettled([
-      fetchJson("/aviation/coverage", {}),
-      fetchJson("/aviation/coverage/quality", {}),
+    const summary = await fetchJson("/aviation/coverage", {});
+    const quality = await fetchJson("/aviation/coverage/quality", {});
+    setData((prev) => ({
+      ...prev,
+      summary: summary || {},
+      quality: quality || {},
+    }));
+    setLoading(false);
+
+    const secondary = await Promise.allSettled([
       fetchJson("/aviation/coverage/missing", { airlines: [], airports: [] }),
       fetchJson("/aviation/coverage/duplicates", { total: 0, details: [] }),
       fetchJson("/aviation/coverage/orphans", { airlines: 0, airports: 0, total: 0 }),
@@ -30,18 +37,16 @@ export function useCoverage() {
       fetchJson("/graph/stats", { total_nodes: 0, total_edges: 0, node_types: {}, edge_types: {} }),
       fetchJson("/fusion/disruptions", { total_analyzed: 0, severity_distribution: {} }),
     ]);
-    setData({
-      summary: results[0].value || {},
-      quality: results[1].value || {},
-      missing: results[2].value || { airlines: [], airports: [] },
-      duplicates: results[3].value || { total: 0, details: [] },
-      orphans: results[4].value || { airlines: 0, airports: 0, total: 0 },
-      validation: results[5].value || { total_issues: 0, issues: [] },
-      normalization: results[6].value || {},
-      graph: results[7].value || EMPTY.graph,
-      disruptions: results[8].value || EMPTY.disruptions,
-    });
-    setLoading(false);
+    setData((prev) => ({
+      ...prev,
+      missing: secondary[0].value || { airlines: [], airports: [] },
+      duplicates: secondary[1].value || { total: 0, details: [] },
+      orphans: secondary[2].value || { airlines: 0, airports: 0, total: 0 },
+      validation: secondary[3].value || { total_issues: 0, issues: [] },
+      normalization: secondary[4].value || {},
+      graph: secondary[5].value || EMPTY.graph,
+      disruptions: secondary[6].value || EMPTY.disruptions,
+    }));
   }, []);
 
   useEffect(() => { load(); }, [load]);
