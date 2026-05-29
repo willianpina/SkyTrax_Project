@@ -42,7 +42,7 @@ class Settings:
     embedding_dimension: int = int(getenv("EMBEDDING_DIMENSION", "384"))
     nlp_enable_embeddings: bool = getenv("NLP_ENABLE_EMBEDDINGS", "false").lower() == "true"
     nlp_embedding_model: str = getenv("NLP_EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-    database_pool_size: int = int(getenv("DATABASE_POOL_SIZE", "5"))
+    database_pool_size: int = int(getenv("DATABASE_POOL_SIZE", "10"))
     database_max_overflow: int = int(getenv("DATABASE_MAX_OVERFLOW", "10"))
     database_pool_timeout: int = int(getenv("DATABASE_POOL_TIMEOUT", "30"))
     scheduler_enabled: bool = getenv("SCHEDULER_ENABLED", "true").lower() == "true"

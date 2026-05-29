@@ -43,7 +43,15 @@ export async function fetchJson(path, fallback, { signal } = {}) {
       console.warn("api_request_failed", path, response.status);
       return fallback;
     }
-    return await response.json();
+    if (response.status === 204) {
+      console.warn("api_empty_response", path, response.status);
+      return fallback;
+    }
+    const text = await response.text();
+    if (!text || !text.trim()) {
+      return fallback;
+    }
+    return JSON.parse(text);
   } catch (error) {
     if (error?.name === "AbortError") {
       return fallback;

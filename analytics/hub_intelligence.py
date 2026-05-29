@@ -13,8 +13,11 @@ Provides:
 from __future__ import annotations
 
 import logging
+import os
 import re
+import time
 from collections import Counter, defaultdict
+from threading import Lock
 from typing import Any, Dict, List, Optional, Tuple
 
 from sqlalchemy import func, desc
@@ -29,6 +32,11 @@ from database.models.aviation import (
 )
 
 logger = logging.getLogger(__name__)
+
+_MENTION_CACHE_LOCK = Lock()
+_MENTION_CACHE: dict[str, Any] = {"built_at": 0.0, "review_count": -1, "index": {}}
+_MENTION_CACHE_TTL_S = int(os.getenv("HUB_MENTION_CACHE_TTL", "300"))
+_MENTION_REVIEW_LIMIT = int(os.getenv("HUB_MENTION_REVIEW_LIMIT", "12000"))
 
 COMPLAINT_CATEGORIES = {
     "baggage": {"baggage", "luggage", "lost bag", "suitcase", "missing bag", "damaged bag"},
@@ -116,10 +124,23 @@ class HubIntelligenceService:
 
         Scans review text, title, and route fields.  Uses compiled regex with
         word boundaries for IATA codes to avoid false positives.  Result is
-        cached on the instance so multiple methods can reuse it.
+        cached on the instance and shared across requests (TTL) to avoid pool
+        exhaustion when the UI fires parallel hub-intelligence calls.
         """
         if self._mention_cache is not None:
             return self._mention_cache
+
+        review_count = self.session.query(func.count(Review.id)).scalar() or 0
+        now = time.time()
+        with _MENTION_CACHE_LOCK:
+            cache_fresh = (
+                _MENTION_CACHE.get("review_count") == review_count
+                and (now - float(_MENTION_CACHE.get("built_at", 0))) < _MENTION_CACHE_TTL_S
+                and _MENTION_CACHE.get("index") is not None
+            )
+            if cache_fresh:
+                self._mention_cache = _MENTION_CACHE["index"]
+                return self._mention_cache
 
         airports = self._load_airports()
         if not airports:
@@ -144,9 +165,12 @@ class HubIntelligenceService:
 
         iata_regex = re.compile(r"\b([A-Z]{3})\b")
 
-        reviews = self.session.query(
+        reviews_q = self.session.query(
             Review.id, Review.title, Review.text, Review.rating, Review.route, Review.review_date
-        ).all()
+        ).order_by(Review.review_date.desc().nullslast())
+        if _MENTION_REVIEW_LIMIT > 0:
+            reviews_q = reviews_q.limit(_MENTION_REVIEW_LIMIT)
+        reviews = reviews_q.all()
 
         index: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
 
@@ -179,7 +203,12 @@ class HubIntelligenceService:
             for code in matched_codes:
                 index[code].append(review_dict)
 
-        self._mention_cache = dict(index)
+        built = dict(index)
+        self._mention_cache = built
+        with _MENTION_CACHE_LOCK:
+            _MENTION_CACHE["built_at"] = now
+            _MENTION_CACHE["review_count"] = review_count
+            _MENTION_CACHE["index"] = built
         return self._mention_cache
 
     def _detect_complaints(self, text: str) -> List[str]:
@@ -238,9 +267,9 @@ class HubIntelligenceService:
         critical_threshold = complaint_counts[top_10_pct - 1][1] if complaint_counts else 0
         critical_hubs = sum(1 for _, c in complaint_counts if c >= critical_threshold and c > 0)
 
-        # High risk airports: avg rating < 5 when mentioned
+        # High risk airports: avg rating < 5 when mentioned (scope: active hubs only)
         high_risk = 0
-        for ap in airports:
+        for ap in active_hubs:
             code = (ap.iata or "").upper()
             mentions = mention_index.get(code, [])
             if mentions:

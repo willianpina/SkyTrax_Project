@@ -12,6 +12,15 @@ const EMPTY = {
   hubConcentration: [],
 };
 
+const HUB_INTEL_LOADERS = [
+  ["hubDashboard", "/aviation/hub-intelligence/dashboard", {}],
+  ["hubRankings", "/aviation/hub-intelligence/rankings", []],
+  ["hubRisk", "/aviation/hub-intelligence/risk", []],
+  ["hubAlliances", "/aviation/hub-intelligence/alliances", []],
+  ["hubIncidents", "/aviation/hub-intelligence/incidents", []],
+  ["hubConcentration", "/aviation/hub-intelligence/concentration", []],
+];
+
 export function useAviation() {
   const [data, setData] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
@@ -26,14 +35,9 @@ export function useAviation() {
       fetchJson("/aviation/regions", []),
       fetchJson("/aviation/premium", []),
       fetchJson("/aviation/metadata", {}),
-      fetchJson("/aviation/hub-intelligence/dashboard", {}),
-      fetchJson("/aviation/hub-intelligence/rankings", []),
-      fetchJson("/aviation/hub-intelligence/risk", []),
-      fetchJson("/aviation/hub-intelligence/alliances", []),
-      fetchJson("/aviation/hub-intelligence/incidents", []),
-      fetchJson("/aviation/hub-intelligence/concentration", []),
     ]);
-    setData({
+    setData((prev) => ({
+      ...prev,
       airlines: results[0].value || [],
       airports: results[1].value || [],
       alliances: results[2].value || [],
@@ -41,14 +45,14 @@ export function useAviation() {
       regions: results[4].value || [],
       premium: results[5].value || [],
       metadata: results[6].value || {},
-      hubDashboard: results[7].value || {},
-      hubRankings: results[8].value || [],
-      hubRisk: results[9].value || [],
-      hubAlliances: results[10].value || [],
-      hubIncidents: results[11].value || [],
-      hubConcentration: results[12].value || [],
-    });
+    }));
     setLoading(false);
+
+    // Hub intelligence is expensive (review mention scan); load sequentially to avoid DB pool exhaustion.
+    for (const [key, path, fallback] of HUB_INTEL_LOADERS) {
+      const value = await fetchJson(path, fallback);
+      setData((prev) => ({ ...prev, [key]: value }));
+    }
   }, []);
 
   useEffect(() => { load(); }, [load]);
