@@ -155,7 +155,9 @@ class AviationIntelligenceService:
         for code, members in grouped.items():
             member_slugs = [m.slug for m in members]
             airlines = (
-                self.session.query(Airline).filter(Airline.slug.in_(member_slugs)).all() if member_slugs else []
+                self.session.query(Airline).filter(Airline.slug.in_(member_slugs)).all()
+                if member_slugs
+                else []
             )
             airline_ids = [a.id for a in airlines]
             review_count = 0

@@ -49,9 +49,16 @@ jobs:
         run: ruff format --check .
 
       - name: Import smoke (FastAPI app)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+          DATABASE_URL: sqlite:///:memory:
+          NLP_ENABLE_EMBEDDINGS: "false"
+          SCHEMA_VALIDATE_ON_STARTUP: "false"
         run: python -c "from main import app; assert app.title"
 
       - name: Scrapy registration smoke
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: scrapy list | grep -q airlinequality_reviews
 
   frontend:
@@ -72,8 +79,10 @@ jobs:
 
       - name: Install and build
         working-directory: frontend
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: |
-          npm ci --no-audit
+          npm ci --no-audit --no-fund
           npm run build
 
   test:
