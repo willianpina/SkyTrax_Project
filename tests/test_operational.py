@@ -55,7 +55,7 @@ def test_enhanced_search_threshold_filters_low_scores() -> None:
 def test_openapi_operational_routes() -> None:
     from fastapi.testclient import TestClient
 
-    from api.main import app
+    from tests.conftest import app
 
     client = TestClient(app)
     paths = client.get("/openapi.json").json()["paths"]

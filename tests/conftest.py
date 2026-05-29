@@ -3,13 +3,34 @@
 from __future__ import annotations
 
 import os
+import sys
+from pathlib import Path
 
-# Defaults for collection/import before CI or local env is fully configured.
+# Pytest prepends tests/ to sys.path; force repo root before any skytrax imports.
+_ROOT = Path(__file__).resolve().parents[1]
+_root_str = str(_ROOT)
+if _root_str not in sys.path:
+    sys.path.insert(0, _root_str)
+
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("NLP_ENABLE_EMBEDDINGS", "false")
 os.environ.setdefault("SCHEMA_VALIDATE_ON_STARTUP", "false")
 os.environ.setdefault("API_TRUSTED_HOSTS", "testserver,localhost,127.0.0.1")
+
+
+def _load_fastapi_app():
+    """Load api/main.py without relying on top-level `api` package resolution."""
+    import importlib.util
+
+    main_path = _ROOT / "api" / "main.py"
+    spec = importlib.util.spec_from_file_location("skytrax_api_main", main_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load FastAPI app from {main_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.app
+
 
 from datetime import datetime, timezone
 from unittest.mock import MagicMock
@@ -17,11 +38,8 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 
-from api.main import app
+app = _load_fastapi_app()
 from database.session import get_session
-
-
-# ── Database session ────────────────────────────────────────────────
 
 
 @pytest.fixture()
@@ -31,9 +49,6 @@ def fake_session():
     session.query.return_value = session
     session.execute.return_value = MagicMock()
     return session
-
-
-# ── FastAPI TestClient ──────────────────────────────────────────────
 
 
 @pytest.fixture()
@@ -47,9 +62,6 @@ def test_client(fake_session):
     with TestClient(app) as client:
         yield client
     app.dependency_overrides.clear()
-
-
-# ── Sample data factories ──────────────────────────────────────────
 
 
 @pytest.fixture()

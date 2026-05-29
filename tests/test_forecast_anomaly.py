@@ -29,7 +29,7 @@ def test_anomaly_z_score_spike_detection() -> None:
 def test_openapi_forecast_anomaly_routes() -> None:
     from fastapi.testclient import TestClient
 
-    from api.main import app
+    from tests.conftest import app
 
     client = TestClient(app)
     paths = client.get("/openapi.json").json()["paths"]
@@ -45,7 +45,7 @@ def test_openapi_forecast_anomaly_routes() -> None:
 def test_forecasting_refresh_not_captured_by_slug_route() -> None:
     from fastapi.testclient import TestClient
 
-    from api.main import app
+    from tests.conftest import app
 
     client = TestClient(app)
     response = client.post("/api/forecasting/refresh")

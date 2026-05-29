@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from api.main import app
+from tests.conftest import app
 
 
 def test_root_and_health_contracts() -> None:
