@@ -15,7 +15,6 @@ from sqlalchemy.orm import sessionmaker
 from analytics.metadata_extractor import run_metadata_extraction, run_metadata_extraction_until_done
 from database.models.core import Airline, Review
 from database.models.graph import ReviewIntelligence
-from database.session import Base
 
 
 @pytest.fixture
@@ -24,13 +23,15 @@ def metadata_session():
     if db_url.startswith("sqlite"):
         pytest.skip("metadata extractor integration requires PostgreSQL (pgvector types)")
     engine = create_engine(db_url, future=True)
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+    connection = engine.connect()
+    transaction = connection.begin()
+    Session = sessionmaker(bind=connection, autoflush=False, autocommit=False, future=True)
     session = Session()
+    suffix = uuid.uuid4().hex[:8]
     airline = Airline(
         id=str(uuid.uuid4()),
-        slug="test-air",
-        name="Test Air",
+        slug=f"test-air-{suffix}",
+        name=f"Test Air {suffix}",
         source="test",
     )
     session.add(airline)
@@ -41,16 +42,19 @@ def metadata_session():
                 id=str(uuid.uuid4()),
                 airline_id=airline.id,
                 source="test",
-                external_id=f"ext-{i}",
-                fingerprint=f"fp-{i}",
+                external_id=f"ext-{suffix}-{i}",
+                fingerprint=f"fp-{suffix}-{i}",
                 title=f"Delay on flight {i}",
                 text="Terrible delay and lost baggage at JFK to LHR on Boeing 787.",
                 rating=2,
             )
         )
-    session.commit()
+    session.flush()
     yield session
     session.close()
+    transaction.rollback()
+    connection.close()
+    engine.dispose()
 
 
 def test_metadata_extraction_persists_rows(metadata_session):
