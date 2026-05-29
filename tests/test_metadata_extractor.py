@@ -5,8 +5,6 @@ from __future__ import annotations
 import os
 import uuid
 
-os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
-
 import pytest
 
 pgvector = pytest.importorskip("pgvector")
@@ -22,7 +20,10 @@ from database.session import Base
 
 @pytest.fixture
 def metadata_session():
-    engine = create_engine("sqlite:///:memory:", future=True)
+    db_url = os.environ.get("DATABASE_URL", "sqlite:///:memory:")
+    if db_url.startswith("sqlite"):
+        pytest.skip("metadata extractor integration requires PostgreSQL (pgvector types)")
+    engine = create_engine(db_url, future=True)
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
     session = Session()

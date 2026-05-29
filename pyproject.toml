@@ -18,6 +18,6 @@ source = ["api", "app", "analytics", "database", "nlp", "pipelines", "scraper", 
 omit = ["*/migrations/*", "tests/*"]
 
 [tool.coverage.report]
-# CI enforces coverage gradually; local gate kept permissive until suite stabilizes.
-fail_under = 0
+# CI enforces coverage gradually: 45 → 55 → 70 (see docs/testing/coverage.md).
+fail_under = 45
 show_missing = true

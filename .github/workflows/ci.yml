@@ -133,13 +133,15 @@ jobs:
       - name: Validate migrations
         run: alembic upgrade head
 
+      - name: Alembic drift check (advisory)
+        continue-on-error: true
+        run: alembic check
+
       - name: Pytest collection smoke
         run: pytest --collect-only -q
 
       - name: Run pytest
-        run: |
-          pytest --cov --cov-report=term-missing -q \
-            --ignore=tests/test_metadata_extractor.py
+        run: pytest --cov --cov-report=term-missing --cov-fail-under=45 -q
 
   docker:
     name: Docker compose
