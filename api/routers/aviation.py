@@ -12,6 +12,7 @@ from aviation.intelligence.service import AviationIntelligenceService
 from aviation.graph.context import AviationGraphContext
 from aviation.validation.engine import AviationValidator
 from analytics.hub_intelligence import HubIntelligenceService
+from aviation.domain_audit import log_domain
 from database.models.aviation import AirportMetadata, AviationCoverageReport
 
 router = APIRouter(prefix="/aviation", tags=["aviation"])
@@ -39,19 +40,7 @@ def _validator(session: Session = Depends(get_session)) -> AviationValidator:
     return AviationValidator(session)
 
 
-@router.get("/airlines")
-def list_airlines(
-    limit: int = Query(50, ge=1, le=200),
-    intel: AviationIntelligenceService = Depends(_intel),
-):
-    return intel._operational_airline_rows(limit=limit)
-
-
-@router.get("/airports")
-def list_airports(
-    limit: int = Query(50, ge=1, le=200),
-    session: Session = Depends(get_session),
-):
+def _airport_rows(session: Session, limit: int) -> list[dict]:
     rows = (
         session.query(AirportMetadata)
         .order_by(AirportMetadata.airport_rating.desc().nullslast())
@@ -74,14 +63,74 @@ def list_airports(
     ]
 
 
+@router.get("/catalog")
+def aviation_catalog(
+    airline_limit: int = Query(100, ge=1, le=200),
+    airport_limit: int = Query(200, ge=1, le=500),
+    session: Session = Depends(get_session),
+    intel: AviationIntelligenceService = Depends(_intel),
+):
+    """Single round-trip bundle for Aviation workspace (avoids DB pool exhaustion)."""
+    meta = intel.metadata_summary()
+    airlines = intel._operational_airline_rows(limit=airline_limit)
+    airports = _airport_rows(session, airport_limit)
+    alliances = intel.alliance_intelligence()
+    hubs = intel.hub_intelligence()
+
+    log_domain(
+        "AVIATION",
+        endpoint="/aviation/catalog",
+        records_loaded=meta.get("airlines_total", 0) + meta.get("airports_total", 0),
+        records_returned=len(airlines) + len(airports) + len(alliances) + len(hubs),
+        extra={
+            "airlines": len(airlines),
+            "airports": len(airports),
+            "alliances": len(alliances),
+            "hubs": len(hubs),
+            **{k: meta.get(k) for k in ("airlines_total", "airports_total", "alliances_total", "hubs_total")},
+        },
+    )
+    return {
+        "metadata": meta,
+        "airlines": airlines,
+        "airports": airports,
+        "alliances": alliances,
+        "hubs": hubs,
+    }
+
+
+@router.get("/airlines")
+def list_airlines(
+    limit: int = Query(50, ge=1, le=200),
+    intel: AviationIntelligenceService = Depends(_intel),
+):
+    rows = intel._operational_airline_rows(limit=limit)
+    log_domain("AVIATION", endpoint="/aviation/airlines", records_returned=len(rows))
+    return rows
+
+
+@router.get("/airports")
+def list_airports(
+    limit: int = Query(50, ge=1, le=200),
+    session: Session = Depends(get_session),
+):
+    rows = _airport_rows(session, limit)
+    log_domain("AVIATION", endpoint="/aviation/airports", records_returned=len(rows))
+    return rows
+
+
 @router.get("/alliances")
 def list_alliances(intel: AviationIntelligenceService = Depends(_intel)):
-    return intel.alliance_intelligence()
+    rows = intel.alliance_intelligence()
+    log_domain("ALLIANCES", endpoint="/aviation/alliances", records_returned=len(rows))
+    return rows
 
 
 @router.get("/hubs")
 def list_hubs(intel: AviationIntelligenceService = Depends(_intel)):
-    return intel.hub_intelligence()
+    rows = intel.hub_intelligence()
+    log_domain("HUBS", endpoint="/aviation/hubs", records_returned=len(rows))
+    return rows
 
 
 @router.get("/regions")
@@ -96,7 +145,14 @@ def list_premium(intel: AviationIntelligenceService = Depends(_intel)):
 
 @router.get("/metadata")
 def metadata_summary(intel: AviationIntelligenceService = Depends(_intel)):
-    return intel.metadata_summary()
+    meta = intel.metadata_summary()
+    log_domain(
+        "AVIATION",
+        endpoint="/aviation/metadata",
+        records_returned=meta.get("airlines_total", 0),
+        extra=meta,
+    )
+    return meta
 
 
 @router.get("/airline/{slug}")
@@ -130,7 +186,19 @@ def graph_context(
 
 @router.get("/coverage")
 def coverage_summary(cov: CoverageAuditEngine = Depends(_coverage)):
-    return cov.generate_report()
+    report = cov.generate_report()
+    log_domain(
+        "COVERAGE",
+        endpoint="/aviation/coverage",
+        records_loaded=report.get("total_airlines", 0) + report.get("total_airports", 0),
+        records_returned=report.get("total_airlines", 0),
+        extra={
+            "total_airports": report.get("total_airports"),
+            "total_alliances": report.get("total_alliances"),
+            "coverage_score": report.get("coverage_score"),
+        },
+    )
+    return report
 
 
 @router.get("/coverage/report")
@@ -243,7 +311,14 @@ def normalization_report(validator: AviationValidator = Depends(_validator)):
 
 @router.get("/hub-intelligence/dashboard")
 def hub_intel_dashboard(svc: HubIntelligenceService = Depends(_hub_intel)):
-    return svc.hub_dashboard()
+    payload = svc.hub_dashboard()
+    log_domain(
+        "HUBS",
+        endpoint="/aviation/hub-intelligence/dashboard",
+        records_returned=payload.get("active_hubs", 0),
+        extra={"airports_monitored": payload.get("airports_monitored")},
+    )
+    return payload
 
 
 @router.get("/hub-intelligence/rankings")

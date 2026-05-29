@@ -1,4 +1,4 @@
-export const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+export const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
 export const FALLBACK_ANALYTICS = {
   average_rating: 7.8,

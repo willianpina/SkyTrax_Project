@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { fetchJson } from "../lib/apiClient";
+import { logDomain } from "../lib/domainAuditLog";
 
 const EMPTY = {
   summary: {},
@@ -21,6 +22,18 @@ export function useCoverage() {
     setLoading(true);
     const summary = await fetchJson("/aviation/coverage", {});
     const quality = await fetchJson("/aviation/coverage/quality", {});
+
+    logDomain("COVERAGE", {
+      endpoint: "/aviation/coverage",
+      recordsReturned: summary?.total_airlines ?? 0,
+      recordsRendered: summary?.total_airlines ?? 0,
+      extra: {
+        total_airports: summary?.total_airports,
+        total_alliances: summary?.total_alliances,
+        coverage_score: summary?.coverage_score ?? quality?.coverage_score,
+      },
+    });
+
     setData((prev) => ({
       ...prev,
       summary: summary || {},

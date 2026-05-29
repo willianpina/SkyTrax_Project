@@ -1,7 +1,8 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plane } from "lucide-react";
 import { OperationalModuleCard } from "../../components/forecasting/OperationalModuleCard";
+import { logDomain } from "../../lib/domainAuditLog";
 import { ALLIANCE_COLORS, formatAirlineType } from "./aviationShared";
 
 function TypeBadge({ typeInfo }) {
@@ -20,6 +21,15 @@ function AviationRegistryInner({ airlines = [], loading }) {
   const [limit, setLimit] = useState(40);
   const displayed = airlines.slice(0, limit);
   const isEmpty = !loading && airlines.length === 0;
+
+  useEffect(() => {
+    if (!loading) {
+      logDomain("AVIATION", {
+        endpoint: "AviationRegistry",
+        recordsRendered: airlines.length,
+      });
+    }
+  }, [loading, airlines.length]);
 
   return (
     <OperationalModuleCard

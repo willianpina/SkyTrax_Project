@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { fetchJson } from "../lib/apiClient";
+import { logDomain } from "../lib/domainAuditLog";
 
 const EMPTY = {
   alliances: [],
@@ -13,17 +14,29 @@ export function useAllianceIntel() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const results = await Promise.allSettled([
-      fetchJson("/aviation/alliances", []),
+    const alliances = await fetchJson("/aviation/alliances", []);
+    logDomain("ALLIANCES", {
+      endpoint: "/aviation/alliances",
+      recordsReturned: alliances.length,
+      recordsRendered: alliances.length,
+    });
+    setData((prev) => ({ ...prev, alliances: alliances || [] }));
+    setLoading(false);
+
+    const secondary = await Promise.allSettled([
       fetchJson("/fusion/signals?limit=50", []),
       fetchJson("/aviation/hub-intelligence/alliances", []),
     ]);
-    setData({
-      alliances: results[0].value || [],
-      fusionSignals: results[1].value || [],
-      hubAlliances: results[2].value || [],
+    const hubAlliances = secondary[1].value || [];
+    logDomain("ALLIANCES", {
+      endpoint: "/aviation/hub-intelligence/alliances",
+      recordsReturned: hubAlliances.length,
     });
-    setLoading(false);
+    setData((prev) => ({
+      ...prev,
+      fusionSignals: secondary[0].value || [],
+      hubAlliances,
+    }));
   }, []);
 
   useEffect(() => { load(); }, [load]);
