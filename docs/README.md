@@ -7,6 +7,8 @@
 | [architecture/architecture.md](architecture/architecture.md) | Visão arquitetural e fluxo de dados |
 | [architecture/diagram.md](architecture/diagram.md) | Diagrama Mermaid (Frontend → API → DB → Analytics) |
 | [architecture/project_inventory.md](architecture/project_inventory.md) | Inventário de pastas, módulos e APIs |
+| [architecture/PROJECT_STRUCTURE.md](architecture/PROJECT_STRUCTURE.md) | Auditoria da árvore do projeto (órfãos, duplicatas) |
+| [architecture/TARGET_STRUCTURE.md](architecture/TARGET_STRUCTURE.md) | Estrutura alvo proposta (sem mover arquivos) |
 | [architecture/technical_debt.md](architecture/technical_debt.md) | Dívida técnica classificada (ALTO/MÉDIO/BAIXO) |
 | [backend/README.md](backend/README.md) | API, workers, Scrapy, configuração |
 | [frontend/README.md](frontend/README.md) | React workspaces, Vite, stack UI |
@@ -23,6 +25,8 @@
 | [production.md](production.md) | Hardening de produção |
 | [screenshots/](screenshots/) | Capturas para o README |
 | [ci_cd/](ci_cd/) | Auditoria e remediação do GitHub Actions |
+| [release/PROJECT_HEALTH_REPORT.md](release/PROJECT_HEALTH_REPORT.md) | Saúde do projeto (CI, testes, Docker, débito) |
+| [audits/](audits/) | Auditorias de domínio (Aviation, API, data flow) |
 
 ## Arquivos legados
 
