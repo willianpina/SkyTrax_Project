@@ -12,7 +12,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
 
-**Turn passenger reviews and aviation master data into operational intelligence.**
+**Plataforma de Inteligência Analítica para o setor de aviação** — baseada em dados operacionais, reputacionais e experiência do passageiro.
+
+*Global Aviation Intelligence Platform*
 
 [Quick Start](#quick-start) · [Architecture](#architecture) · [Features](#features) · [API](#main-api-endpoints) · [Roadmap](#roadmap)
 
@@ -20,28 +22,41 @@
 
 ---
 
-## Executive summary
+## Visão geral
 
-**SkyTrax Analytics** is an open-source airline intelligence platform that ingests passenger reviews, enriches them with aviation metadata, and delivers executive dashboards for reputation, forecasting, semantic analysis, and global network operations.
+**SkyTrax Analytics** integra múltiplas fontes aeronáuticas e sinais de reputação em um único centro de comando analítico, com coleta automatizada, enriquecimento de metadados e workspaces operacionais em tempo real.
 
-Built for portfolio-grade demonstration and production-ready deployment via Docker Compose, the stack combines a **FastAPI** backend, **React** workspaces, **PostgreSQL + pgvector**, and **RQ workers** orchestrating Scrapy crawls and NLP pipelines.
+### O sistema integra
+
+- **Reviews da AirlineQuality** — corpus unificado de avaliações de passageiros
+- **Metadados globais de companhias aéreas** — registro operacional e enriquecimento (`airline_metadata`)
+- **Metadados aeroportuários** — cobertura global de aeroportos (`airport_metadata`)
+- **Alianças aéreas** — Star Alliance, SkyTeam, Oneworld e vínculos de rede
+- **Hubs operacionais** — classificação, rankings, risco e concentração
+- **Análise semântica** — tópicos, entidades e busca vetorial (pgvector)
+- **Benchmarking competitivo** — comparação entre pares e heatmaps
+- **Investigação operacional** — correlação multi-sinal e feed de incidentes
+- **Geoespacial** — mapa operacional com camadas MapLibre / Deck.gl
+
+Stack: **FastAPI** · **React** · **PostgreSQL + pgvector** · **Redis/RQ** · **Scrapy**
 
 ---
 
 ## Features
 
-| Capability | Description |
-|------------|-------------|
-| **Executive Intelligence** | KPI strip, insights feed, operational timeline |
-| **Reputation Monitoring** | Airline Reputation Score (ARS), drill-down tables |
-| **Semantic Intelligence** | Topic clusters, entity extraction, vector search |
-| **Benchmarking** | Peer comparison, heatmaps, radar analytics |
-| **Aviation Domain Intelligence** | Airline & airport registry, metadata catalog |
-| **Hub Intelligence** | Rankings, risk matrix, concentration, incidents |
-| **Alliance Intelligence** | Panorama, comparison, hub network analytics |
-| **Investigations** | Multi-signal correlation workspace |
+| Módulo | Capacidade |
+|--------|------------|
+| **Executive Intelligence** | KPIs, insights e timeline operacional |
+| **Reputation Monitoring** | Airline Reputation Score (ARS) e drill-down |
+| **Semantic Intelligence** | Clusters, entidades, busca vetorial |
+| **Benchmarking** | Comparação competitiva e heatmaps |
+| **Aviation Domain** | Registro de airlines, airports e catálogo |
+| **Hub Intelligence** | Rankings, matriz de risco, concentração |
+| **Alliance Intelligence** | Panorama, comparativo e rede de hubs |
+| **Investigations** | Correlação multi-sinal |
+| **Geospatial** | Mapa operacional global |
 
-Additional modules: **Forecasting**, **Anomaly Detection**, **Coverage Audit**, **Geospatial Map**.
+Módulos adicionais: **Forecasting**, **Anomaly Detection**, **Coverage Audit**.
 
 ---
 
