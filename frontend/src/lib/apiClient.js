@@ -1,3 +1,5 @@
+import { logDomain } from "./domainAuditLog";
+
 export const API_BASE = import.meta.env.VITE_API_BASE || "/api";
 
 export const FALLBACK_ANALYTICS = {
@@ -36,27 +38,43 @@ export const EMPTY_BENCHMARKING = {
 /**
  * JSON fetch with optional AbortSignal (polling governance).
  */
-export async function fetchJson(path, fallback, { signal } = {}) {
+export async function fetchJson(path, fallback, { signal, domain } = {}) {
+  const started = performance.now();
   try {
     const response = await fetch(`${API_BASE}${path}`, { signal });
+    const elapsed = Math.round(performance.now() - started);
     if (!response.ok) {
-      console.warn("api_request_failed", path, response.status);
+      console.warn(`[${domain || "API"}] api_request_failed`, { path, status: response.status, query_time_ms: elapsed });
       return fallback;
     }
     if (response.status === 204) {
-      console.warn("api_empty_response", path, response.status);
+      console.warn(`[${domain || "API"}] api_empty_response`, { path, status: 204, query_time_ms: elapsed, records_returned: 0 });
       return fallback;
     }
     const text = await response.text();
     if (!text || !text.trim()) {
+      console.warn(`[${domain || "API"}] api_empty_body`, { path, query_time_ms: elapsed, records_returned: 0 });
       return fallback;
     }
-    return JSON.parse(text);
+    const data = JSON.parse(text);
+    const count = Array.isArray(data)
+      ? data.length
+      : typeof data === "object" && data !== null
+        ? Object.values(data).reduce((n, v) => n + (Array.isArray(v) ? v.length : 0), 0)
+        : 0;
+    if (domain) {
+      logDomain(domain, {
+        endpoint: path,
+        recordsReturned: count,
+        extra: { query_time_ms: elapsed, response_size: text.length },
+      });
+    }
+    return data;
   } catch (error) {
     if (error?.name === "AbortError") {
       return fallback;
     }
-    console.warn("api_request_error", path, error);
+    console.warn(`[${domain || "API"}] api_request_error`, path, error);
     return fallback;
   }
 }

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import time
+from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.orm import Session
@@ -18,6 +21,34 @@ from database.models.aviation import AirportMetadata, AviationCoverageReport
 router = APIRouter(prefix="/aviation", tags=["aviation"])
 
 _bootstrap_status = {"running": False, "last_result": None}
+
+
+def _record_count(payload: Any) -> int:
+    if isinstance(payload, list):
+        return len(payload)
+    if isinstance(payload, dict):
+        if "airlines" in payload:
+            return sum(
+                len(payload[k]) if isinstance(payload.get(k), list) else 0
+                for k in ("airlines", "airports", "alliances", "hubs")
+            )
+        for key in ("active_hubs", "total_airlines", "airports_monitored", "total_airports"):
+            if key in payload and isinstance(payload[key], int):
+                return int(payload[key])
+        return len(payload)
+    return 0
+
+
+def _audit_response(domain: str, endpoint: str, payload: Any, started: float) -> Any:
+    body = json.dumps(payload, default=str)
+    log_domain(
+        domain,
+        endpoint=endpoint,
+        records_returned=_record_count(payload),
+        query_time_ms=round((time.perf_counter() - started) * 1000, 1),
+        response_size=len(body.encode("utf-8")),
+    )
+    return payload
 
 
 def _intel(session: Session = Depends(get_session)) -> AviationIntelligenceService:
@@ -71,17 +102,27 @@ def aviation_catalog(
     intel: AviationIntelligenceService = Depends(_intel),
 ):
     """Single round-trip bundle for Aviation workspace (avoids DB pool exhaustion)."""
+    started = time.perf_counter()
     meta = intel.metadata_summary()
     airlines = intel._operational_airline_rows(limit=airline_limit)
     airports = _airport_rows(session, airport_limit)
     alliances = intel.alliance_intelligence()
     hubs = intel.hub_intelligence()
 
+    payload = {
+        "metadata": meta,
+        "airlines": airlines,
+        "airports": airports,
+        "alliances": alliances,
+        "hubs": hubs,
+    }
     log_domain(
         "AVIATION",
         endpoint="/aviation/catalog",
-        records_loaded=meta.get("airlines_total", 0) + meta.get("airports_total", 0),
+        records_found=meta.get("airlines_total", 0) + meta.get("airports_total", 0),
         records_returned=len(airlines) + len(airports) + len(alliances) + len(hubs),
+        query_time_ms=round((time.perf_counter() - started) * 1000, 1),
+        response_size=len(json.dumps(payload, default=str).encode("utf-8")),
         extra={
             "airlines": len(airlines),
             "airports": len(airports),
@@ -90,13 +131,7 @@ def aviation_catalog(
             **{k: meta.get(k) for k in ("airlines_total", "airports_total", "alliances_total", "hubs_total")},
         },
     )
-    return {
-        "metadata": meta,
-        "airlines": airlines,
-        "airports": airports,
-        "alliances": alliances,
-        "hubs": hubs,
-    }
+    return payload
 
 
 @router.get("/airlines")
@@ -121,16 +156,16 @@ def list_airports(
 
 @router.get("/alliances")
 def list_alliances(intel: AviationIntelligenceService = Depends(_intel)):
+    started = time.perf_counter()
     rows = intel.alliance_intelligence()
-    log_domain("ALLIANCES", endpoint="/aviation/alliances", records_returned=len(rows))
-    return rows
+    return _audit_response("ALLIANCES", "/aviation/alliances", rows, started)
 
 
 @router.get("/hubs")
 def list_hubs(intel: AviationIntelligenceService = Depends(_intel)):
+    started = time.perf_counter()
     rows = intel.hub_intelligence()
-    log_domain("HUBS", endpoint="/aviation/hubs", records_returned=len(rows))
-    return rows
+    return _audit_response("HUBS", "/aviation/hubs", rows, started)
 
 
 @router.get("/regions")
@@ -186,19 +221,9 @@ def graph_context(
 
 @router.get("/coverage")
 def coverage_summary(cov: CoverageAuditEngine = Depends(_coverage)):
+    started = time.perf_counter()
     report = cov.generate_report()
-    log_domain(
-        "COVERAGE",
-        endpoint="/aviation/coverage",
-        records_loaded=report.get("total_airlines", 0) + report.get("total_airports", 0),
-        records_returned=report.get("total_airlines", 0),
-        extra={
-            "total_airports": report.get("total_airports"),
-            "total_alliances": report.get("total_alliances"),
-            "coverage_score": report.get("coverage_score"),
-        },
-    )
-    return report
+    return _audit_response("COVERAGE", "/aviation/coverage", report, started)
 
 
 @router.get("/coverage/report")
@@ -343,36 +368,36 @@ def hubs_enrich(session: Session = Depends(get_session)):
 
 @router.get("/hub-intelligence/dashboard")
 def hub_intel_dashboard(svc: HubIntelligenceService = Depends(_hub_intel)):
+    started = time.perf_counter()
     payload = svc.hub_dashboard()
-    log_domain(
-        "HUBS",
-        endpoint="/aviation/hub-intelligence/dashboard",
-        records_returned=payload.get("active_hubs", 0),
-        extra={"airports_monitored": payload.get("airports_monitored")},
-    )
-    return payload
+    return _audit_response("HUBS", "/aviation/hub-intelligence/dashboard", payload, started)
 
 
 @router.get("/hub-intelligence/rankings")
 def hub_intel_rankings(svc: HubIntelligenceService = Depends(_hub_intel)):
-    return svc.hub_rankings()
+    started = time.perf_counter()
+    return _audit_response("HUBS", "/aviation/hub-intelligence/rankings", svc.hub_rankings(), started)
 
 
 @router.get("/hub-intelligence/risk")
 def hub_intel_risk(svc: HubIntelligenceService = Depends(_hub_intel)):
-    return svc.hub_risk_matrix()
+    started = time.perf_counter()
+    return _audit_response("HUBS", "/aviation/hub-intelligence/risk", svc.hub_risk_matrix(), started)
 
 
 @router.get("/hub-intelligence/alliances")
 def hub_intel_alliances(svc: HubIntelligenceService = Depends(_hub_intel)):
-    return svc.alliance_hub_network()
+    started = time.perf_counter()
+    return _audit_response("HUBS", "/aviation/hub-intelligence/alliances", svc.alliance_hub_network(), started)
 
 
 @router.get("/hub-intelligence/incidents")
 def hub_intel_incidents(svc: HubIntelligenceService = Depends(_hub_intel)):
-    return svc.airport_incidents()
+    started = time.perf_counter()
+    return _audit_response("HUBS", "/aviation/hub-intelligence/incidents", svc.airport_incidents(), started)
 
 
 @router.get("/hub-intelligence/concentration")
 def hub_intel_concentration(svc: HubIntelligenceService = Depends(_hub_intel)):
-    return svc.hub_concentration()
+    started = time.perf_counter()
+    return _audit_response("HUBS", "/aviation/hub-intelligence/concentration", svc.hub_concentration(), started)

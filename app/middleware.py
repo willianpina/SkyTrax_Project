@@ -33,6 +33,15 @@ _HOT_POLL_PREFIXES = (
 # Async pipeline dispatch — never subject to HTTP timeout.
 _ASYNC_DISPATCH_PREFIX = "/api/operations/refresh"
 
+# Aviation dashboards — hub-intelligence can exceed default 30s on cold mention-index builds.
+_AVIATION_EXTENDED_PREFIXES = (
+    "/api/aviation/hub-intelligence",
+    "/api/aviation/catalog",
+)
+_AVIATION_EXTENDED_TIMEOUT_S = float(
+    __import__("os").getenv("API_AVIATION_TIMEOUT_SECONDS", "120")
+)
+
 
 def _path_matches(path: str, prefixes: tuple[str, ...]) -> bool:
     normalized = path.rstrip("/")
@@ -157,6 +166,8 @@ class TimeoutMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         if _is_async_dispatch(request) or _is_hot_poll_path(path):
             return None
+        if _path_matches(path, _AVIATION_EXTENDED_PREFIXES):
+            return _AVIATION_EXTENDED_TIMEOUT_S
         if _path_matches(path, _HOT_POLL_PREFIXES):
             return self._hot_poll_timeout
         return self.timeout_seconds

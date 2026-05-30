@@ -20,8 +20,8 @@ export function useCoverage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const summary = await fetchJson("/aviation/coverage", {});
-    const quality = await fetchJson("/aviation/coverage/quality", {});
+    const summary = await fetchJson("/aviation/coverage", {}, { domain: "COVERAGE" });
+    const quality = await fetchJson("/aviation/coverage/quality", {}, { domain: "COVERAGE" });
 
     logDomain("COVERAGE", {
       endpoint: "/aviation/coverage",

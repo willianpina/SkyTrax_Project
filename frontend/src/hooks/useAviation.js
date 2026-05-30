@@ -31,6 +31,7 @@ export function useAviation() {
     const catalog = await fetchJson(
       "/aviation/catalog?airline_limit=100&airport_limit=200",
       { metadata: {}, airlines: [], airports: [], alliances: [], hubs: [] },
+      { domain: "AVIATION" },
     );
 
     const airlines = catalog.airlines || [];
@@ -65,7 +66,7 @@ export function useAviation() {
     setData((prev) => ({ ...prev, regions: regions || [], premium: premium || [] }));
 
     for (const [key, path, fallback] of HUB_INTEL_LOADERS) {
-      const value = await fetchJson(path, fallback);
+      const value = await fetchJson(path, fallback, { domain: "HUBS" });
       const count = Array.isArray(value) ? value.length : Object.keys(value || {}).length;
       logDomain("HUBS", { endpoint: path, recordsReturned: count });
       setData((prev) => ({ ...prev, [key]: value }));

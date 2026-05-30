@@ -14,7 +14,7 @@ export function useAllianceIntel() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const alliances = await fetchJson("/aviation/alliances", []);
+    const alliances = await fetchJson("/aviation/alliances", [], { domain: "ALLIANCES" });
     logDomain("ALLIANCES", {
       endpoint: "/aviation/alliances",
       recordsReturned: alliances.length,
@@ -25,7 +25,7 @@ export function useAllianceIntel() {
 
     const secondary = await Promise.allSettled([
       fetchJson("/fusion/signals?limit=50", []),
-      fetchJson("/aviation/hub-intelligence/alliances", []),
+      fetchJson("/aviation/hub-intelligence/alliances", [], { domain: "HUBS" }),
     ]);
     const hubAlliances = secondary[1].value || [];
     logDomain("ALLIANCES", {

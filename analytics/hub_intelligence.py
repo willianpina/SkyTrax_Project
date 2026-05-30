@@ -120,6 +120,45 @@ class HubIntelligenceService:
     def _load_airports(self) -> List[AirportMetadata]:
         return self.session.query(AirportMetadata).all()
 
+    def _hub_airports(self) -> List[AirportMetadata]:
+        """Operational hubs only — avoids ranking 6000+ non-hub airports."""
+        hubs = (
+            self.session.query(AirportMetadata)
+            .filter(AirportMetadata.hub_level.in_(_CLASSIFIED_HUB_LEVELS))
+            .all()
+        )
+        if hubs:
+            return hubs
+        linked_ids = {
+            row[0]
+            for row in self.session.query(AirlineAirport.airport_metadata_id).distinct().all()
+            if row[0]
+        }
+        if linked_ids:
+            return self.session.query(AirportMetadata).filter(AirportMetadata.id.in_(linked_ids)).all()
+        return (
+            self.session.query(AirportMetadata)
+            .order_by(AirportMetadata.airport_rating.desc().nullslast())
+            .limit(200)
+            .all()
+        )
+
+    def _mention_scan_eligible(self) -> bool:
+        """Full review corpus scan is only feasible for smaller datasets."""
+        review_count = self.session.query(func.count(Review.id)).scalar() or 0
+        hub_count = (
+            self.session.query(func.count(AirportMetadata.id))
+            .filter(AirportMetadata.hub_level.in_(_CLASSIFIED_HUB_LEVELS))
+            .scalar()
+            or 0
+        )
+        return review_count <= 8000 and hub_count <= 80
+
+    def _mention_index_or_empty(self) -> Dict[str, List[Dict[str, Any]]]:
+        if not self._mention_scan_eligible():
+            return {}
+        return self._airport_mention_index()
+
     def _airport_mention_index(self) -> Dict[str, List[Dict[str, Any]]]:
         """Build a mapping of airport IATA -> list of review dicts that mention it.
 
@@ -385,11 +424,11 @@ class HubIntelligenceService:
 
     def hub_rankings(self) -> List[dict]:
         """Ranked list of airports/hubs with composite scores."""
-        airports = self._load_airports()
+        airports = self._hub_airports()
         if not airports:
             return []
 
-        mention_index = self._airport_mention_index()
+        mention_index = self._mention_index_or_empty()
 
         airline_count_map: Dict[str, int] = {}
         rows = (
@@ -482,12 +521,11 @@ class HubIntelligenceService:
 
     def hub_risk_matrix(self) -> List[dict]:
         """Complaint category breakdown for each hub airport."""
-        airports = self._load_airports()
-        hub_airports = [ap for ap in airports if ap.hub_level is not None]
+        hub_airports = self._hub_airports()
         if not hub_airports:
             return []
 
-        mention_index = self._airport_mention_index()
+        mention_index = self._mention_index_or_empty()
         result = []
 
         for ap in hub_airports:
@@ -530,7 +568,7 @@ class HubIntelligenceService:
         if not alliances:
             return []
 
-        mention_index = self._airport_mention_index()
+        mention_index = self._mention_index_or_empty()
         result = []
 
         for alliance in alliances:
@@ -603,11 +641,11 @@ class HubIntelligenceService:
 
     def airport_incidents(self) -> List[dict]:
         """Timeline of airport-related complaint spikes by month."""
-        airports = self._load_airports()
+        airports = self._hub_airports()
         if not airports:
             return []
 
-        mention_index = self._airport_mention_index()
+        mention_index = self._mention_index_or_empty()
         result = []
 
         for ap in airports:
@@ -687,7 +725,7 @@ class HubIntelligenceService:
         if not airline_metas:
             return []
 
-        mention_index = self._airport_mention_index()
+        mention_index = self._mention_index_or_empty()
         result = []
 
         for am in airline_metas:
