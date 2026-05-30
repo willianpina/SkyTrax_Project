@@ -214,7 +214,7 @@ GitHub Actions: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 | Test | **Pytest** | Migrations + full suite, coverage ≥ 45% |
 | Frontend | **npm** | `npm ci` + `npm run build` |
 | Docker | **Compose** | Config validation + image build |
-| Security | **pip-audit** | Dependency advisory scan |
+| Security | **pip-audit** | Dependency advisory scan (non-blocking) |
 
 Local validation:
 
@@ -225,6 +225,27 @@ cd frontend && npm run build
 ```
 
 Release reports: [docs/release/](docs/release/)
+
+---
+
+## Security Audit
+
+The project runs **pip-audit** on every CI execution against `requirements.txt`.
+
+The security job currently operates in **advisory-only** mode during the platform stabilization phase: findings are printed to the workflow log and surfaced as GitHub warnings, but they **do not fail the pipeline**.
+
+Identified vulnerabilities are tracked in:
+
+- [docs/security/DEPENDENCY_AUDIT.md](docs/security/DEPENDENCY_AUDIT.md)
+- [docs/security/UPGRADE_PLAN.md](docs/security/UPGRADE_PLAN.md)
+- [docs/security/SECURITY_RELEASE_REPORT.md](docs/security/SECURITY_RELEASE_REPORT.md)
+
+Local run:
+
+```bash
+pip install pip-audit
+pip-audit -r requirements.txt
+```
 
 ---
 

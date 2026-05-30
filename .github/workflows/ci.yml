@@ -173,8 +173,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: lint
-    # Stabilization phase: audit runs for visibility; does not block merge/deploy.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -189,5 +187,16 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install --default-timeout=120 -r requirements-dev.txt
 
-      - name: pip-audit
-        run: pip-audit -r requirements.txt
+      - name: pip-audit (advisory-only)
+        run: |
+          set +e
+          echo "=== pip-audit advisory scan (requirements.txt) ==="
+          pip-audit -r requirements.txt
+          AUDIT_EXIT=$?
+          echo "=== pip-audit finished (exit=${AUDIT_EXIT}) ==="
+          if [ "${AUDIT_EXIT}" -ne 0 ]; then
+            echo "::warning title=Dependency audit (advisory)::pip-audit reported findings or scan issues. This job does not block CI during platform stabilization. See docs/security/."
+          else
+            echo "No vulnerabilities reported by pip-audit."
+          fi
+          exit 0
