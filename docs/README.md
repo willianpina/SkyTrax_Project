@@ -29,6 +29,9 @@
 | [release/QUALITY_AUDIT.md](release/QUALITY_AUDIT.md) | Auditoria de qualidade pré-release |
 | [release/README_AUDIT.md](release/README_AUDIT.md) | Auditoria do README |
 | [release/FINAL_RELEASE_REPORT.md](release/FINAL_RELEASE_REPORT.md) | Relatório final de publicação GitHub |
+| [security/DEPENDENCY_AUDIT.md](security/DEPENDENCY_AUDIT.md) | pip-audit — CVEs e severidade |
+| [security/UPGRADE_PLAN.md](security/UPGRADE_PLAN.md) | Plano de upgrade de dependências |
+| [security/SECURITY_RELEASE_REPORT.md](security/SECURITY_RELEASE_REPORT.md) | Relatório de estabilização security CI |
 | [audits/](audits/) | Auditorias de domínio (Aviation, API, data flow) |
 
 ## Arquivos legados

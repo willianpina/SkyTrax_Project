@@ -173,6 +173,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: lint
+    # Stabilization phase: audit runs for visibility; does not block merge/deploy.
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
