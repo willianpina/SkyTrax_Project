@@ -26,6 +26,9 @@
 | [screenshots/](screenshots/) | Capturas para o README |
 | [ci_cd/](ci_cd/) | Auditoria e remediação do GitHub Actions |
 | [release/PROJECT_HEALTH_REPORT.md](release/PROJECT_HEALTH_REPORT.md) | Saúde do projeto (CI, testes, Docker, débito) |
+| [release/QUALITY_AUDIT.md](release/QUALITY_AUDIT.md) | Auditoria de qualidade pré-release |
+| [release/README_AUDIT.md](release/README_AUDIT.md) | Auditoria do README |
+| [release/FINAL_RELEASE_REPORT.md](release/FINAL_RELEASE_REPORT.md) | Relatório final de publicação GitHub |
 | [audits/](audits/) | Auditorias de domínio (Aviation, API, data flow) |
 
 ## Arquivos legados

@@ -388,7 +388,9 @@ def hub_intel_risk(svc: HubIntelligenceService = Depends(_hub_intel)):
 @router.get("/hub-intelligence/alliances")
 def hub_intel_alliances(svc: HubIntelligenceService = Depends(_hub_intel)):
     started = time.perf_counter()
-    return _audit_response("HUBS", "/aviation/hub-intelligence/alliances", svc.alliance_hub_network(), started)
+    return _audit_response(
+        "HUBS", "/aviation/hub-intelligence/alliances", svc.alliance_hub_network(), started
+    )
 
 
 @router.get("/hub-intelligence/incidents")
@@ -400,4 +402,6 @@ def hub_intel_incidents(svc: HubIntelligenceService = Depends(_hub_intel)):
 @router.get("/hub-intelligence/concentration")
 def hub_intel_concentration(svc: HubIntelligenceService = Depends(_hub_intel)):
     started = time.perf_counter()
-    return _audit_response("HUBS", "/aviation/hub-intelligence/concentration", svc.hub_concentration(), started)
+    return _audit_response(
+        "HUBS", "/aviation/hub-intelligence/concentration", svc.hub_concentration(), started
+    )

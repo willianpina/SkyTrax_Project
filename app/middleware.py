@@ -38,9 +38,7 @@ _AVIATION_EXTENDED_PREFIXES = (
     "/api/aviation/hub-intelligence",
     "/api/aviation/catalog",
 )
-_AVIATION_EXTENDED_TIMEOUT_S = float(
-    __import__("os").getenv("API_AVIATION_TIMEOUT_SECONDS", "120")
-)
+_AVIATION_EXTENDED_TIMEOUT_S = float(__import__("os").getenv("API_AVIATION_TIMEOUT_SECONDS", "120"))
 
 
 def _path_matches(path: str, prefixes: tuple[str, ...]) -> bool:
